@@ -1,17 +1,35 @@
 # MatrixOrigin Blog
 
-This repository is the **source of truth** for all blog posts published on [thememoria.ai/blog](https://thememoria.ai/blog.html).
+This repository is the **shared content source** for blog posts across MatrixOrigin projects.
 
-The website backend watches this repository via GitHub Webhook and a periodic poller. When you push a change, the article is automatically synced to the site within seconds (Webhook) or within 5 minutes (poller fallback).
+Each project has its own top-level directory. The project's backend only watches its own directory and ignores the rest.
+
+```
+memoria/          ← Memoria articles → synced to thememoria.ai/blog.html
+  introducing-memoria/
+    index.md
+    images/
+project-b/        ← Future projects get their own directory
+  their-article/
+    index.md
+```
 
 ---
 
-## How to publish a new article
+## Memoria Blog
 
-### 1. Create a directory for your article
+Articles in `memoria/` are automatically published to [thememoria.ai/blog.html](https://thememoria.ai/blog.html).
+
+The Memoria backend watches this directory via GitHub Webhook and a periodic poller. Push a change → article updates on the site within seconds (Webhook) or within 5 minutes (poller fallback).
+
+---
+
+## How to publish a new Memoria article
+
+### 1. Create a directory under `memoria/`
 
 ```
-blogs/
+memoria/
   your-article-slug/       ← directory name becomes the URL slug
     index.md               ← article content (required)
     images/                ← optional, for images referenced in the article
@@ -93,7 +111,7 @@ Edit `index.md` and push. The backend detects the change (via GitHub file SHA co
 ## Directory structure example
 
 ```
-blogs/
+memoria/
   introducing-memoria/
     index.md
     images/
