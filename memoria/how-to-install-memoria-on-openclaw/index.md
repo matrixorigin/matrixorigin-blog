@@ -1,64 +1,67 @@
 ---
-title: "Install Memoria on OpenClaw in 3 Minutes"
-title_zh: "1 分钟在 OpenClaw 上安装 Memoria"
+title: "Get Started in 1 Minute: Connect Memoria to OpenClaw"
+title_zh: "1 Minute to Connect Memoria to OpenClaw"
 date: "2026-04-01"
 tag: "Tutorial"
-tag_zh: "教程"
+tag_zh: "Tutorial"
 status: "published"
 description: "A step-by-step guide to replacing OpenClaw's default file-based memory with Memoria — semantic retrieval, version control, and cross-agent memory sharing."
-description_zh: "一篇安装教程：将 OpenClaw 默认的文件记忆替换为 Memoria，获得语义检索、版本控制和跨 Agent 记忆共享能力。"
+description_zh: "A tutorial on replacing OpenClaw's default file-based memory with Memoria for semantic retrieval, version control, and cross-agent memory sharing."
 ---
 
-# Install Memoria on OpenClaw in 1 Minutes
+# Get Started in 1 Minute: Connect Memoria to OpenClaw
 
-Have you noticed that after using OpenClaw for a while, it starts to feel a little forgetful — or more precisely, like it's remembering things wrong?
+> One command. Smarter memory. Cut token usage by 70%+.
 
-OpenClaw's memory system is built on plain Markdown files: long-term memory lives in `MEMORY.md`, which gets loaded into context at the start of every private session. It's transparent and easy to understand, and early on it works without friction. But as usage grows, cracks start to show:
+---
 
-- **Files bloat and content gets silently truncated**: `MEMORY.md` and other memory files have character limits. Once exceeded, content is cut without any warning — the agent doesn't throw an error, it just forgets.
-- **Retrieval quality degrades**: OpenClaw's default hybrid search (vector + keyword) works well when memory is small, but struggles with relational reasoning as entries accumulate. Write "Alice manages the auth team" on Monday, then ask "who handles permission issues?" on Friday — the system surfaces chunks about Alice and chunks about auth, but can't connect them.
-- **Poor cross-session continuity**: Context compaction summarizes older context to save tokens. Memory file contents injected into the context window can get rewritten or dropped in the process.
+## Why You Need This
 
-This isn't a bug in OpenClaw. It's the ceiling that file-based memory inevitably hits at scale.
+OpenClaw's built-in memory works — until it starts costing you.
 
-## What Memoria Fixes
+**It loads everything, every time.** OpenClaw's default memory system loads `MEMORY.md` and related files into the context window at the start of every session. The more you use it, the more you accumulate: past preferences, old decisions, stale context. All of it gets injected whether it's relevant or not. Every session pays the full token bill.
 
-[Memoria](https://github.com/matrixorigin/memoria) is a persistent memory layer designed for AI agents. It sits on top of OpenClaw's existing file system and provides stronger retrieval and management capabilities.
+**Files hit a ceiling — and fail silently.** Memory files have character limits. Once exceeded, content is truncated without warning. The agent doesn't tell you. It just forgets.
 
-**More accurate semantic retrieval.** Memoria doesn't rely on simple vector similarity matching — it understands relationships between memory entries. Cross-entry reasoning like connecting "Alice manages the auth team" to "who handles permission issues?" returns structured context, not a pile of loosely related chunks.
+**Retrieval breaks down over time.** Write "Alice manages the auth team" on Monday, then ask "who handles permission issues?" on Friday — OpenClaw's default search surfaces both chunks but can't connect them. Relational reasoning isn't something keyword + vector search handles well at scale.
 
-**Memory that survives compaction.** Memoria stores memories outside the context window entirely. Session restarts and compaction events leave memory intact. Relevant entries are injected fresh each turn, unconstrained by token limits.
+**Context compaction quietly destroys memory.** When long sessions trigger compaction, memory file contents injected into the context window can be rewritten or dropped entirely. You lose what you thought was saved.
 
-**Version control: traceable and reversible.** Memoria supports snapshots, branches, and rollbacks. If a memory update causes unexpected agent behavior, you can roll back to the last known-good state without manually digging through files.
+Memoria fixes all of this. It replaces full-file loading with on-demand semantic retrieval — only the memories relevant to your current task get injected. The result: **70%+ reduction in memory-related token usage**, with better recall accuracy and no silent data loss.
 
-**Cross-agent sharing.** The same memory store can be accessed by multiple agent instances. No more starting from scratch every time you open a new conversation.
+**The whole setup takes under 1 minute.** Sign in, copy your key, run one command — done.
 
-The free tier includes **20,000 memory entries** and **2,000 retrieval API calls per month** — plenty for everyday personal use.
+---
 
-## Installation
+## Step 1 — Get Your API Key
 
-First, grab your Memoria API key. Go to the [Memoria Dashboard](https://thememoria.ai/dashboard), sign up with GitHub, Google, or email, and copy your key (format: `sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx`).
+![Get your API key from the Memoria dashboard](./images/api_key.png)
 
-![Get your API key from the Memoria Dashboard](./images/api_key.png)
+Go to [thememoria.ai](https://thememoria.ai), sign in with one click (GitHub / Google), and copy your API key from the dashboard.
+
+No database to set up. No backend to run.
 
 Then confirm OpenClaw is running:
-
 ```bash
 openclaw status
 ```
 
-Pick either method below — both get you to the same place.
+---
 
-### Option 1: Command Line
+## Step 2 — Connect Memoria
 
-**Step 1: Install the plugin**
+Two ways to install: run a command in terminal, or paste a prompt into your OpenClaw chat.
 
+### Option A: Terminal
+
+![](./images/install_cli_2.png)
+
+Run the following in your terminal:
 ```bash
 openclaw plugins install @matrixorigin/thememoria
 ```
 
-**Step 2: Configure and enable**
-
+Then configure the cloud backend:
 ```bash
 openclaw memoria setup \
   --mode cloud \
@@ -66,18 +69,20 @@ openclaw memoria setup \
   --api-key sk-YOUR_API_KEY
 ```
 
-**Step 3: Verify**
-
+Verify the connection:
 ```bash
 openclaw memoria health
 ```
 
-You should see `"status": "ok"`. That's it.
+You should see `"status": "ok"`.
 
-### Option 2: Chat Install
+![](./images/install_cli_1.png)
 
-Prefer to stay in the chat interface? Send the following prompt to OpenClaw directly. The agent will execute each step in order and report back at every stage:
+### Option B: Paste into OpenClaw chat
 
+![](./images/install_cli_3.png)
+
+Copy the prompt below, replace `sk-YOUR_API_KEY` with your actual key, and send it directly to OpenClaw. The agent will run every step and report back.
 ```
 Install the Memoria memory plugin for my OpenClaw in cloud mode.
 Credentials (pre-filled from my Memoria account):
@@ -102,14 +107,25 @@ Rules:
 - Do NOT attempt to use memory_store or other memory tools in this conversation
 ```
 
-Replace `sk-YOUR_API_KEY` with your actual key before sending. If any step fails, the agent will classify the error and suggest the exact fix — no manual debugging needed.
+If any step fails, the agent will classify the error and suggest the exact fix — no manual debugging needed.
 
-## Confirm Memoria Is Working
+---
+
+## Step 3 — Verify It Works
 
 In any OpenClaw conversation, type:
-
 ```
 List my memoria memories
 ```
 
-If Memoria is connected correctly, the agent will call the memory tool and return your current memory count (empty on first use is normal). Starting from your next conversation, Memoria is in charge of your memory.
+If Memoria is connected, your agent will call the memory tool and return your current memory count (empty on first use is normal).
+
+![](./images/list_memory.png)
+
+> 💡 **Seeing an empty list?** Head to the [Memoria Playground](https://thememoria.ai/playground) and store a few memories — your name, preferred language, or current project. Then come back and ask your agent again. You'll see it recall exactly what you stored, confirming the connection works end-to-end.
+
+---
+
+## That's It
+
+One command. Smarter retrieval. No more token bloat, no more lost context, no more repeating yourself across sessions.
