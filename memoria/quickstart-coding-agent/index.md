@@ -1,10 +1,10 @@
 ---
 title: "Get Started in 1 Minute: Connect Your Coding Agent to Memoria"
 title_zh: "1分钟上手：将你的 Coding Agent 连接到 Memoria"
-date: "2026-04-03"
+date: "2026-03-30"
 tag: "Tutorial"
 tag_zh: "教程"
-status: "draft"
+status: "published"
 description: "One command. Persistent memory. Works with Cursor, Claude Code, Codex, and Kiro. The whole setup takes under 1 minute."
 description_zh: "一条命令，持久记忆。支持 Cursor、Claude Code、Codex 和 Kiro。整个设置不到1分钟完成。"
 ---
