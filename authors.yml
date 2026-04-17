@@ -1,0 +1,19 @@
+# 作者信息集中管理
+# 每篇文章 frontmatter 的 authors: ["id"] 引用这里的 id
+# 新增作者时按 schema/frontmatter.ts 的 AuthorSchema 格式。
+
+- id: matrixorigin
+  name:
+    en: MatrixOrigin
+    zh: MatrixOrigin
+  title:
+    en: MatrixOrigin Team
+    zh: MatrixOrigin 团队
+
+- id: matrixone
+  name:
+    en: MatrixOne
+    zh: MatrixOne
+  title:
+    en: MatrixOne Team
+    zh: MatrixOne 团队

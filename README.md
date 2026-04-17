@@ -10,10 +10,19 @@ memoria/          ← Memoria articles → synced to thememoria.ai/blog.html
     index.md
     images/
     videos/
-project-b/        ← Future projects get their own directory
-  their-article/
+matrixorigin/     ← Main company blog → matrixorigin.cn/blog & matrixorigin.io/blog
+  matrixone-v2-release/
     index.md
+    images/
 ```
+
+## Tooling
+
+- **Frontmatter schema** — all articles validated against [`schema/frontmatter.ts`](./schema/frontmatter.ts) (Zod). Backward-compatible with existing Memoria articles.
+- **Local validation** — `pnpm validate` (runs in CI on every PR).
+- **Migration** — `pnpm migrate:dry ../mo-website-redesign` to preview pulling historical articles into `matrixorigin/`.
+
+See [`docs/DESIGN.md`](./docs/DESIGN.md) for the full blog system design (SSG, SEO, syndication, feedback).
 
 ---
 
