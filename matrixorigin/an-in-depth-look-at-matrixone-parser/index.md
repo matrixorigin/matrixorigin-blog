@@ -1,0 +1,288 @@
+---
+title: An In-Depth Look at MatrixOne Parser
+author: MatrixOrigin
+mail: contact@matrixorigin.io
+description: >-
+  The database kernel is extensive, but the process of executing SQL is pretty
+  much the same.
+tags:
+  - technology
+keywords:
+  - MatrixOne
+  - Database
+  - Database Kernel
+  - SQL
+  - HTAP Database
+publishTime: '2023-10-14 17:00:00+00:00'
+image:
+  '1': >-
+    /content/en/an-in-depth-look-at-matrixone-parser/an-in-depth-look-at-matrixone-parser.png
+  '235': >-
+    /content/en/an-in-depth-look-at-matrixone-parser/an-in-depth-look-at-matrixone-parser.png
+date: '2023-10-14 17:00:00+00:00'
+lang: en
+status: published
+---
+
+The database kernel is **extensive**, but the process of executing SQL is **pretty much the same**.
+
+The database kernel can be broken down into:
+
+- Receiving network packets from the client.
+- Processing the packet and parsing the SQL into an abstract syntax tree.
+- Converting and optimizing the syntax tree into a query plan.
+- Using the query plan to generate the execution plan, and return the results.
+
+Each component has its own value for discussion and research, with various manufacturers implementing different approaches and details in their database implementations.
+
+## Lexical Parsing
+
+Parsing SQL into a syntax tree starts with **lexical parsing**. Parsing SQL into a syntax tree starts with lexical parsing. The process of lexical parsing is simply to break down the SQL string into a number of tokens, e.g., select **a** from **t** can be broken down into select, a, from, and t. These tokens can be used as inputs for syntax parsing.
+
+### >>> DFA
+
+MatrixOne's Lexer (lexical analyzer) is written manually, as opposed to generating a Lexer through a tool such as Lex, is more flexible. This facilitates MatrixOne parser compatibility with MySQL syntax. For manually writing a Lexer, we can start with Finite Automata.
+
+Finite Automata was first proposed by two neurophysicists, MeCuloch and Pitts, in 1948. It is a mathematical model for a class of processing systems. A simple definition is: given an input string x, x is said to be received by a modified FA if there exists a sequence of transitions corresponding to x from an initial state to some termination state.
+
+First, to recognize a token, it can be defined by regular matching, e.g. a regular definition of an integer:
+
+```text
+digit : 0|1|2|...|9
+integer : digit digit*
+```
+
+Implementing regular matching can be done by FA, for example, if we want to recognize the regular syntax `r = (a | b) * abb`, the state transition diagram is as follows:
+
+![](/content/en/an-in-depth-look-at-matrixone-parser/picture1.jpg)
+
+In this way, when the state reaches the termination state 3, the recognition is successful. A closer look reveals a problem, at state 0, the reception of a, which can go from 0 to 0 or from 0 to 1. This uncertainty cannot be programmed. We call it a Non-deterministic Finite Automata (NFA).
+
+**Given a conclusion, for any NFA, there exists a Deterministic Finite Automata (DFA) that defines the same language. NFAs can be converted into DFAs by subset construction method.**
+
+For the above example, the state diagram after converting NFA to DFA is as follows:
+
+![](/content/en/an-in-depth-look-at-matrixone-parser/picture2.jpg)
+
+From the above figure it can be seen that no matter which state a or b is received, the next state arrived is determined.
+
+In this way, by making state diagrams and integrating for different types of tokens, a simple identification token DFA is as follows:
+
+![](/content/en/an-in-depth-look-at-matrixone-parser/picture3.jpg)
+
+For different MySQL tokens, such as numbers, strings, identifiers, mathematical symbols, comments, etc., you can refer to their definitions, write the corresponding DFAs, and ultimately form a Lexer. If you're interested, you can take a look at MatrixOne's Lexer, which is implemented in [scanner.go](https://github.com/matrixorigin/matrixone/blob/main/pkg/vm/engine/tae/db/scanner.go), and wrapped up in [mysql_lexer.go](https://github.com/matrixorigin/matrixone/blob/main/pkg/sql/parsers/dialect/mysql/mysql_lexer.go).
+
+## Syntactic Parsing
+
+Lexical parsing of tokens will be used as input for syntactic parsing.There are two common ways to implement syntactic parsing of SQL:
+
+One is to use LL syntax, top-down parsing. Manually written parsers usually take this approach, such as clickhouse's parser, sqlparser-rs.
+
+The other is to use LR syntax, bottom-up parsing. Some tools like bison, goyacc can generate syntax parsers from pre-defined BNF files.
+
+These two ways have their own advantages and disadvantages, theoretically, there is little difference in performance. Manually written syntax parser is easy to debug , the code is intuitively obvious , but also the development time will be longer. MatrixOne's syntax parser is generated using goyacc and is currently compatible with MySQL syntax. The parser can be generated by defining a BNF file (`.y` file) from MySQL documentation. Of course, the generated parser code is difficult to read and debug.
+
+### >>> Working Process
+
+The syntax parser generated by goyacc accepts LALR(1) (lookahead-LR) syntax. Unlike LL syntaxs, parsers accept LALR(1) syntaxs have their syntax parsing constructed from the bottom to the top of the parser tree.
+
+**For LALR(1), each word means:**
+
+- **L:** Left-to-right scanning of inputs
+- **R:** Inverse construction of a rightmost derivation sequence
+- **1:** Required to view 1 token forward
+
+Bottom-up syntactic parsing uses a leftmost statute approach, and the generic framework is Shift-Reduce Parsing (SRP).
+
+**Shift-Reduce Parsing can take following 4 actions:**
+
+- Shift: Shifts the next token to the top of the stack
+- Reduce: If a symbol string in the stack is the left end of some generating formula, it will normalized to the right end, and the right end of the normalized symbol string must be at the top of the stack. The syntax parser determines the left end of this string on the stack and decides which non-terminal to replace the string
+- Receive: Successful completion of the syntax parsing process
+- Bug: A syntax error was found
+
+**Shift-Reduce Parsing Process:**
+
+1. The syntax parser moves zero or more input tokens into the top of the stack until a syntax symbol string β at the top of the stack can be normalized.
+2. Then,β reduces to the left part of some generating formula.
+3. The syntax parser repeats this loop until a syntax error is detected, or the stack contains the start symbol and the input buffer is empty (successful syntax parsing).
+
+For example, when parsing the E syntax of the following expression:
+
+```text
+id + (id + id)
+```
+
+We can definite following generators, where the expression E is non-terminal and id, +, -, (, ) are terminators:
+
+```text
+E : E + E
+E : E * E
+E : (E)
+E : id
+```
+
+By Shift-Reduce Parsing, we can conclude the expression is syntactically correct.
+
+![](/content/en/an-in-depth-look-at-matrixone-parser/picture4.jpg)
+
+### >>> Conflict
+
+If input strings can be constructed in two or more ways, it can be said there is duality in this set of syntax. Still looking at one of the examples mentioned above, for the generating formula:
+
+```text
+E : E + E
+```
+
+This is a natural way to express arithmetic expressions. However, this recursive definition does not fully specify all cases of complex inputs, e.g., where the input is:
+
+```text
+a + b + c
+```
+
+If it is a left union, it is constructed as:
+
+```text
+(a + b) + c
+```
+
+If it is a right union, it is constructed as:
+
+```text
+a + (b + c)
+```
+
+The syntax parser is able to detect ambiguity when it encounters this situation, and when the syntax parser reads b, the input visible on the stack is:
+
+```text
+a + b
+```
+
+The right end of the syntax rule above is matched, and the reductio ad absurdum operation is performed. After applying the rule, the input in the stack is regularized to E, and the grammar analyzer can read the subsequent part.
+
+```text
++ c
+```
+
+Then reductio ad absurdum again, producing a left union. However, the syntax parser can choose lookahead 1 until the read is complete:
+
+```text
+a + b + c
+```
+
+And we reductio ad absurdum for b+c:
+
+```text
+a + E
+```
+
+Finally, reductions are made again, producing a right union. In fact, the syntax parser can choose either shift or reduce when it encounters b. When it cannot choose, a conflict is generated. In contrast, for right union, the syntax parser chooses between two reductive actions, producing a revert/revert conflict.
+
+In fact, we can supplement the rules in the BNF file. It is common in arithmetic expressions to supply rules with priority, left or right combinations as a way of removing some of the ambiguity that can be defined, for example:
+
+```text
+%left '+' '-'
+%left '*' '/'
+```
+
+Define both addition, subtraction, multiplication and division as left union. Also, the later (lower) the token defined in the BNF file, the higher the priority it is. Obviously, multiplication and division have higher priority than addition and subtraction.
+
+## MatrixOne Parser
+
+The lexical parsing of MatrixOne Parser (hereinafter referred to as "MO Parser") is written manually, and its main function is to split words and provide tokens for the syntax parser. Database syntax parsing is actually the process of generating the syntax tree, and it is also the focus of the entire SQL parsing. [`mysql_sql.y`](https://github.com/matrixorigin/matrixone/blob/main/pkg/sql/parsers/dialect/mysql/mysql_sql.y) defined MO Parser rules. The structure of the rules file is as follows:
+
+```go
+%{
+// Here you can introduce the package name, and during the parsing process you can call the corresponding function
+}%
+
+%struct {
+    id int // token id
+    str string // token string
+    item interface{} // Converts the token to its actual type, e.g. 1 is converted to an int64 type
+}
+
+%union {
+// Define here the syntax tree structure that MatrixOne has designed, for example
+    selectStatement tree.SelectStatement
+}
+
+// This defines a series of terminators, i.e., tokens. goyacc generates the corresponding token ids, such as
+%token<str> SELECT
+
+// Next, define a series of non-terminators. These can be defined using the fields in %union, and goyacc will map them accordingly, for example
+%type <selectStatement> simple_select_clause
+
+%%
+// When writing BNFs here, the syntax rules will refer to MySQL for compatibility, but of course there will be some of MatrixOne's own syntax as well
+// For example, part of the simple_select_clause definition.
+
+simple_select_clause:
+    SELECT distinct_opt select_expression_list from_opt where_expression_opt group_by_opt having_opt
+    {
+        $$ = &tree.SelectClause{
+            Distinct: $2,
+            Exprs: $3,
+            From: $4,
+            Where: $5,
+            GroupBy: $6,
+            Having: $7,
+        }
+    }
+%%
+```
+
+A partial definition of a simple select can be seen in [`select.go`](https://github.com/matrixorigin/matrixone/blob/main/pkg/sql/parsers/tree/select.go)'s `SelectClause`:
+
+```go
+type SelectClause struct {
+    SelectStatement
+    Distinct bool
+    Exprs    SelectExprs
+    From     *From
+    Where    *Where
+    GroupBy  GroupBy
+    Having   *Where
+    Option   string
+}
+```
+
+When the SQL is successfully parsed, the fields in the MO-defined structure will assigned values accordingly. For example, parsing SQL:
+
+```sql
+select a, b from t1 where a > 3 and b = 4;
+```
+
+The following syntax tree is generated:
+
+![](/content/en/an-in-depth-look-at-matrixone-parser/picture5.jpg)
+
+Then, the syntax tree can be transformed and optimized into a logical plan.
+
+After familiarizing with MO's syntax tree, you are welcome to make MO Parser compatible with more MySQL syntax. After modifying [mysql_sql.y](https://github.com/matrixorigin/matrixone/blob/main/pkg/sql/parsers/dialect/mysql/mysql_sql.y), go to the parsers directory and execute make to generate a new syntax parser, which is [mysql_sql.go](https://github.com/matrixorigin/matrixone/blob/main/pkg/sql/parsers/dialect/mysql/mysql_sql.go).
+
+Finally, a simple example of SQL parsing using MO Parser:
+
+```go
+package main
+
+import (
+    "fmt"
+
+    "github.com/matrixorigin/matrixone/pkg/sql/parsers"
+    "github.com/matrixorigin/matrixone/pkg/sql/parsers/dialect"
+    "github.com/matrixorigin/matrixone/pkg/sql/parsers/tree"
+)
+
+func main() {
+    sql := `select u.a, (select t.a from sa.t, u) from u, (select t.a, u.a from sa.t, u where t.a = u.a) as t where (u.a, u.b, u.c) in (select t.a, u.a, t.b * u.b as tubb from t)`
+    // You can also call parsers.Parse(dialect.MySQL, sqls), to parse more than one sql.
+    ast, err := parsers.ParseOne(dialect.MYSQL, sql)
+    if err != nil {
+        fmt.Println(err)
+    }
+    fmt.Println(tree.String(ast, dialect.MYSQL))
+}
+```
+
+It can be noticed that Parser needs to pass in the dialect. MySQL parameter, this is because MO Parser was designed at the beginning with the idea of supporting multi-dialects and currently implements a multi-dialect framework.

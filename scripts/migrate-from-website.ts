@@ -57,7 +57,12 @@ async function listMarkdown(dir: string): Promise<string[]> {
 }
 
 function toSlug(filename: string): string {
-  return basename(filename, ".md").toLowerCase();
+  return basename(filename, ".md")
+    .toLowerCase()
+    .replace(/\s+/g, "-")        // 空格 → 连字符
+    .replace(/[^a-z0-9-]/g, "-") // 其他非法字符也转 -
+    .replace(/-+/g, "-")         // 合并连续 -
+    .replace(/^-|-$/g, "");      // 去首尾 -
 }
 
 function normalizeFrontmatter(

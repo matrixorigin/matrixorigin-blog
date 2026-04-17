@@ -54,8 +54,8 @@ export const FrontmatterSchema = z
     description: z
       .string()
       .min(10, "description 至少 10 字（SEO meta + 列表摘要）")
-      .max(300, "description 建议 <160 字，超 300 直接报错"),
-    description_zh: z.string().min(10).max(300).optional(),
+      .max(500, "description 超 500 字，请缩写（SEO meta 截断约 158）"),
+    description_zh: z.string().min(10).max(500).optional(),
 
     status: StatusSchema.default("published"),
 
@@ -109,6 +109,8 @@ export const FrontmatterSchema = z
 
     // ----- 兼容旧字段（不做处理，仅为不 fail） -----
     publishTime: z.string().optional(),
+    /** 老文章的中文副标题/分类标注，渲染时可选用 */
+    annotation: z.string().optional(),
   })
   .strict();
 
