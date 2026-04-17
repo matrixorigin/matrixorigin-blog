@@ -1,0 +1,19 @@
+{
+  "name": "matrixorigin-blog",
+  "version": "0.1.0",
+  "private": true,
+  "description": "MatrixOrigin blog content source (memoria, matrixorigin main site, future projects)",
+  "type": "module",
+  "scripts": {
+    "validate": "tsx scripts/validate.ts",
+    "migrate": "tsx scripts/migrate-from-website.ts",
+    "migrate:dry": "tsx scripts/migrate-from-website.ts --dry-run"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "gray-matter": "^4.0.3",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0",
+    "zod": "^3.23.8"
+  }
+}
