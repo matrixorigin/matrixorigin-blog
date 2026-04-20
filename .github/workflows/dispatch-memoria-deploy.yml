@@ -1,0 +1,101 @@
+name: dispatch-memoria-deploy
+
+# Fires when content under memoria/ is pushed to main.
+#
+# Trigger logic:
+#   - Diffs the entire push range (github.event.before → github.sha),
+#     so multi-commit pushes are fully covered (no HEAD~1 blind spot).
+#   - Aggregates changed slugs from ANY file under memoria/<slug>/
+#     (index.md, images/, videos/, etc.) and checks the slug's index.md
+#     for `status: published`. This means updating a cover image also
+#     triggers a redeploy, not just edits to index.md.
+#   - workflow_dispatch always dispatches (no status check needed).
+#
+# Required secret:
+#   MEMORIA_WEBSITE_PAT — GitHub PAT with `repo` scope on
+#                         matrixorigin/memoria-website (for repository_dispatch)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "memoria/**"
+  workflow_dispatch:
+
+jobs:
+  check-and-dispatch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0    # full history needed for git diff BEFORE..AFTER
+
+      - name: Detect changes requiring deploy
+        id: check
+        if: github.event_name != 'workflow_dispatch'
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          BEFORE="${{ github.event.before }}"
+          AFTER="${{ github.sha }}"
+
+          # Diff the full push range — covers every commit in the push,
+          # not just the last one.
+          CHANGED=$(git diff --name-only "$BEFORE" "$AFTER" -- memoria/ 2>/dev/null || true)
+          echo "Changed files under memoria/:"
+          echo "${CHANGED:-  (none)}"
+
+          SHOULD_DEPLOY=false
+
+          # Extract unique slugs from any changed path under memoria/<slug>/
+          # (matches index.md, images/*, videos/*, etc.)
+          while IFS= read -r slug; do
+            [[ -z "$slug" ]] && continue
+            INDEX="memoria/${slug}/index.md"
+
+            if [[ -f "$INDEX" ]]; then
+              # Slug still exists — check current published status
+              if grep -qiE '^status:\s*"?published"?\s*$' "$INDEX"; then
+                echo "Published article touched: ${slug}"
+                SHOULD_DEPLOY=true
+                break
+              fi
+            else
+              # Slug removed/renamed — check if it was published before the push
+              if git show "${BEFORE}:${INDEX}" 2>/dev/null | grep -qiE '^status:\s*"?published"?\s*$'; then
+                echo "Previously published article removed/renamed: ${slug}"
+                SHOULD_DEPLOY=true
+                break
+              fi
+            fi
+          done < <(
+            printf '%s\n' "$CHANGED" \
+              | awk -F/ '/^memoria\/[^/]+\// { print $2 }' \
+              | sort -u
+          )
+
+          echo "should_deploy=${SHOULD_DEPLOY}" >> "$GITHUB_OUTPUT"
+          echo "Result: should_deploy=${SHOULD_DEPLOY}"
+
+      - name: Dispatch to memoria-website
+        if: >
+          github.event_name == 'workflow_dispatch' ||
+          steps.check.outputs.should_deploy == 'true'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.MEMORIA_WEBSITE_PAT }}
+          script: |
+            await github.rest.repos.createDispatchEvent({
+              owner: 'matrixorigin',
+              repo:  'memoria-website',
+              event_type: 'blog-content-updated',
+              client_payload: {
+                sha:     context.sha,
+                before:  context.payload?.before ?? '',
+                ref:     context.ref,
+                message: context.payload?.head_commit?.message ?? 'manual dispatch',
+              },
+            })
+            core.info(`Dispatched blog-content-updated → matrixorigin/memoria-website @ ${context.sha}`)
