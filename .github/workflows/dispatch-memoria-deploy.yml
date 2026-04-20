@@ -1,8 +1,15 @@
 name: dispatch-memoria-deploy
 
 # Fires when content under memoria/ is pushed to main.
-# Only dispatches to memoria-website if at least one changed index.md
-# currently has `status: "published"` (or unpublishes a previously published post).
+#
+# Trigger logic:
+#   - Diffs the entire push range (github.event.before → github.sha),
+#     so multi-commit pushes are fully covered (no HEAD~1 blind spot).
+#   - Aggregates changed slugs from ANY file under memoria/<slug>/
+#     (index.md, images/, videos/, etc.) and checks the slug's index.md
+#     for `status: published`. This means updating a cover image also
+#     triggers a redeploy, not just edits to index.md.
+#   - workflow_dispatch always dispatches (no status check needed).
 #
 # Required secret:
 #   MEMORIA_WEBSITE_PAT — GitHub PAT with `repo` scope on
@@ -13,7 +20,7 @@ on:
     branches: [main]
     paths:
       - "memoria/**"
-  workflow_dispatch:          # manual trigger, always dispatches
+  workflow_dispatch:
 
 jobs:
   check-and-dispatch:
@@ -22,48 +29,57 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 2      # need HEAD~1 to diff changed files
+          fetch-depth: 0    # full history needed for git diff BEFORE..AFTER
 
-      - name: Detect published-post changes
+      - name: Detect changes requiring deploy
         id: check
-        # Skip status check on manual runs — always deploy.
         if: github.event_name != 'workflow_dispatch'
         shell: bash
         run: |
           set -euo pipefail
 
-          CHANGED=$(git diff --name-only HEAD~1 HEAD -- memoria/ 2>/dev/null || true)
+          BEFORE="${{ github.event.before }}"
+          AFTER="${{ github.sha }}"
+
+          # Diff the full push range — covers every commit in the push,
+          # not just the last one.
+          CHANGED=$(git diff --name-only "$BEFORE" "$AFTER" -- memoria/ 2>/dev/null || true)
           echo "Changed files under memoria/:"
           echo "${CHANGED:-  (none)}"
 
           SHOULD_DEPLOY=false
 
-          while IFS= read -r f; do
-            [[ -z "$f" ]]            && continue
-            [[ "$f" != */index.md ]] && continue
+          # Extract unique slugs from any changed path under memoria/<slug>/
+          # (matches index.md, images/*, videos/*, etc.)
+          while IFS= read -r slug; do
+            [[ -z "$slug" ]] && continue
+            INDEX="memoria/${slug}/index.md"
 
-            if [[ -f "$f" ]]; then
-              # File exists → check current status
-              if grep -qE '^status:\s+"?published"?' "$f"; then
-                echo "Published post changed: $f"
+            if [[ -f "$INDEX" ]]; then
+              # Slug still exists — check current published status
+              if grep -qiE '^status:\s*"?published"?\s*$' "$INDEX"; then
+                echo "Published article touched: ${slug}"
                 SHOULD_DEPLOY=true
                 break
               fi
             else
-              # File deleted → check previous status (unpublish triggers rebuild too)
-              if git show "HEAD~1:${f}" 2>/dev/null | grep -qE '^status:\s+"?published"?'; then
-                echo "Published post removed: $f"
+              # Slug removed/renamed — check if it was published before the push
+              if git show "${BEFORE}:${INDEX}" 2>/dev/null | grep -qiE '^status:\s*"?published"?\s*$'; then
+                echo "Previously published article removed/renamed: ${slug}"
                 SHOULD_DEPLOY=true
                 break
               fi
             fi
-          done <<< "$CHANGED"
+          done < <(
+            printf '%s\n' "$CHANGED" \
+              | awk -F/ '/^memoria\/[^/]+\// { print $2 }' \
+              | sort -u
+          )
 
           echo "should_deploy=${SHOULD_DEPLOY}" >> "$GITHUB_OUTPUT"
           echo "Result: should_deploy=${SHOULD_DEPLOY}"
 
       - name: Dispatch to memoria-website
-        # Run when: manual trigger (no check step) OR status check says yes
         if: >
           github.event_name == 'workflow_dispatch' ||
           steps.check.outputs.should_deploy == 'true'
@@ -77,6 +93,7 @@ jobs:
               event_type: 'blog-content-updated',
               client_payload: {
                 sha:     context.sha,
+                before:  context.payload?.before ?? '',
                 ref:     context.ref,
                 message: context.payload?.head_commit?.message ?? 'manual dispatch',
               },
