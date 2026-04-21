@@ -57,14 +57,14 @@ jobs:
 
             if [[ -f "$INDEX" ]]; then
               # Slug still exists — check current published status
-              if grep -qiE '^status:\s*"?published"?\s*$' "$INDEX"; then
+              if grep -qiE '^status:[[:space:]]*"?published"?[[:space:]]*$' "$INDEX"; then
                 echo "Published article touched: ${slug}"
                 SHOULD_DEPLOY=true
                 break
               fi
             else
               # Slug removed/renamed — check if it was published before the push
-              if git show "${BEFORE}:${INDEX}" 2>/dev/null | grep -qiE '^status:\s*"?published"?\s*$'; then
+              if git show "${BEFORE}:${INDEX}" 2>/dev/null | grep -qiE '^status:[[:space:]]*"?published"?[[:space:]]*$'; then
                 echo "Previously published article removed/renamed: ${slug}"
                 SHOULD_DEPLOY=true
                 break
