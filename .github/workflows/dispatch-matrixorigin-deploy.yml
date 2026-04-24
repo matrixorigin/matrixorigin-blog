@@ -1,0 +1,30 @@
+# matrixorigin/ 目录变更时，触发官网仓库 (mo-website-redesign) CI 重新构建
+name: dispatch-matrixorigin-deploy
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "matrixorigin/**"
+  workflow_dispatch:
+
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dispatch to website repo
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.WEBSITE_REPO_PAT }}
+          script: |
+            await github.rest.repos.createDispatchEvent({
+              owner: 'matrixorigin',
+              repo:  'mo-website-redesign',
+              event_type: 'matrixorigin-blog-updated',
+              client_payload: {
+                sha:     context.sha,
+                ref:     context.ref,
+                message: context.payload?.head_commit?.message ?? 'manual dispatch',
+              },
+            })
+            core.info(`Dispatched matrixorigin-blog-updated → mo-website-redesign @ ${context.sha}`)
