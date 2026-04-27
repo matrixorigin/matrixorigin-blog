@@ -4,7 +4,7 @@ author: MatrixOrigin
 description: 介绍 MOI 寻源比价智能体如何打通采购分析全链路，解决采购需求结构化难、数据分散、分析不一致、结果复用性弱等痛点，通过智能解析、多源数据融合、供应商评估与报告自动生成，实现采购分析高效化、标准化、可沉淀，助力企业提升采购决策效率与质量。
 tags: ["技术干货"]
 keywords: ["MOI 智能体", "智能采购", "数据融合", "采购数字化"]
-publishTime: "2025-04-27T17:00:00+08:00"
+publishTime: "2026-04-27T17:00:00+08:00"
 image:
   "1": "/content/zh/shared/tech.png"
   "235": "/content/zh/shared/tech.png"
