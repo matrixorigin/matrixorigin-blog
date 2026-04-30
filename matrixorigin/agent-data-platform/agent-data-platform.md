@@ -8,6 +8,8 @@ publishTime: "2026-04-23T17:00:00+08:00"
 image:
   '1': '/content/zh/shared/tech.png'
   '235': '/content/zh/shared/tech.png'
+lang: zh
+status: published
 ---
 
 # 为什么企业 Agent 建设离不开数据平台
