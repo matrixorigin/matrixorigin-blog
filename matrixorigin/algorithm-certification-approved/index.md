@@ -1,7 +1,7 @@
 ---
-title: Good News! Two Algorithms Approved: MatrixOrigin Deep Synthesis Algorithms Pass CAC Filing
+title: "Good News! Two Algorithms Approved: MatrixOrigin Deep Synthesis Algorithms Pass CAC Filing"
 author: MatrixOrigin
-description: Two MatrixOrigin AI search generation algorithms have successfully passed the deep synthesis service algorithm filing of the Cyberspace Administration of China, obtaining qualifications for compliant commercial use.
+description: "Two MatrixOrigin AI search generation algorithms have successfully passed the deep synthesis service algorithm filing of the Cyberspace Administration of China, obtaining qualifications for compliant commercial use."
 tags:
   - News
 keywords:

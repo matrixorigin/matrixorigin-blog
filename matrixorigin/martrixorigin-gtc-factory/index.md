@@ -1,7 +1,7 @@
 ---
 title: "MatrixOrigin Appears at NVIDIA GTC 2026, Joining Jinpan Technology to Reveal the Full-Stack Enablement Path for AI Factory"
 author: MatrixOrigin
-description: On March 16, 2026 at 11:00, MatrixOrigin CEO Wang Long will appear at NVIDIA GTC 2026 together with Yang Qing, Deputy Dean of Jinpan Technology's Artificial Intelligence Technology Research Institute, and deliver a keynote titled "Full-Stack Enablement Based on NVIDIA AI Enterprise: AI Factory Reshapes a New Benchmark for Intelligent Manufacturing."
+description: "On March 16, 2026 at 11:00, MatrixOrigin CEO Wang Long will appear at NVIDIA GTC 2026 together with Yang Qing, Deputy Dean of Jinpan Technology's Artificial Intelligence Technology Research Institute, and deliver a keynote titled \"Full-Stack Enablement Based on NVIDIA AI Enterprise: AI Factory Reshapes a New Benchmark for Intelligent Manufacturing.\""
 tags:
   - News
 keywords:

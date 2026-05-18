@@ -1,7 +1,7 @@
 ---
 title: "Year-End Review | MatrixOrigin Reviews the 2025 AI + Data Keyword Landscape"
 author: MatrixOrigin
-description: MatrixOrigin's 2025 AI + Data keyword review summarizes 10 key terms across three dimensions: model evolution, data foundation, and application implementation, interpreting each term's definition and industry meaning.
+description: "MatrixOrigin's 2025 AI + Data keyword review summarizes 10 key terms across three dimensions: model evolution, data foundation, and application implementation, interpreting each term's definition and industry meaning."
 tags:
   - Technical Insights
 keywords:

@@ -1,7 +1,7 @@
 ---
 title: 'MatrixOne Storage Optimization: Intelligent Storage Optimization Strategies for HTAP Scenarios'
 author: MatrixOrigin
-description: This article provides an in-depth analysis of MatrixOne storage optimization for HTAP scenarios, including four core technologies: improved Merge strategy, event-driven scheduler, polynomial fitting data representation, and Merge simulator.
+description: "This article provides an in-depth analysis of MatrixOne storage optimization for HTAP scenarios, including four core technologies: improved Merge strategy, event-driven scheduler, polynomial fitting data representation, and Merge simulator."
 tags:
   - Technical Insights
 keywords:

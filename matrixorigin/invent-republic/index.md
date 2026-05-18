@@ -1,7 +1,7 @@
 ---
-title: Intelligence from Data, Data Governed by Intelligence: The Enterprise Data Path in the New Normal of GenAI | MatrixOrigin Product Launch Begins
+title: "Intelligence from Data, Data Governed by Intelligence: The Enterprise Data Path in the New Normal of GenAI | MatrixOrigin Product Launch Begins"
 author: MatrixOrigin
-description: MatrixOrigin will hold an offline launch event in Shanghai on September 12, 2025, offering an in-depth look at the latest capabilities of its hyper-converged database and intelligence platform, sharing real-world cases across industries, and exploring enterprise core competitiveness in the AI era.
+description: "MatrixOrigin will hold an offline launch event in Shanghai on September 12, 2025, offering an in-depth look at the latest capabilities of its hyper-converged database and intelligence platform, sharing real-world cases across industries, and exploring enterprise core competitiveness in the AI era."
 tags:
   - News
 keywords:

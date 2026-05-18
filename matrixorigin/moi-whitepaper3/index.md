@@ -1,8 +1,8 @@
 ---
-title: MatrixOne Intelligence Multimodal AI Data Intelligence Solution Whitepaper (3)
+title: "MatrixOne Intelligence Multimodal AI Data Intelligence Solution Whitepaper (3)"
 author: MatrixOrigin
 mail: wudi@matrixorigin.cn
-description: MatrixOne Intelligence Multimodal AI Data Intelligence Solution Whitepaper, Part Three: Industry Use Cases
+description: "MatrixOne Intelligence Multimodal AI Data Intelligence Solution Whitepaper, Part Three: Industry Use Cases"
 tags:
   - Whitepaper
 keywords:

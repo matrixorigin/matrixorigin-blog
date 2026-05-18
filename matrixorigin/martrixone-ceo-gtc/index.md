@@ -1,8 +1,7 @@
 ---
-title: On the Ground at GTC 2026: What Jensen Huang Spent 20 Minutes Explaining, and Why the AI Data Foundation Matters
+title: "On the Ground at GTC 2026: What Jensen Huang Spent 20 Minutes Explaining, and Why the AI Data Foundation Matters"
 author: MatrixOrigin
-description: >-
-  This article is a field note from MatrixOrigin CEO Wang Long at GTC 2026. Jensen Huang's keynote emphasized the importance of integrating structured and unstructured data, a pattern that will be implemented across industries. MatrixOrigin's three major product directions are highly aligned with this trend and fit the needs of the AI Agent era. At the same time, leading companies such as Dell and IBM are collectively investing in AI data platforms, showing that an industry consensus is taking shape. MatrixOrigin's cooperation with Jinpan Technology also validates the value of data fusion in real-world scenarios.
+description: "A field note from GTC 2026 on Jensen Huang's keynote, AI data foundations, and how MatrixOrigin's product direction aligns with the AI Agent era."
 tags:
   - News
 keywords:

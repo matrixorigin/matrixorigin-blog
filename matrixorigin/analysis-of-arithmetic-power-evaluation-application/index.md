@@ -1,8 +1,8 @@
 ---
-title: NVIDIA H20 and the Transformation of Computing: A Deep Dive into Compute Power Evaluation and Applications
+title: "NVIDIA H20 and the Transformation of Computing: A Deep Dive into Compute Power Evaluation and Applications"
 author: Zhang Songpo, Xiong Tingfeng, Liu Siguo
 mail: zhangsongpo@matrixorigin.cn
-description: This article explores the concept of compute power and evaluation methods, with a focus on the application and value of NVIDIA H20 GPUs in modern computing.
+description: "This article explores the concept of compute power and evaluation methods, with a focus on the application and value of NVIDIA H20 GPUs in modern computing."
 tags:
   - Technical Insights
 keywords:

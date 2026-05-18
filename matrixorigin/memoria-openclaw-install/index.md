@@ -1,5 +1,5 @@
 ---
-title: Get Started in 1 Minute: Connect Memoria to OpenClaw
+title: "Get Started in 1 Minute: Connect Memoria to OpenClaw"
 author: MatrixOrigin
 description: >-
   Connect the Memoria intelligent memory system to OpenClaw in one minute. Replace full-file loading with on-demand semantic retrieval, reduce memory-related Token usage by more than 70%, and solve four common issues in default memory systems: full loading, silent truncation, retrieval degradation, and context corruption. No self-hosted database is required, and setup takes one command.

@@ -1,7 +1,7 @@
 ---
-title: When Sourcing and Price Comparison No Longer Depend on Manual Stitching: How MOI Turns Procurement Analysis into a Complete Intelligent Workflow
+title: "When Sourcing and Price Comparison No Longer Depend on Manual Stitching: How MOI Turns Procurement Analysis into a Complete Intelligent Workflow"
 author: MatrixOrigin
-description: This article introduces how the MOI sourcing and price comparison Agent connects the full procurement analysis workflow, solving pain points such as difficult procurement requirement structuring, scattered data, inconsistent analysis, and weak result reuse. Through intelligent parsing, multi-source data fusion, supplier evaluation, and automatic report generation, it makes procurement analysis more efficient, standardized, and reusable, helping enterprises improve procurement decision efficiency and quality.
+description: "This article shows how the MOI sourcing and price comparison Agent connects procurement analysis end to end, from requirement structuring and multi-source data fusion to supplier evaluation and automated report generation."
 tags: ["Technical Insights"]
 keywords: ["MOI Agent", "intelligent procurement", "data fusion", "procurement digitalization"]
 publishTime: "2026-05-08T17:00:00+08:00"

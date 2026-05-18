@@ -1,8 +1,7 @@
 ---
-title: Major News! National Standard Officially Released, MatrixOrigin Contributes to the New Technical Requirements for Cloud-Native Relational Database Management Systems
+title: "Major News! National Standard Officially Released, MatrixOrigin Contributes to the New Technical Requirements for Cloud-Native Relational Database Management Systems"
 author: MatrixOrigin
-description: >-
-  National standard GB/T 47343-2026, Information Technology - Technical Requirements for Cloud-Native Relational Database Management Systems, has been officially released, with MatrixOrigin participating deeply as a main drafting organization. MatrixOne, its self-developed cloud-native hyper-converged database, aligns closely with the standard through its hyper-converged architecture, extreme elasticity, and intelligent operations. This marks a new stage of standardization for China's cloud-native databases and represents national-level authoritative recognition of MatrixOrigin's technical direction.
+description: "MatrixOrigin helped draft the new cloud-native relational database standard, marking national-level recognition of its technical direction."
 tags:
   - News
 keywords:

@@ -1,5 +1,5 @@
 ---
-title: Multiverse and Time Variance Authority: A Conversation with MatrixOrigin CEO Wang Long on Another Possibility for AI Implementation
+title: "Multiverse and Time Variance Authority: A Conversation with MatrixOrigin CEO Wang Long on Another Possibility for AI Implementation"
 author: MatrixOrigin
 description: >-
   This in-depth interview with MatrixOrigin CEO Wang Long focuses on four core topics: the popular AI phenomenon OpenClaw, AI-native technology foundations, emerging consensus around AGI, and AI Infra investment trends. It compares the AI ecosystems in China and the United States and analyzes OpenClaw's technical nature, security risks, and business model value.

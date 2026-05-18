@@ -1,7 +1,7 @@
 ---
 title: 'Parallel Universes in Data: Using Branch Management to Implement Data Version Control'
 author: MatrixOrigin
-description: We are not trying to solve "how to make another backup." We are trying to solve three things: keep a reliable anchor at any time, open isolated test environments, and turn changes into reviewable and replayable patches.
+description: "We are not trying to solve \"how to make another backup.\" We are trying to solve three things: keep a reliable anchor at any time, open isolated test environments, and turn changes into reviewable and replayable patches."
 tags:
   - Technical Insights
 keywords:

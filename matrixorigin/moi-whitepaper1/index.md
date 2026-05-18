@@ -2,7 +2,7 @@
 title: "MatrixOne Intelligence Multimodal AI Data Intelligence Solution White Paper (1)"
 author: MatrixOrigin
 mail: wudit@matrixorigin.cn
-description: The first part of the MatrixOne Intelligence multimodal AI data intelligence solution white paper: industry status, challenges, and solution architecture.
+description: "The first part of the MatrixOne Intelligence multimodal AI data intelligence solution white paper: industry status, challenges, and solution architecture."
 tags:
   - White Paper
 keywords:

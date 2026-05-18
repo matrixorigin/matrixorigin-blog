@@ -1,7 +1,7 @@
 ---
 title: "Enterprise NL2SQL Implementation Needs AI-Ready Data and Small Models"
 author: MatrixOrigin
-description: From demo to production, this article explores the key path for enterprise NL2SQL implementation: building an AI-ready data foundation, choosing 3B-7B small models with LoRA fine-tuning, and establishing an engineered process to create a controllable, low-cost intelligent query system.
+description: "From demo to production, this article explores the key path for enterprise NL2SQL implementation: building an AI-ready data foundation, choosing 3B-7B small models with LoRA fine-tuning, and establishing an engineered process to create a controllable, low-cost intelligent query system."
 tags:
   - Technical Insights
 keywords:

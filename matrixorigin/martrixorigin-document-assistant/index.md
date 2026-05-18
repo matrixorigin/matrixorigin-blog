@@ -1,5 +1,5 @@
 ---
-title: [MOI Practice Vol.3] Those Messy Documents Sitting in Your Cloud Drive Finally Have a Job to Do
+title: "[MOI Practice Vol.3] Those Messy Documents Sitting in Your Cloud Drive Finally Have a Job to Do"
 author: MatrixOrigin
 description: >-
   How to use AI to integrate scattered documents and PPT files into a unified knowledge base, and enable answer traceability and synchronized updates through an intelligent assistant, improving the team's efficiency in finding materials and getting answers.

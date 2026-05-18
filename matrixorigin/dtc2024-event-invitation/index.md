@@ -1,5 +1,5 @@
 ---
-title: DTC2024 Preview | MatrixOne: The Rise of a Hyper-Converged Database Star and a New Data Revolution
+title: "DTC2024 Preview | MatrixOne: The Rise of a Hyper-Converged Database Star and a New Data Revolution"
 author: MatrixOrigin News
 mail: contact@matrixorigin.cn
 description: >-

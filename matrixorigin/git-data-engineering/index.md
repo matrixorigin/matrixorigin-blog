@@ -1,7 +1,7 @@
 ---
-title: A New Data Management Paradigm in the AI Era: Git for Data Makes Data Engineering-Ready
+title: "A New Data Management Paradigm in the AI Era: Git for Data Makes Data Engineering-Ready"
 author: MatrixOrigin
-description: This article discusses the challenges enterprises face in data management in the AI era, introduces how the new Git for Data paradigm solves data engineering problems, and explains how MatrixOne implements this concept.
+description: "This article discusses the challenges enterprises face in data management in the AI era, introduces how the new Git for Data paradigm solves data engineering problems, and explains how MatrixOne implements this concept."
 tags:
   - Technical Insights
 keywords:

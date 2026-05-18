@@ -1,5 +1,5 @@
 ---
-title: Anchoring 2026: MatrixOrigin Joins Forces with Industry Partners to Hit the AI + Manufacturing Accelerator
+title: "Anchoring 2026: MatrixOrigin Joins Forces with Industry Partners to Hit the AI + Manufacturing Accelerator"
 author: MatrixOrigin
 description: >-
   MatrixOrigin, together with Jintpan Technology and iSoftStone, has officially put a jointly built AI smart factory into operation. Using the MOI platform to build an intelligent data foundation, the collaboration creates a new high-end manufacturing integration paradigm for "compute + data + model."

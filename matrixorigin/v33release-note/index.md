@@ -1,7 +1,7 @@
 ---
-title: MatrixOne Intelligence v3.3 Officially Released: Threefold Evolution in Structuring, Automation, and Visualization - AI Data Platform Evolution
+title: "MatrixOne Intelligence v3.3 Officially Released: Threefold Evolution in Structuring, Automation, and Visualization - AI Data Platform Evolution"
 author: MatrixOrigin
-description: MatrixOne Intelligence v3.3 brings a threefold evolution in structuring, automation, and visualization, helping enterprises efficiently build AI data intelligence platforms.
+description: "MatrixOne Intelligence v3.3 brings a threefold evolution in structuring, automation, and visualization, helping enterprises efficiently build AI data intelligence platforms."
 tags:
   - Product Center
 keywords:

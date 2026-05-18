@@ -1,7 +1,7 @@
 ---
-title: Video + Tutorial | Three-in-One: MOI Data Source + MO Vector Storage + Dify Application Layer for Enterprise RAG
+title: "Video + Tutorial | Three-in-One: MOI Data Source + MO Vector Storage + Dify Application Layer for Enterprise RAG"
 author: MatrixOrigin
-description: A detailed guide to integrating the Dify platform with the MatrixOne database, exporting data from MOI to a Dify knowledge base, and building an intelligent chat application.
+description: "A detailed guide to integrating the Dify platform with the MatrixOne database, exporting data from MOI to a Dify knowledge base, and building an intelligent chat application."
 tags:
   - Technical Insights
 keywords:

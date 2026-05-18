@@ -1,5 +1,5 @@
 ---
-title: Preview the Ultra Cross Connects Suzhou Headquarters Node Launch: Building a Multimodal AI-Native Data Intelligence Platform Based on Trusted Data Space
+title: "Preview the Ultra Cross Connects Suzhou Headquarters Node Launch: Building a Multimodal AI-Native Data Intelligence Platform Based on Trusted Data Space"
 author: MatrixOrigin
 mail: lichuanzi@matrixorigin.cn
 description: >-

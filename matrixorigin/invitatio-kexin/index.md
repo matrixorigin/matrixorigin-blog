@@ -1,7 +1,7 @@
 ---
-title: July 17: Join Us at the 2025 Trusted Database Development Conference to Explore Database Challenges and Needs in the GenAI Era
+title: "July 17: Join Us at the 2025 Trusted Database Development Conference to Explore Database Challenges and Needs in the GenAI Era"
 author: MatrixOrigin
-description: MatrixOrigin R&D engineer Liu Bo will share database challenges and needs in the GenAI era at the 2025 Trusted Database Development Conference.
+description: "MatrixOrigin R&D engineer Liu Bo will share database challenges and needs in the GenAI era at the 2025 Trusted Database Development Conference."
 tags:
   - News
 keywords:

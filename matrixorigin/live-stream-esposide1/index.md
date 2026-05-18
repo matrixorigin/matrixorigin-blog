@@ -1,8 +1,8 @@
 ---
-title: MatrixOne2.0.0: A Major Upgrade in AI Vectors and High Availability
+title: "MatrixOne2.0.0: A Major Upgrade in AI Vectors and High Availability"
 author: MatrixOrigin
 mail: wudi@matrixorigin.cn
-description: MatrixOne 2.0 livestream explores AI vector engine, high availability, and RAG applications, showing multimodal data management and practical use cases.
+description: "MatrixOne 2.0 livestream explores AI vector engine, high availability, and RAG applications, showing multimodal data management and practical use cases."
 tags:
   - News
 keywords:
