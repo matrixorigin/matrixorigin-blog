@@ -1,0 +1,54 @@
+<svg viewBox="0 0 1200 600" xmlns="http://www.w3.org/2000/svg" font-family="'PingFang SC','Hiragino Sans GB','Microsoft YaHei','Noto Sans CJK SC',sans-serif">
+  <defs>
+    <pattern id="grid2" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M40 0H0V40" fill="none" stroke="#161B22" stroke-width="1"/>
+    </pattern>
+    <marker id="arrG" markerWidth="10" markerHeight="10" refX="7" refY="3" orient="auto">
+      <path d="M0 0 L7 3 L0 6 Z" fill="#3FB950"/>
+    </marker>
+    <style>
+      .mono{font-family:ui-monospace,'SF Mono','JetBrains Mono',Menlo,Consolas,monospace;}
+      .h{fill:#E6EDF3;} .m{fill:#9DA7B3;} .dim{fill:#6E7681;}
+    </style>
+  </defs>
+
+  <rect width="1200" height="600" fill="#0D1117"/>
+  <rect width="1200" height="600" fill="url(#grid2)"/>
+
+  <text x="70" y="66" class="h" font-size="30" font-weight="700">三个你早就会的动作，现在数据也能用</text>
+  <text x="72" y="98" class="mono dim" font-size="16">checkout · branch · merge — 只不过对象是表，不是文件</text>
+
+  <!-- main lane -->
+  <path d="M150 360 H1030" stroke="#58A6FF" stroke-width="3" fill="none"/>
+  <!-- branch lane -->
+  <path d="M330 360 C 400 360, 440 230, 510 230 H690" stroke="#BC8CFF" stroke-width="3" fill="none"/>
+  <!-- merge back to main at c4 -->
+  <path d="M690 230 C 730 230, 740 360, 770 360" stroke="#3FB950" stroke-width="3" fill="none"/>
+
+  <!-- main nodes -->
+  <g>
+    <circle cx="150" cy="360" r="13" fill="#58A6FF"/>
+    <circle cx="330" cy="360" r="13" fill="#58A6FF"/>
+    <circle cx="510" cy="360" r="13" fill="#58A6FF"/>
+    <circle cx="770" cy="360" r="16" fill="#0D1117" stroke="#3FB950" stroke-width="3"/>
+    <circle cx="1030" cy="360" r="13" fill="#58A6FF"/>
+    <text x="150" y="398" text-anchor="middle" class="mono dim" font-size="13">snapshot</text>
+    <text x="770" y="402" text-anchor="middle" class="mono" font-size="13" fill="#3FB950">merge</text>
+  </g>
+  <!-- branch nodes -->
+  <circle cx="510" cy="230" r="12" fill="#BC8CFF"/>
+  <circle cx="690" cy="230" r="12" fill="#BC8CFF"/>
+
+  <!-- branch label -->
+  <text x="600" y="170" text-anchor="middle" class="h" font-size="19" font-weight="600" fill="#BC8CFF">多元宇宙 · 开一条平行分支</text>
+  <text x="600" y="194" text-anchor="middle" class="mono m" font-size="14">DATA BRANCH CREATE TABLE … FROM …{snapshot="…"}</text>
+
+  <!-- merge label -->
+  <text x="900" y="300" text-anchor="middle" class="h" font-size="19" font-weight="600" fill="#3FB950">协作画布 · 合并回主线</text>
+  <text x="900" y="324" text-anchor="middle" class="mono m" font-size="14">DATA BRANCH MERGE … INTO … WHEN CONFLICT FAIL</text>
+
+  <!-- restore arrow -->
+  <path d="M1030 376 C 1000 500, 640 520, 522 374" stroke="#3FB950" stroke-width="2.5" fill="none" stroke-dasharray="6 5" marker-end="url(#arrG)"/>
+  <text x="770" y="506" text-anchor="middle" class="h" font-size="19" font-weight="600" fill="#3FB950">任意门 · 回到过去的任意一刻</text>
+  <text x="770" y="530" text-anchor="middle" class="mono m" font-size="14">RESTORE TABLE …{snapshot="…"}</text>
+</svg>

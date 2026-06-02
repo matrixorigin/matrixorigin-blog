@@ -1,0 +1,71 @@
+<svg viewBox="0 0 1200 680" xmlns="http://www.w3.org/2000/svg" font-family="'PingFang SC','Hiragino Sans GB','Microsoft YaHei','Noto Sans CJK SC',sans-serif">
+  <defs>
+    <pattern id="grid1" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M40 0H0V40" fill="none" stroke="#161B22" stroke-width="1"/>
+    </pattern>
+    <radialGradient id="glow1" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#1F6FEB" stop-opacity="0.18"/>
+      <stop offset="100%" stop-color="#1F6FEB" stop-opacity="0"/>
+    </radialGradient>
+    <style>
+      .mono{font-family:ui-monospace,'SF Mono','JetBrains Mono',Menlo,Consolas,monospace;}
+      .h{fill:#E6EDF3;} .m{fill:#9DA7B3;} .dim{fill:#6E7681;}
+    </style>
+  </defs>
+
+  <rect width="1200" height="680" fill="#0D1117"/>
+  <rect width="1200" height="680" fill="url(#grid1)"/>
+  <ellipse cx="640" cy="340" rx="320" ry="280" fill="url(#glow1)"/>
+
+  <text x="70" y="78" class="h" font-size="34" font-weight="700">分支，不是复制 —— 只是一个指针</text>
+  <text x="72" y="112" class="mono dim" font-size="17">branch ≠ copy  ·  copy-on-write</text>
+
+  <!-- immutable data monolith -->
+  <g>
+    <rect x="520" y="208" width="240" height="36" rx="4" fill="#1C2330" stroke="#3B66B0"/>
+    <rect x="520" y="250" width="240" height="36" rx="4" fill="#1C2330" stroke="#30363D"/>
+    <rect x="520" y="292" width="240" height="36" rx="4" fill="#1C2330" stroke="#30363D"/>
+    <rect x="520" y="334" width="240" height="36" rx="4" fill="#1C2330" stroke="#30363D"/>
+    <rect x="520" y="376" width="240" height="36" rx="4" fill="#1C2330" stroke="#30363D"/>
+    <rect x="520" y="418" width="240" height="36" rx="4" fill="#1C2330" stroke="#30363D"/>
+    <text x="640" y="492" text-anchor="middle" class="m" font-size="18">6 亿行 · 不可变数据</text>
+    <text x="640" y="514" text-anchor="middle" class="mono dim" font-size="13">shared by every branch</text>
+  </g>
+
+  <!-- ref nodes -->
+  <g stroke-width="2" fill="none" opacity="0.85">
+    <path d="M194 250 C 340 250, 400 250, 520 252" stroke="#58A6FF"/>
+    <path d="M194 340 C 340 340, 400 340, 520 340" stroke="#BC8CFF"/>
+    <path d="M194 430 C 340 430, 420 410, 520 392" stroke="#F0883E"/>
+  </g>
+  <g>
+    <circle cx="180" cy="250" r="14" fill="#58A6FF"/>
+    <circle cx="180" cy="340" r="14" fill="#BC8CFF"/>
+    <circle cx="180" cy="430" r="14" fill="#F0883E"/>
+    <text x="150" y="255" text-anchor="end" class="mono h" font-size="16">main</text>
+    <text x="150" y="345" text-anchor="end" class="mono h" font-size="16">branch_a</text>
+    <text x="150" y="435" text-anchor="end" class="mono h" font-size="16">branch_b</text>
+  </g>
+
+  <!-- delta -->
+  <path d="M760 340 C 778 340, 786 345, 800 345" stroke="#BC8CFF" stroke-width="2" fill="none" stroke-dasharray="4 4"/>
+  <rect x="800" y="318" width="132" height="54" rx="8" fill="#0E2A18" stroke="#3FB950" stroke-width="2"/>
+  <text x="866" y="342" text-anchor="middle" class="h" font-size="15">Δ 新写入</text>
+  <text x="866" y="361" text-anchor="middle" class="mono" font-size="13" fill="#3FB950">+314 KB</text>
+  <text x="866" y="392" text-anchor="middle" class="m" font-size="13">只有改动被新增</text>
+
+  <!-- comparison -->
+  <g>
+    <rect x="150" y="560" width="410" height="66" rx="10" fill="#0E2A18" stroke="#2EA043"/>
+    <text x="175" y="586" class="mono" font-size="13" fill="#3FB950">CLONE（克隆）</text>
+    <text x="175" y="614" class="h" font-size="23" font-weight="700">0.2 秒　·　+314 KB</text>
+
+    <text x="600" y="600" text-anchor="middle" class="dim" font-size="18">vs</text>
+
+    <rect x="640" y="560" width="410" height="66" rx="10" fill="#2A1416" stroke="#6E2B2B"/>
+    <text x="665" y="586" class="mono" font-size="13" fill="#F85149">物理复制（copy）</text>
+    <text x="665" y="614" class="m" font-size="23" font-weight="700">114 秒　·　+34 GB</text>
+  </g>
+
+  <text x="600" y="662" text-anchor="middle" class="m" font-size="16">开分支只记一个指针，根本没搬数据 → 开销与数据有多大无关</text>
+</svg>
