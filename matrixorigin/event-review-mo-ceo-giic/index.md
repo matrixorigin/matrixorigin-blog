@@ -28,7 +28,7 @@ status: published
 
 On May 21, the 2024 GIIC (GPU Infrastructure Innovation Conference) and the 4th China IDC Industry DISCOVERY Conference were hosted by the Zhongguancun Ultra-Connectivity New Infrastructure Industry Innovation Alliance, organized by NEOLINK LABS, and co-organized by 21Vianet and MatrixOrigin. The event was supported by the Beijing Municipal Science and Technology Commission and the Zhongguancun Science Park Management Committee. Wang Long, the founder and CEO of Matrix Origin, was invited to attend the conference and delivered a keynote speech titled "Computing Power + Data: The Cornerstone of the AI Native World."
 
-![ceo](/content/en/event-review-mo-ceo-giic/12.jpeg)
+![ceo](./images/12.jpeg)
 
 At the conference, Wang Long unveiled MatrixOS, an open-source AI-native software platform centered around computing power and data. MatrixOS is an open and accessible AI-native operating system that connects computing power, data, algorithms, and applications, offering a comprehensive end-to-end AI stack service framework. MatrixOS comprises three core sub-products: the computing service platform MatrixDC, the hyper-converged data management platform MatrixOne, and the AI agent development platform MatrixGenesis. These sub-products can either be combined for an all-in-one service or provide services independently.
 

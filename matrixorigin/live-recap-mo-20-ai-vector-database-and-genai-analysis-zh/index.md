@@ -44,6 +44,6 @@ MatrixOne 在 AI 搜索中的实践也是此次活动的亮点之一。团队展
 
 ### 5. 获取PPT
 
-![公众号](/content/zh/live-recap-mo-20-ai-vectors-and-high-availability-capabilities/wc.png?width=400)
+![公众号](./images/wc.png?width=400)
 
 关注本公众号，后台回复关键词「 1112 」 ，即可获取为 AI 而生，MatrixOne 面向 GenAI 能力的技术解读」及「MO 助力 AI 搜索」  PDF 版 PPT ！

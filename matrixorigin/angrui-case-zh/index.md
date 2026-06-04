@@ -37,7 +37,7 @@ status: published
 
 盎锐科技测量机器人UCL360，结合建筑图纸BIM化自动测量方案，在主体、砌筑、抹灰、土建移交、精装阶段使用，实测数据实时回传后台。测量机器人具有传统测量不具备的优势：自动化输出结构化数据、数据报表、问题整改通知单，一键分享劳务班组整改，爆点位置一目了然。
 
-![Angrui Case 1](/content/zh/angrui-case/angrui-case1.png)
+![Angrui Case 1](./images/angrui-case1.png)
 
 ### **业务痛点**
 
@@ -53,11 +53,11 @@ status: published
 
 MatrixOne Cloud 的 Serverless实例可以自动识别业务压力并自动调整计算资源，且采用按 SQL收费的计费方式，利用这一特性，盎锐将一个数据库实例按其客户拆分成多个Serverless 实例，单表容量得到了几个数量级的降低，有效地提升了读写性能。
 
-![Angrui Case 2](/content/zh/angrui-case/angrui-case2.png)
+![Angrui Case 2](./images/angrui-case2.png)
 
 由于 MatrixOne是多租户技术架构，这使得数据在租户之间可以方便的分享，MatrixOne Cloud提供了界面化的数据发布订阅功能，数据库或数据表可以由租户管理员快速（秒级）地分享给另一个租户，数据分享期间数据不会被复制（同一地区），订阅方也无需为数据存储付费，由此盎锐将数据上传业务与报表分析业务分离，使用两个实例既解决了不同业务的性能干扰，又天然实现了分析业务代码不要误修改数据的目的。
 
-![Angrui Case 3](/content/zh/angrui-case/angrui-case3.png)
+![Angrui Case 3](./images/angrui-case3.png)
 
 在数据上传至平台或数据入库后的 datapipline修改中，经常会有因数据误操作而需要恢复到指定时间点的情况，MatrixOneCloud支持快速经济的快照备份方式，盎锐客户根据每个用户的实际使用情况，对相应的数据库实例设置快照备份，MatrixOneCloud支持手动快照备份、周期自动快照备份和基于时间点恢复的快照备份三种方式，备份操作对系统几乎没有任何负载影响，且备份操作是秒级别的，快照备份多次也只增加变化的数据存储量，客户可以"肆意"地根据需求对不同的数据N 次备份，与此同时数据恢复时间也相对可控。
 

@@ -23,15 +23,15 @@ status: published
 
 **近日，创新南山 2024 “创业之星”大赛首届人工智能领域挑战赛圆满落下帷幕，矩阵起源（深圳）信息科技有限公司凭借项目“链接算力、数据和 AI-Native 应用的智能操作系统 MatrixOS ”获得企业组三等奖！**
 
-![公示](/content/zh/mo-won-artificial-intelligence-challenge/sz1.png?width=800)
+![公示](./images/sz1.png?width=800)
 
 在决赛路演中，矩阵起源AI平台研发总监赵晨阳为在场评委和观赛团详细阐述了 MatrixOS 的设计构思、技术革新亮点、团队实力以及商业潜能，成功赢得了评委的高度肯定。
 
-![决赛路演现场](/content/zh/mo-won-artificial-intelligence-challenge/sz2.png?width=800)
+![决赛路演现场](./images/sz2.png?width=800)
 
 当前，国家直面人工智能产业发展的“中国式困境”。中国人工智能产业发展呈现“倒三角”特征，基础设施层，如数据的规模质量、算力的规模性能，制约着模型层及应用层的飞速发展。
 
-![决赛演讲画面](/content/zh/mo-won-artificial-intelligence-challenge/sz3.png?width=800)
+![决赛演讲画面](./images/sz3.png?width=800)
 
 为了应对上述问题，且顺应 AI “元年”的行业趋势，矩阵起源全面拥抱并投身于大模型技术的研发，持续完善 AI 技术底座，将业务由 HSTAP 数据库拓展至AI基础设施和AI平台，在现有产品 MatrixOne 超融合异构多模数据库的基础上发布升级版产品项目：链接算力、数据和 AI-Native 应用的智能操作系统 MatrixOS 。该项目是一款 AI 原生操作系统，极简统一且开源开放。包含三部分：超融合多模数据管理平台 MatrixOne 、 AI 智能体应用开发平台 MatrixGenesis 、以及异构算力纳管调度平台 MatrixDC 。旨在链接各方资源，提供端到端的服务框架，彻底解决企业在 AI 算力、连接及成本控制难题。
 

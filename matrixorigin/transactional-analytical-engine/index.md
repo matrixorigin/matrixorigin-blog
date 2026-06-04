@@ -31,7 +31,7 @@ status: published
 
 This article assumes readers have a basic understanding of columnar storage, and are familiar with standard columnar storage organizations like block (or page, the minimum IO unit), segment (row group of multiple blocks), zonemap (min/max values within a column block), and also have a preliminary understanding of common Key Value storage engine implementations like LSM Tree, concepts like Memtable, WAL, SST files, etc. The left half of the TAE logical structure diagram below covers some basic columnar concepts, which can help readers without the relevant background.
 
-![](/content/en/transactional-analytical-engine/picture1.jpg)
+![](./images/picture1.jpg)
 
 To begin with, let's address a fundamental question before delving into the design of TAE: Why would one opt for a columnar structure when designing the core storage engine for a database?
 
@@ -48,7 +48,7 @@ It is well known that SQL compute engines handle TP and AP requests very differe
 
 When the storage engine needs to support multiple tables internally, it is straightforward for row stores to prefix each row with a TableID, which does not add much overhead to the system overall, because deserialization and decoding only needs to be done for a few records. For the storage engine, the multiple tables are still unified KeyValue, without much difference between tables.
 
-![](/content/en/transactional-analytical-engine/picture2.jpg)
+![](./images/picture2.jpg)
 
 However, for columnar storage, first, the columns of each table are stored independently, and different tables contain different columns, so the data layout between tables is completely different. Assuming it also supports the primary key, prefixing each row with TableID essentially interrupts vectorized execution, and data like TableID needs to be stored in metadata. In addition to TableID, columnar also needs to record information for each column (such as block, segment, zonemap, etc.), and they are completely different between different Tables, which is not a problem for row stores since all Tables can use TableID as the prefix. Therefore, one of the core reasons columnar is harder than row store is that the metadata complexity is much higher than row store. Looking at it from a tree perspective, common columnar metadata organization looks like this:
 
@@ -72,7 +72,7 @@ However, for columnar storage, first, the columns of each table are stored indep
 
 In addition to complex Metadata, there is also the crash recovery mechanism, namely WAL (Write Ahead Logging). Columnar also needs to consider more things in this area. All tables share the same Key Value space for row stores, so it's just a common WAL needed for Key Value storage, recording an LSN (Last Sequence Number) watermark is sufficient. But if columnar does the same, there will be some issues:
 
-![](/content/en/transactional-analytical-engine/picture3.jpg)
+![](./images/picture3.jpg)
 
 The diagram above shows a rough example of a columnar Memtable. For easier management, we stipulate that each Block (Page) in the Memtable can only contain data from one column of one table. Assuming the Memtable contains data being written from multiple tables simultaneously, due to different write speeds of different tables, each table may have a different amount of data in the Memtable. If we only record one LSN in the WAL, it means that when a Checkpoint happens, we need to Flush the data of every table in the Memtable to disk, even if there is only 1 row of data for that table in the Memtable. At the same time, since the columnar schema cannot be fully integrated into a single Key Value like row store, even one row of table data will generate corresponding files, potentially one file per column, which will create a large number of fragmented files with many tables, leading to huge read amplification. Of course, such complex scenarios can be ignored, after all, many columnar engines don't even have WAL yet, and even columnar engines with WAL mostly don't consider the problem this way, such as only doing Checkpoint when all tables reach a certain number of rows, so with many tables, Memtable may occupy a lot of memory, potentially even OOM. TAE is the main if not only storage engine for MatrixOne database, it needs to support not only AP but also TP workloads, so for database usage, it must be able to freely create tables like a normal Key Value storage engine. Therefore, the most straightforward solution means maintaining an LSN for each table in the WAL, that is, each table has its own independent logical log space in the unified WAL to record its own current write watermark. In other words, if we view the WAL as a message queue, the WAL of a regular row store is equivalent to a message queue with only one topic, while the WAL of columnar is equivalent to a message queue with many topics, and these topics are stored continuously physically, unlike separate storage of each topic in a typical message queue. Therefore, the WAL for columnar needs a more refined design to make it easy to use.
 
@@ -94,7 +94,7 @@ TAE stores data in table format. Each table's data is organized using an LSM tre
 
 The data in L1 and L2 are all sorted by primary key. There are overlapping primary key ranges between the sorted data. The difference between L1 and L2 is that L1 guarantees sorting within blocks, while L2 guarantees sorting within a segment. Here segment is a logical concept, it can also be equivalent to a row group, row set, etc. in similar implementations. If a segment has many updates (deletions), it can be compacted into a new segment, multiple segments can also be merged into a new segment, these are done through background asynchronous tasks, and the scheduling strategy of tasks mainly balances between write amplification and read amplification — based on this consideration, TAE does not recommend providing L4 layer, that is, fully sorting all segments by primary key, although technically it can be done (through background asynchronous merge tasks continuously, similar to the behavior of columnar stores like ClickHouse).
 
-![](/content/en/transactional-analytical-engine/picture4.jpg)
+![](./images/picture4.jpg)
 
 ## Indexes and Metadata
 
@@ -106,7 +106,7 @@ Similar to traditional columnar databases, TAE does not introduce secondary inde
 
 Looking at index granularity, TAE can have two types, one is table-level indexes, the other is segment-level. For example, there can be a table-level index, or each segment can have an index. The table data in TAE consists of multiple segments, and the data in each segment has gone through the process from unordered to ordered through compression/merge from L1 to L3. This is very unfriendly to table-level indexes. So TAE's indexes are built at the segment level. There are two types of segments. One type can be appended, the other cannot be modified. The segment-level index is a two-level structure, bloom filter and zonemap for the latter. For bloom filters there are two options, one is segment-based bloom filter, the other is block-based bloom filter. When the index can reside entirely in memory, segment-based is a better choice. An appendable segment consists of at least one appendable block plus multiple non-appendable blocks. The index of an appendable block is an in-memory ART-tree plus a zonemap, while a non-appendable one is a bloom filter plus a zonemap.
 
-![](/content/en/transactional-analytical-engine/picture5.jpg)
+![](./images/picture5.jpg)
 
 ## Buffer Manager
 
@@ -123,19 +123,19 @@ Each buffer node in Buffer Manager has Loaded and Unloaded two states. When the 
 
 As mentioned earlier, the WAL design in columnar engines is more intricate compared to row stores. In TAE, the redo log is not required to record every write operation, but it must capture the transaction at the time of commit. TAE utilizes the Buffer Manager to minimize IO usage, eliminating unnecessary IO events for short-lived transactions that may require rollback due to conflicts while still accommodating long or large transactions.The Log Entry Header format used in TAE's WAL is as follows:
 
-![](/content/en/transactional-analytical-engine/form1.jpg)
+![](./images/form1.jpg)
 
 The transaction Log Entry contains the following types:
 
-![](/content/en/transactional-analytical-engine/form2.jpg)
+![](./images/form2.jpg)
 
 Most transactions only have one Log Entry. Only large transactions may be require multiple Log Entries to be recorded. So a transaction log may contain 1 or more UC type log entries plus one PC type Log Entry, or just one AC type Log Entry. TAE allocates a dedicated Group for UC type Log Entries. The figure below shows transaction logs for six committed transactions.
 
-![](/content/en/transactional-analytical-engine/picture6.jpg)
+![](./images/picture6.jpg)
 
 The Payload of a transaction Log Entry contains multiple transaction nodes, as shown in the figure. Transaction nodes contain various types, such as DML Delete, Append, Update, DDL Create/Drop Table, Create/Drop Database, etc. A node is an atomic command, which can be considered an index to a sub-entry of a committed Log Entry. As mentioned in the Buffer Manager section, all active transactions share a fixed amount of memory space, which is managed by the Buffer Manager. When space remaining is insufficient, some transaction nodes will be unloaded. If it is the first time a node is unloaded, it will be saved as a Log Entry in the Redo Log, and upon loading, the corresponding Log Entry will be replayed from the Redo Log. This process is illustrated as follows:
 
-![](/content/en/transactional-analytical-engine/picture7.jpg)
+![](./images/picture7.jpg)
 
 In the above figure, TN1–1 represents the first transaction node of transaction Txn1. Initially, Txn1 registers transaction node TN1–1 in the Buffer Manager and writes data W1–1:
 

@@ -34,7 +34,7 @@ status: published
 - 工程化智能链路：MOI 将 AI 能力内嵌至数据处理全流程（MatrixPipeline）。通过向量化检索和前沿技术，有效提升了 RAG（检索增强生成）的召回准确率，从数据源头抑制大模型“幻觉”，确保输出结果通过企业合规风控标准。
 - 闭环反馈机制：系统支持“数据 - 应用”的双向反馈，使模型能够随着业务数据的积累持续迭代，保障了系统在生产环境中的长期稳定性与可用性。
 
-![1.png](/content/zh/matrixorigin-datafun-staraward/1.png)
+![1.png](./images/1.png)
 
 ## 02 聚焦真实价值，做企业可信赖的合作伙伴
 
@@ -46,7 +46,7 @@ status: published
 
 这些一线场景的实践成果，不仅印证了产品的高可用性，也是我们致力于成为企业构建数智化能力坚实基石的有力证明。
 
-![2.png](/content/zh/matrixorigin-datafun-staraward/2.png)
+![2.png](./images/2.png)
 
 ## 03 结语
 

@@ -82,7 +82,7 @@ status: published
 
 ### 解决方案剖析
 
-![解决方案](/content/zh/transportation-dataplatform-based-hyper-Converged-database/szc1.png?width=800)
+![解决方案](./images/szc1.png?width=800)
 
 该项目主要从以下三个方面入手：
 
@@ -108,7 +108,7 @@ status: published
 2. 处理海量数据：具备每小时处理TB级数据的能力，确保系统在高数据量下依然稳定高效运行。
 3. 实现秒级业务及分析实时性：通过MatrixOne技术，确保业务处理和数据分析的实时性，实现秒级响应。
 
-![MatrixOne 方案](/content/zh/transportation-dataplatform-based-hyper-Converged-database/szc2.png?width=800)
+![MatrixOne 方案](./images/szc2.png?width=800)
 
 ### 客户收益
 

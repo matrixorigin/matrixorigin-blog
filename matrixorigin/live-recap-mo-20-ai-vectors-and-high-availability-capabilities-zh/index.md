@@ -48,6 +48,6 @@ MatrixOne 2.0 扩展了对非结构化数据的管理，支持文本、图片、
 
 ### 5. 获取PPT
 
-![公众号](/content/zh/live-recap-mo-20-ai-vectors-and-high-availability-capabilities/wc.png?width=400)
+![公众号](./images/wc.png?width=400)
 
 关注本公众号，后台回复关键词「 1105 」 ，即可获取「 MatrixOne v2.0.0 新特性」及「基于 MatrixOne v2.0.0 数据库快速构建大模型应用」 PDF版PPT！

@@ -78,7 +78,7 @@ The existing technologies have limited compatibility with cloud-native infrastru
 
 ### Solution Analysis
 
-![1.png](/content/zh/transportation-dataplatform-based-hyper-Converged-database/szc1.png?width=800)
+![1.png](./images/szc1.png?width=800)
 
 The project mainly focuses on the following three aspects:
 
@@ -106,7 +106,7 @@ The project mainly focuses on the following three aspects:
 
 - **Second-level real-time business and analytics:** Through MatrixOne technology, ensure real-time business processing and data analysis, achieving second-level response times.
 
-![2.png](/content/zh/transportation-dataplatform-based-hyper-Converged-database/szc2.png?width=800)
+![2.png](./images/szc2.png?width=800)
 
 ### Customer Benefits
 

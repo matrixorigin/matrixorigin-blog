@@ -27,7 +27,7 @@ status: published
 
 GTC以前我来过很多次了，我住在San Jose多年，跟老黄也见过好几次面。英伟达的盛会已经持续好多年，最近几年英伟达加冕为AI之王以来更加火爆。不过今天是第一次代表矩阵起源，以NVIDIA AI Factory生态的数据平台合作伙伴身份来参与。我和三万人一起听了黄仁勋两个多小时的keynote。
 
-![1.png](/content/zh/martrixone-ceo-gtc/1.jpg)
+![1.png](./images/1.jpg)
 
 说实话，演讲的前20分钟，让我极其兴奋——**黄仁勋在主舞台上向全世界阐述的方向，和我们过去5年所做的技术，在客户侧解决的问题，几乎完全一致。**
 
@@ -35,11 +35,11 @@ GTC以前我来过很多次了，我住在San Jose多年，跟老黄也见过好
 
 皮衣教主登台后，先是例行感谢、回顾CUDA 20周年。然后他放出了一张图——一张密密麻麻列满了Apache Spark、Presto、DuckDB、Polars等几十个数据引擎Logo的架构图。
 
-![2.png](/content/zh/martrixone-ceo-gtc/2.png)
+![2.png](./images/2.png)
 
 他说，这些数据引擎处理的是data frames，都是结构化数据，也是Business的ground truth。也就是我们一直在告诉我们的客户的，即使在AI时代结构化数据仍然是核心，因为它们是最精准的描述企业现状的核心数据。
 
-![3.png](/content/zh/martrixone-ceo-gtc/3.png)
+![3.png](./images/3.png)
 
 然后他又谈到了非结构化数据。他说全世界90%的数据是非结构化的——PDF、文档、图片、视频。企业花了几十年时间收集、存储……然后就没有然后了。因为你没法索引它，没法查询它，没法搜索它。
 
@@ -95,7 +95,7 @@ https://memoria.matrixorigin.cn/
 
 除了NVIDIA自己的发布，今天同步官宣的一系列合作让我看到了产业共识加速形成：
 
-![4.png](/content/zh/martrixone-ceo-gtc/4.png)
+![4.png](./images/4.png)
 
 Dell发布了AI Data Platform with NVIDIA，Michael Dell亲自站台说这是purpose-built for agentic AI。IBM宣布WatsonX全面接入cuDF加速——黄仁勋专门提了一句"IBM，SQL的发明者"。Oracle在AI Database里集成cuVS。Google Cloud在Dataproc里集成cuDF，Snap用它把每日数据处理成本降了76%。
 

@@ -24,19 +24,19 @@ status: published
 
 新春伊始，矩阵起源向大家分享一连串好消息 🏆🏆🏆！
 
-![矩阵起源创新突出贡献人物](/content/zh/matrixorigin-good-news-in-new-year/good-news1.jpg)
+![矩阵起源创新突出贡献人物](./images/good-news1.jpg)
 
 首先，**矩阵起源创始人兼 CEO 王龙先生获评“2023 深圳创新突出贡献人物“**。这一荣誉是对其在推动数据库行业技术创新和产品开发方面所做出的卓越贡献的认可。
 
-![矩阵起源未来创造之星榜](/content/zh/matrixorigin-good-news-in-new-year/good-news2.jpg)
+![矩阵起源未来创造之星榜](./images/good-news2.jpg)
 
-![矩阵起源获 2023 深圳企业创新纪录](/content/zh/matrixorigin-good-news-in-new-year/good-news3.jpg)
+![矩阵起源获 2023 深圳企业创新纪录](./images/good-news3.jpg)
 
 其次，**公司荣膺“2023 粤港澳大湾区企业创新力榜单——未来创造之星榜”**、凭借 “MatrixOne 新一代超融合云原生异构数据库”项目**获评“2023 深圳企业创新（国际）记录”并入编《深圳年鉴》**，作为深圳优质创新成果向社会展示。这些荣誉不仅是对我们在产品开发和技术创新方面独树一帜的认可，也是对公司未来发展潜力的肯定与鼓励。
 
-![MatrixOne 获香港中文大学创业大赛奖状](/content/zh/matrixorigin-good-news-in-new-year/good-news4.jpg)
+![MatrixOne 获香港中文大学创业大赛奖状](./images/good-news4.jpg)
 
-![MatrixOne 获优秀奖](/content/zh/matrixorigin-good-news-in-new-year/good-news5.jpg)
+![MatrixOne 获优秀奖](./images/good-news5.jpg)
 
 此外，我们还参加并获得香港中文大学（深圳）“神仙湖”国际创新创业大赛优秀奖的殊荣。
 

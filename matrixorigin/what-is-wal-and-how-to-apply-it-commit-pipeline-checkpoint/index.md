@@ -46,7 +46,7 @@ The time required to perform these tasks significantly impacts the commit's perf
 
 In systems like us, a commit pipeline is implemented to persist WAL entries asynchronously. This approach ensures that the persistence process does not block the updates occurring in the memory, thereby enhancing overall efficiency.
 
-![](/content/en/what-is-wal-and-how-to-apply-it-commit-pipeline-checkpoint/picture1.jpg)
+![](./images/picture1.jpg)
 
 ### The process of transaction commit involves:
 
@@ -72,7 +72,7 @@ Scan the transactions between [t0, t1] on Logtail Mgr, initiate background trans
 
 To conduct checkpoints promptly and prevent the unlimited growth of WAL, **even if a block in the interval has only one line changed, it still needs to be transferred.**
 
-![](/content/en/what-is-wal-and-how-to-apply-it-commit-pipeline-checkpoint/picture2.jpg)
+![](./images/picture2.jpg)
 
 **Scanning the Catalog involves dumping Data Definition Language (DDL) and metadata changes.**
 
@@ -80,7 +80,7 @@ The Catalog itself is structured like a tree, storing all DDL and metadata infor
 
 When scanning, the process entails collecting all changes that fall within a specified time range, denoted by [t0, t1].
 
-![](/content/en/what-is-wal-and-how-to-apply-it-commit-pipeline-checkpoint/picture3.jpg)
+![](./images/picture3.jpg)
 
 **Destroy old WAL (Write Ahead Log) entries.**
 

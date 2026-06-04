@@ -30,7 +30,7 @@ From the insights gained in the [last article](/posts/surmounting-three-major-ch
 
 ## 3. MatrixOne Reborn
 
-![](/content/en/surmounting-three-major-challenges-the-evolution-from-newsql-to-htap-distributed-arichitecure-2/picture1.jpg)
+![](./images/picture1.jpg)
 
 The new architecture, through decoupling, ultimately achieved three independent layers, each with its own object units and division of labor, allowing different types of nodes to scale flexibly without being constrained by other layers:
 
@@ -38,14 +38,14 @@ The new architecture, through decoupling, ultimately achieved three independent 
 - **Transaction Layer:** with Transaction Nodes and Log Service as units, provides complete log services and metadata information, with built-in Logtail for storing recent data;
 - **Storage Layer:** where all data is stored in object storage represented by S3, achieving low-cost, infinitely scalable storage, and a unified file operation service named File Service, enabling nodes to operate on underlying storage seamlessly.
 
-![](/content/en/surmounting-three-major-challenges-the-evolution-from-newsql-to-htap-distributed-arichitecure-2/picture2.jpg)
+![](./images/picture2.jpg)
 
 After deciding on TAE as the sole storage engine, numerous design adjustments were made to the integrated TAE engine, leading to the later version of the integrated TAE storage engine. This achieved the goal of a single engine handling all database storage behaviors, with the following advantages:
 
 - **Columnar Storage Management:** unified columnar storage and compression, offering inherent performance advantages for OLAP operations;
 - **Transaction Processing:** shared logs and TN(DN in diagram above) nodes jointly support transactions for compute nodes;
 - **Hot-Cold Separation:** using File Service with S3 object storage as the target, each compute node has its own Cache.
-- ![](/content/en/surmounting-three-major-challenges-the-evolution-from-newsql-to-htap-distributed-arichitecure-2/picture3.jpg)
+- ![](./images/picture3.jpg)
 
 Multiple tests were run, yielding results with high confidence:
 

@@ -27,7 +27,7 @@ https://github.com/matrixorigin/Memoria。
 
 作为业内首个提出"Git for Memory"概念的 Agent 可信记忆框架，Memoria 不仅仅是让 Agent 记住，更是通过底层 MatrixOne 的 Copy-on-Write 技术，让 AI 记忆变得可回溯、可管理、可信赖。
 
-![1.png](/content/zh/martrixone-agent-mem/1.png)
+![1.png](./images/1.png)
 
 ## **阶段一：完全没有记忆的 Agent**
 

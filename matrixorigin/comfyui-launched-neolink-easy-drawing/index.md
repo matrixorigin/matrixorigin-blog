@@ -26,7 +26,7 @@ ComfyUI is an open-source local image generation tool designed to simplify the u
 
 ComfyUI offers an easy-to-use graphical interface and API, supporting the development and integration of tasks such as image generation and style transfer. It allows users to have fine control over the image generation process, ensuring that all data processing and image generation are conducted locally, making it particularly suitable for scenarios that require high data privacy and custom configurations. ComfyUI streamlines the management process of image generation models, enabling developers to quickly build and deploy AI-based image generation applications.
 
-![Comfyui](/content/en/comfyui-launched-neolink-easy-drawing/cfui.png?width=800)
+![Comfyui](./images/cfui.png?width=800)
 
 ### Challenges of Local Deployment of ComfyUI
 

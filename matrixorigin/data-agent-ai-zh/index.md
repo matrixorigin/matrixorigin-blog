@@ -24,7 +24,7 @@ status: published
 
 矩阵起源魏旭东受邀出席，并发表了题为《打造值得信赖的企业级Agent—— 从多模态数据治理开启》的主题演讲。他结合矩阵起源在Data+AI领域的深厚积累，通过拆解真实的制造业案例，深度剖析了企业级Agent构建的核心痛点与破局之道。
 
-![1.png](/content/zh/data-agent-ai/1.png)
+![1.png](./images/1.png)
 
 ## 01 戳破泡沫：为什么企业级 AI 落地面临“信任危机”？
 
@@ -36,7 +36,7 @@ status: published
 
 他强调：“**真正卡住 AI 落地的，往往不是模型不行，而是数据太乱。** ”
 
-![2.png](/content/zh/data-agent-ai/2.png)
+![2.png](./images/2.png)
 
 ## 02 破局之道：以 MOI 为底座，构建“懂业务”的智能体
 
@@ -46,7 +46,7 @@ status: published
 
 矩阵起源基于 MatrixOne Intelligence (MOI) 平台，通过“数据治理 + 多Agent协同”的超融合架构，重塑了业务流程，最终成效显著——招标文件分析时间从 12小时缩短至10分钟，素材查找时间从 5天缩短至5分钟，整体投标效率提升 80% 以上。
 
-![3.png](/content/zh/data-agent-ai/3.png)
+![3.png](./images/3.png)
 
 ## 03 深度思考：AI Agent 落地不等于“去工程化”
 
@@ -60,7 +60,7 @@ status: published
 
 **三是价值回归数据**：真正花时间的往往是对“数据”的理解与治理，“生成”只占很小一部分。
 
-![4.png](/content/zh/data-agent-ai/4.png)
+![4.png](./images/4.png)
 
 ## 结语
 

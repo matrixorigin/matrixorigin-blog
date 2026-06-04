@@ -46,11 +46,11 @@ Uascent provides a mobile application that allows users to control the home appl
 
 By combining the vector capabilities of MatrixOne (hereinafter referred to as MO) with the Agent service capabilities of MatrixGenesis (hereinafter referred to as MG), the system understands users' natural language inputs, retrieves the corresponding instructions, and then issues a series of actions to the terminal devices.
 
-![1.png](/content/zh/jixian-aiot-matrixone-agent/1.png)
+![1.png](./images/1.png)
 
 MatrixGenesis is another AI service product provided by MatrixOrigin. In this case, MG's Agent service is able to understand textual information and convert it into data retrieval SQL for MO. As the storage and service provider for vector data, MO delivers fast vector retrieval services, returns the corresponding instructions to MG, and ultimately enables the intelligent management platform to issue operational commands to multiple terminal devices.
 
-![2.png](/content/zh/jixian-aiot-matrixone-agent/2.png)
+![2.png](./images/2.png)
 
 ### Customer Benefits
 

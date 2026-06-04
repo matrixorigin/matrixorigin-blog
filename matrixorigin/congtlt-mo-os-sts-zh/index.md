@@ -31,21 +31,21 @@ status: published
 **项目导师**：Ian.Zhao  
 **项目学员**：杨生
 
-![基于大语言模型的操作系统任务自动识别，拆解，判断以及执行](/content/zh/congtlt-mo-os-sts/image1.png?width=500)
+![基于大语言模型的操作系统任务自动识别，拆解，判断以及执行](./images/image1.png?width=500)
 
 **项目名称**：Implement Document LLM support in MatrixOrigin Database  
 **项目链接**：https://summer-ospp.ac.cn/org/prodetail/24b4d0357?list=org&navpage=org  
 **项目导师**：Arjun  
 **项目学员**：乐驰
 
-![Implement Document LLM support in MatrixOrigin Database](/content/zh/congtlt-mo-os-sts/image2.png?width=500)
+![Implement Document LLM support in MatrixOrigin Database](./images/image2.png?width=500)
 
 **项目名称**：MatrixAI Bot  
 **项目链接**：https://summer-ospp.ac.cn/org/prodetail/24b4d0349?list=org&navpage=org  
 **项目导师**：肖树伟  
 **项目学员**：曾庆宁
 
-![MatrixAI Bot](/content/zh/congtlt-mo-os-sts/image3.png?width=500)
+![MatrixAI Bot](./images/image3.png?width=500)
 
 更多详情可以通过开源之夏官网 MatrixOne 开源社区项目列表页进行了解。
 再次祝贺以上 3 位同学中选！社区周边礼品已邮寄，请注意查收哦！

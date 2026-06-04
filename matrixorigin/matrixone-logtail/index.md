@@ -83,7 +83,7 @@ Based on the logtail table, the main workflow upon receiving a pull request is a
 2. Take a snapshot of the logtail table and use RespBuilder in a visitor pattern to iterate over the relevant txn handles in this snapshot, collecting committed log information.
 3. Convert the collected log information according to the logtail protocol format and return it as a response to CN.
 
-![](/content/en/matrixone-logtail/picture1.jpg)
+![](./images/picture1.jpg)
 
 ```go
 type RespBuilder interface {

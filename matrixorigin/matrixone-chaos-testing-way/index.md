@@ -37,7 +37,7 @@ Chaos testing, also known as fault injection or failure testing, is a testable m
 
 Generally speaking, different industries and products have different standards and requirements for software testing. However, the overall principles are similar. Here, we will share the testing standards MatrixOne testing team has established to conduct better and manage product testing.
 
-![](/content/en/matrixone-chaos-testing-way/picture1.jpg)
+![](./images/picture1.jpg)
 
 You will find that Chaos Testing seems to defy categorization into any specific testing type, or rather, it is associated with all testing types while not strictly belonging to any single one. Here, using Professor Zhu Shaomin's definition of the "software testing" formula, we can elaborate on MatrixOne testing team's definition of Chaos Testing:
 
@@ -56,7 +56,7 @@ In simpler terms, "known" refers to factors within human control, while "unknown
 
 **We can further understand Chaos Testing through the following diagram.**
 
-![](/content/en/matrixone-chaos-testing-way/picture2.jpg)
+![](./images/picture2.jpg)
 
 Therefore, in the MatrixOne testing system, all testing efforts enable the current product to perceive, manage, and evaluate the quality factors it focuses on belong to Chaos Testing. Chaos Testing is not a new or disruptive testing technique; it still adheres to the essence of software testing, which is to provide quality information and confidence for the product's business activities. **Therefore, the ultimate goal of Chaos Testing is to make "chaos" become "orderly".**
 
@@ -72,7 +72,7 @@ Moreover, current research on Chaos Testing mostly focuses on enhancing the capa
 
 These are currently available and highly effective fault injection tools, widely adopted for Chaos Testing. However, addressing fault injection alone is not sufficient. Tools are just support, to conduct Chaos Testing more effectively, an engineering mindset is required to design and layout the Chaos Testing process. After multiple iterations and experiments, the architecture diagram for Chaos Testing developed by the MatrixOne Testing team is as shown below:
 
-![](/content/en/matrixone-chaos-testing-way/picture3.jpg)
+![](./images/picture3.jpg)
 
 ### Core Modules:
 
@@ -86,11 +86,11 @@ Of course, the definition of fault injection strategy is often related to the cu
 
 The Steady-state model refers to the valid state of the system under test. This valid state can be described by a set of quality element rules to which the object under test must adhere. For example, if the functional availability must satisfy r1 and performance indicators must satisfy r2, then the steady-state model can be represented as:
 
-![](/content/en/matrixone-chaos-testing-way/picture4.jpg)
+![](./images/picture4.jpg)
 
 In other words, regardless of the faults injected or tests executed during chaos testing, the system under test must not violate any of the quality element rules, which can be stated as:
 
-![](/content/en/matrixone-chaos-testing-way/picture5.jpg)
+![](./images/picture5.jpg)
 
 **When defining a steady-state model, it is necessary to adhere to the following principles:**
 
@@ -122,4 +122,4 @@ As for the design of each stage in MatrixOne's chaos practice, we will not delve
 
 Regarding the mixed evaluation of chaos testing maturity, there have been some explorations in the industry. For example, Alibaba's CMM model. However, this model is somewhat complex and theoretical. Based on this, MatrixOne testing team has customized its evaluation model, and the entire development and evolution of chaos testing are also based on this model.
 
-![](/content/en/matrixone-chaos-testing-way/picture6.jpg)
+![](./images/picture6.jpg)

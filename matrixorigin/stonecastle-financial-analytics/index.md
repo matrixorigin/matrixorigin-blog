@@ -46,7 +46,7 @@ Queries in StoneCastle's user accounting management system are primarily focused
 
 StoneCastle's clients are extremely sensitive about data security, so they have concerns about using SaaS-based database services, fearing that incidents such as data breaches would be difficult to control and respond to. In addition, considering compatibility with existing systems and operational costs, the company did not choose AWS services such as RDS or AuroraDB. Instead, it purchased EC2 servers and privately deployed MySQL, along with building a series of in-house security measures to ensure that data can be securely and properly managed within its own environment.
 
-![1.png](/content/zh/mo-enable-stonecastle-build-financial-analytics-system/sc2.png?width=800)
+![1.png](./images/sc2.png?width=800)
 
 ### Solution
 
@@ -58,7 +58,7 @@ MatrixOne supports private deployment on cloud servers and provides very simple 
 
 MatrixOne is highly compatible with MySQL, including connection protocols, SQL syntax, and upper-layer application ORM frameworks. This compatibility allows users to reuse familiar tools and SQL statements during migration and development. As a result, StoneCastle's engineers were able to complete the application switch with virtually no modifications to the application itself. To ensure reliability and consistency during the migration process, MatrixOne supports reading MySQL binlogs for data synchronization, allowing the two systems to run in parallel for a period of time before the final application cutover.
 
-![2.png](/content/zh/mo-enable-stonecastle-build-financial-analytics-system/sc3.png?width=800)
+![2.png](./images/sc3.png?width=800)
 
 ### Client's Benefits
 

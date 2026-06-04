@@ -46,7 +46,7 @@ Memoria 解决了这两个问题。它为所有编程智能体提供了一个共
 
 无需配置数据库，无需运行后端服务。
 
-![1.png](/content/zh/start-agent-memoria/1.png)
+![1.png](./images/1.png)
 
 ---
 
@@ -68,9 +68,9 @@ curl -sSL https://raw.githubusercontent.com/matrixorigin/Memoria/main/scripts/in
   --token sk-xxxxx
 ```
 
-![2.png](/content/zh/start-agent-memoria/2.png)
+![2.png](./images/2.png)
 
-![3.png](/content/zh/start-agent-memoria/3.png)
+![3.png](./images/3.png)
 
 运行完成后，重新加载或重启你的编程智能体。
 
@@ -80,7 +80,7 @@ curl -sSL https://raw.githubusercontent.com/matrixorigin/Memoria/main/scripts/in
 
 **Claude Code**
 
-![4.png](/content/zh/start-agent-memoria/4.png)
+![4.png](./images/4.png)
 
 ```
 {
@@ -103,7 +103,7 @@ curl -sSL https://raw.githubusercontent.com/matrixorigin/Memoria/main/scripts/in
 完成修改后，请告知执行结果，并提醒我：重启终端
 ```
 
-![5.png](/content/zh/start-agent-memoria/5.png)
+![5.png](./images/5.png)
 
 ---
 
@@ -119,7 +119,7 @@ curl -sSL https://raw.githubusercontent.com/matrixorigin/Memoria/main/scripts/in
 
 > 💡 **首次使用看到空列表？** 先前往 [Memoria 实验场](https://thememoria.ai/playground) 存储一些简单的记忆内容——比如你的名字、常用的编程语言，或者正在开发的项目。然后回到这里再次向智能体发送指令，你会看到它能调取你存储的内容，这说明端到端连接已生效。
 
-![6.png](/content/zh/start-agent-memoria/6.png)
+![6.png](./images/6.png)
 
 ---
 

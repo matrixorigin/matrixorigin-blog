@@ -36,7 +36,7 @@ MIT的一份报告显示，企业在应用"任务关键型AI"（Mission-critical
 
 当算力和算法已不再是主要矛盾，下一个能让AI真正为企业"干活儿"的价值高地，必然回归到**数据**本身。
 
-![1.png](/content/zh/ai-landing-data/1.png)
+![1.png](./images/1.png)
 
 ## 每一代应用，都在呼唤新的数据底座
 
@@ -46,7 +46,7 @@ MIT的一份报告显示，企业在应用"任务关键型AI"（Mission-critical
 
 这个底座必须能让那位聪明的"AI毕业生"，快速完成"入职培训"和"岗位实践"，从一个新人迅速成长为能独当一面的专家。
 
-![2.png](/content/zh/ai-landing-data/2.png)
+![2.png](./images/2.png)
 
 关于这套行业洞察和应对思路的完整阐述，矩阵起源CEO王龙先生在近期分享中进行了更深入的讲解。您可以点击下方视频，观看完整内容。
 
@@ -68,7 +68,7 @@ https://www.bilibili.com/video/BV1DepvzxEsm/?spm_id_from=333.1387.homepage.video
 
 - **省：** 通过一体化架构，从根本上降低数据管理和AI应用的综合成本。
 
-![3.png](/content/zh/ai-landing-data/3.png)
+![3.png](./images/3.png)
 
 这套"智能数据飞轮"的理念，已经在真实的业务场景中得到了验证。例如，在与金盘科技的合作中，我们将标书制作的周期从3-7天大幅缩短，核心环节的准确率在从50%提升至95%以上。
 

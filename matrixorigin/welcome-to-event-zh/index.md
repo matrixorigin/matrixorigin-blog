@@ -30,4 +30,4 @@ status: published
 
 </div>
 
-![MatrixOne 最强体验官，等你来挑战！](/content/zh/welcome-to-event/hd.jpg?width=500)
+![MatrixOne 最强体验官，等你来挑战！](./images/hd.jpg?width=500)

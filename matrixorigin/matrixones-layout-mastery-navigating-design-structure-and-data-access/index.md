@@ -62,7 +62,7 @@ When MatrixOne has been operational for a while and customer demands increase, i
 
 Supports data analysis tools and the addition of Scrub tasks.
 
-![](/content/en/matrixones-layout-mastery-navigating-design-structure-and-data-access/picture1.jpg)
+![](./images/picture1.jpg)
 
 Based on the aforementioned issues, we designed the current Layout, which consists of the Header, Data Area, Index Area, Metadata Area, and Footer.
 

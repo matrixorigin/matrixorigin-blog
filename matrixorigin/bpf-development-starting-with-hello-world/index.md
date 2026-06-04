@@ -59,7 +59,7 @@ int main()
 
 ##### Compilation and Execution of C Language
 
-![Compilation and Execution of C Language](/content/en/bpf-development-starting-with-hello-world/compilation-and-execution-of-c.webp)
+![Compilation and Execution of C Language](./images/compilation-and-execution-of-c.webp)
 
 #### eBPF Program
 
@@ -78,7 +78,7 @@ int helloworld(void *ctx)
 
 ##### Compilation and Execution of eBPF Program
 
-![Compilation and Execution of eBPF Program](/content/en/bpf-development-starting-with-hello-world/compilation-and-execution-of-ebpf-program.webp)
+![Compilation and Execution of eBPF Program](./images/compilation-and-execution-of-ebpf-program.webp)
 
 Compiling, loading, and running eBPF is a bit more complex than for standard C programs. The entire process will be introduced step by step.
 
@@ -164,7 +164,7 @@ This chunk of eBPF assembly code is available for interested readers to referenc
 
 Process:
 
-![Process](/content/en/bpf-development-starting-with-hello-world/process.webp)
+![Process](./images/process.webp)
 
 There are many events in the Linux kernel that support eBPF. After mounting an eBPF program, you need to wait for an event to be asynchronously triggered to see the effects.
 

@@ -40,7 +40,7 @@ At this moment, I feel it's necessary to provide a comprehensive explanation of 
 
 How do we define the early architecture of MatrixOne? Specifically, it refers to the architecture of MatrixOne from versions 0.1 to 0.4, which was prevalent in various releases before the first half of 2022. Rather than calling it an architecture, it's more apt to describe it as an experiment to explore the shortcomings of various architectures and find one truly suitable for native HTAP distributed architecture.
 
-![](/content/en/surmounting-three-major-challenges-the-evolution-from-newsql-to-htap-distributed-arichitecure-1/picture1.jpg)
+![](./images/picture1.jpg)
 
 The old architecture of this experiment had two notable features: NewSQL and MPP. NewSQL was derived from several classic papers by Google and forms the general approach of many database products today. MPP, as the name suggests, stands for Massively Parallel Processing, with parallel computing as its prominent feature. Applied to the early architecture of MatrixOne, these concepts take on more specific meanings.
 
@@ -53,7 +53,7 @@ The old architecture of this experiment had two notable features: NewSQL and MPP
 
 **Parallel Computing**: Tasks are distributed in parallel across multiple servers and nodes, with the partial results from each node aggregated to produce the final outcome.
 
-![](/content/en/surmounting-three-major-challenges-the-evolution-from-newsql-to-htap-distributed-arichitecure-1/picture2.jpg)
+![](./images/picture2.jpg)
 
 ### 1.1. Detailed Explanation of the Early Architecture
 

@@ -123,7 +123,7 @@ cd ..
 
 4. **连接节点**: 按照 解析节点 -> 分段节点 -> 文本嵌入节点 的顺序,将这三个节点连接起来,形成一个完整的数据处理流水线。
 
-![1.png](/content/zh/deerflow-moi-integration/1.png)
+![1.png](./images/1.png)
 
 **步骤 3: 获取 API 密钥与 URL**
 
@@ -135,7 +135,7 @@ cd ..
 
 3. **获取 API URL**: 记录下您的 MOI 服务的访问地址,例如 https://freetier-01.cn-hangzhou.cluster.matrixonecloud.cn。Deerflow 需要的最终接入点(Endpoint)是这个地址后面拼接上 /byoa。
 
-![2.png](/content/zh/deerflow-moi-integration/2.png)
+![2.png](./images/2.png)
 
 ### 四、 配置 Deerflow 对接 MOI
 
@@ -157,7 +157,7 @@ MOI_API_URL=https://your-moi-instance.com/byoa
 
 **配置示例:**
 
-![3.png](/content/zh/deerflow-moi-integration/3.png)
+![3.png](./images/3.png)
 
 **步骤 3: 配置基础模型 (conf.yaml)**
 
@@ -220,7 +220,7 @@ uv run python main.py
 
    c. 选择您想要检索的特定数据源,然后输入您的问题,即可开始针对该数据源的深度检索查询。(注意:用户输入的问题不能是过于简单或者不需要研究的内容,否则deerflow可能会出错。)
 
-![4.png](/content/zh/deerflow-moi-integration/4.png)
+![4.png](./images/4.png)
 
 至此,您已成功将 Deerflow 与 MOI RAG 服务集成,并可以开始您的深度检索增强生成应用之旅。
 

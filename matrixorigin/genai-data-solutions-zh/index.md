@@ -50,7 +50,7 @@ status: published
 - 详尽的技术架构解析：深入了解如何通过“超融合”引擎从源头解决数据碎片化问题。
 
 扫描下方二维码，免费下载完整版报告，为您的企业构建AI时代的真正竞争优势。
-![1.png](/content/zh/genai-data-solutions/1.png)
+![1.png](./images/1.png)
 
 ## 关于InfoQ
 

@@ -46,7 +46,7 @@ Search is one of TechAgent's core capabilities. This includes both keyword-based
 
 As the business scale gradually expanded and the number of data sources increased, MySQL's processing capacity became increasingly insufficient. On the one hand, write-side concurrency pressure increased, making it necessary to cache data on the frontend for a period of time through code before writing it into the database. On the other hand, as single-table sizes exceeded tens of millions of records, manual table sharding had to be adopted to limit query scope and maintain query performance. For certain report generation tasks and large-scale analytical queries, TechAgent had to introduce an additional ClickHouse instance to ensure performance.
 
-![1.png](/content/zh/mo-helps-TechAgent-build-AIGC-pedestal/sw2.png?width=800)
+![1.png](./images/sw2.png?width=800)
 
 As a startup with a very limited team size, TechAgent has found it increasingly unsustainable to maintain and manage numerous database components. Product iteration often requires adding various pieces of "glue code" to resolve data interoperability issues, and this makes onboarding newly hired engineers particularly difficult. The greatest challenge to the business lies in private deployment scenarios for large clients: while the delivery team can complete application-layer software deployment in just a few days, it often takes several weeks to deploy and debug the databases—an area that is not TechAgent's core expertise.
 
@@ -64,7 +64,7 @@ MatrixOne is designed natively for Kubernetes (K8s) and inherently supports K8s-
 
 Finally, when facing a wide variety of heterogeneous workloads, MatrixOne also provides flexible workload isolation solutions. In practice, workload isolation within the same database can be achieved by assigning specific CN container resource groups to handle dedicated business workloads, thereby maximizing business stability and security.
 
-![2.png](/content/zh/mo-helps-TechAgent-build-AIGC-pedestal/sw3.png?width=800)
+![2.png](./images/sw3.png?width=800)
 
 ### Client's Benefits
 

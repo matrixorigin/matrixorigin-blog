@@ -28,7 +28,7 @@ The SQL execution engine of the database is responsible for processing and execu
 
 There are two ways to build a pipeline: the first is the demand-driven pipeline, where an operator continuously pulls the next data tuple from the downstream operator; the second is the demand-driven pipeline, where an operator pushes each data tuple to the next operator. So, which type of pipeline construction is better? This may not be an easy question to answer. Snowflake’s paper mentions that push-based execution improves cache efficiency by removing control flow logic from data loops. It also allows Snowflake to effectively handle DAG plans of pipelines, creating additional opportunities for sharing and pipelining of intermediate results.
 
-![](/content/en/push-or-pull/picture1.jpg)
+![](./images/picture1.jpg)
 
 The following figure from reference [1] illustrates the difference between Push and Pull most directly:
 
@@ -73,7 +73,7 @@ FROM SJOIN R USING A
 JOIN T USING B;
 ```
 
-![](/content/en/push-or-pull/picture2.jpg)
+![](./images/picture2.jpg)
 
 This query consists of multiple Pipelines, Pipelines need to be parallel between each other, and also parallel inside the Pipeline. In practice, controlling parallelism only needs to happen at the endpoints of the Pipeline. For example, in the above diagram, intermediate operators like Filter do not need to consider parallelism themselves, because the source TableScan will Push data to it, and the Sink of the Pipeline is Hash Join, whose Hashtable Build phase needs to be parallelism-aware, but the Probe phase(stage?) does not need to be. Basing on Push to control the parallelism-awareness of Pipelines makes it technically easier.
 
@@ -137,7 +137,7 @@ PullingAsyncPipelineExecutor executor(pipeline);
 
 When pull is called, a thread is selected from the `thread_group`, then data.executor->execute(`num_threads`) executes the `PipelineExecutor`, where `num_threads` indicates the number of parallel threads. Next, `PipelineExecutor` converts the Pipeline into an `ExecutingGraph` for physical scheduling and execution. The pipeline is a logical structure, it does not care about how to execute, while `ExecutingGraph` is the physical reference for scheduling and execution. `ExecutingGraph` converts the `InputPort` and `OutputPort` of Pipeline Operators into Edges, using Edges to connect 2 Operators, Operator is the Node of the graph. After that is `PipelineExecutor::execute` which schedules the Pipeline via the `ExecutingGraph`, the main functionality of this function is to schedule tasks by popping `ExecutingGraph::Node` execution plans from the `task_queue`. During scheduling, threads keep traversing the `ExecutingGraph`, scheduling execution based on Operator execution states, until all Operators reach the finished state. Scheduler initialization picks all Nodes in `ExecutingGraph` without `OutPort` to start, hence, control flow originates from the Sink Node of the Pipeline, recursively calling `prepareProcessor`.This differs from the Push model where the control flow starts from the Source Node and propagates level by level. Apart from the difference in the control flow direction, this Pipeline Operator is identical to Push, thus some people also categorize ClickHouse into the Push model, after all, in many literature contexts, Push is equivalent to Pipeline Operator, and Pull is equivalent to Volcano. The correspondence between Pipeline and ExecutingGraph is shown below (in ClickHouse, Operator=Processor=Transformer):
 
-![](/content/en/push-or-pull/picture3.jpg)
+![](./images/picture3.jpg)
 
 Therefore, the Push model is parallelism-aware, which essentially requires designing a scheduler that controls data flow and parallelism well. In addition to the aforementioned advantages, the naive Push model also has some disadvantages: handling Limit and Merge Join is difficult (see reference [1]), for the former, the Operator cannot easily control when the source Operator stopsproducing data, thus some elements may be produced but never used. For the latter, since the Merge Join Operator cannot know which source Operator generates the next data Tuple, Merge Join cannot be pipelined, so Pipeline Breaker is needed for at least one of the source Operators, requiring materialization. The essence of these two problems is still the Pipeline scheduling problem in the Push model: how consumers control producers. Apart from Limit and Merge Join, other operations like terminating a query in progress face the same situation. Just like separating the query plan tree from Pipeline enables parallelism-awareness for the Pull model, the Push model does not necessarily have to be implemented exactly as described in papers where only the Pipeline source can be controlled. By introducing mechanisms like ClickHouse’s task_queue, the Push model can similarly achieve level-by-level control of source Operators.
 
@@ -176,7 +176,7 @@ Let’s look at a simple query first:
 select * from R where a > 1 limit 10
 ```
 
-![](/content/en/push-or-pull/picture4.jpg)
+![](./images/picture4.jpg)
 
 This query has a Limit Operator, meaning there are termination conditions for the Pipeline like Cancel, Limit, Merge Join mentioned above. The Pipeline for this query is shown below, executing in parallel on 2 Cores.
 
@@ -210,11 +210,11 @@ select
 
 Assume the query plan is as follow:
 
-![](/content/en/push-or-pull/picture5.jpg)
+![](./images/picture5.jpg)
 
 Assume the data of these three tables are evenly distributed on two nodes, node0 and node1, then the corresponding Pipelines are as follows:
 
-![](/content/en/push-or-pull/picture6.jpg)
+![](./images/picture6.jpg)
 
 Adopting the Push model also has a potential advantage in maintaining consistency with the Data Flow paradigm of stream computing (such as Flink). FlinkSQL will convert each Operator in the query plan into a streaming Operator, streaming Operators will pass the updates of each Operator’s computation results to the next Operator, which is logically consistent with the Push model. For MatrixOne, which intends to implement a streaming engine internally, this is a place for logical reuse. Of course, implementing a streaming engine is far from just relying on the Push model, which is beyond the scope of this article. One last potential advantage of using the Push model is that it naturally combines with query compilation Codegen. Currently MatrixOne has not implemented Codegen, which is also beyond this article’s scope.
 

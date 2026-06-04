@@ -21,7 +21,7 @@ status: published
 ---
 
 近日，全球领先的IT市场研究和咨询公司IDC发布《IDC MarketScape: 中国面向生成式AI的数据基础设施 2025 年厂商评估》报告。矩阵起源凭借在AI原生多模态数据智能领域的创新技术实力，成功入选并被评为主要厂商（Major Players）。
-![1.png](/content/zh/idc-award/1.png)
+![1.png](./images/1.png)
 
 ## 技术创新驱动
 

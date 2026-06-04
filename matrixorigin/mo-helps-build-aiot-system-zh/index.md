@@ -48,11 +48,11 @@ status: published
 
 项目实施前的技术架构如下图所示：
 
-![引入前技术架构](/content/zh/mo-helps-build-AIOT-system/yd2.png?width=800)
+![引入前技术架构](./images/yd2.png?width=800)
 
 项目实施后的技术架构如下图所示：
 
-![引入后技术架构](/content/zh/mo-helps-build-AIOT-system/yd3.png?width=800)
+![引入后技术架构](./images/yd3.png?width=800)
 
 可以明显的看到，一个 MatrixOne 集群即可以处理结构化和半结构化数据，并且可以删除掉原有系统之间的ETL任务，无需再维护不同种类的数据库系统，并且能够统一数据库与应用程序之间的访问接口，整个 MES 应用再次回到了单一数据库的极简架构。
 

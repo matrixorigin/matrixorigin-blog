@@ -34,4 +34,4 @@ status: published
 
 扫描下图二维码，立即注册参会，与矩阵起源一起，见证 AI 与智造的碰撞！
 
-![1.png](/content/zh/martrixorigin-gtc-factory/1.png)
+![1.png](./images/1.png)

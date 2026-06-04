@@ -77,7 +77,7 @@ status: published
 
 通过 GROUPING 函数标记哪些行是年汇总、哪些是季度汇总、哪些是总汇总。
 
-![15861](/content/zh/thx-Cyberleu-contribution/gx1.png?width=800)
+![15861](./images/gx1.png?width=800)
 
 ### FeatureRequest
 

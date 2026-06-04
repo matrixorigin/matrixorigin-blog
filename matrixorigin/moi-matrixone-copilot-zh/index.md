@@ -45,7 +45,7 @@ status: published
 
 所有经过处理、增强和向量化的AI-Ready数据，最终被统一存储在MatrixOne数据库中。MatrixOne作为核心的向量数据库，为上层所有的AI应用提供了一个统一、高性能、高可用的知识入口。
 
-![1.png](/content/zh/moi-matrixone-copilot/1.png)
+![1.png](./images/1.png)
 
 ## 实施效果
 

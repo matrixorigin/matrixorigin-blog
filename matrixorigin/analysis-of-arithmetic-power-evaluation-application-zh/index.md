@@ -247,7 +247,7 @@ NVLink 互联带宽方面，H20 也进行了显著的提升。相比前代产品
 
 在矩阵乘法（GEMM）任务中，浮点运算性能是评估 GPU 计算能力的重要指标之一。以下是从表格中筛选出的伊迪雅 H20 在不同浮点精度下的GEMM性能数据，并对其进行详细分析。
 
-![GEMM](/content/zh/analysis-of-arithmetic-power-evaluation-application/nh1.png)
+![GEMM](./images/nh1.png)
 
 **分析与解读**
 

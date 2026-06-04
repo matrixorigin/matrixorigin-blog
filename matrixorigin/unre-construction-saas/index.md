@@ -40,7 +40,7 @@ In China, the construction industry accounts for more than 7% of GDP, representi
 
 The UNRE Technology's UCL360 measurement robot, combined with an automated BIM-based measurement solution derived from building drawings, is used during the structural, masonry, plastering, civil handover, and interior finishing stages, with measured data transmitted to the backend in real time. Compared with traditional measurement methods, the measurement robot offers advantages that traditional approaches do not possess: automated output of structured data, data reports, and issue rectification notices, one-click sharing with labor teams for rectification, and clear visualization of defect hotspot locations.
 
-![Angrui Case 1](/content/zh/angrui-case/angrui-case1.png)
+![Angrui Case 1](./images/angrui-case1.png)
 
 ### Pain Point
 
@@ -56,11 +56,11 @@ UNRE's SaaS application service platform is deployed on Alibaba Cloud and uses a
 
 MatrixOne Cloud's Serverless instances can automatically detect workload pressure and dynamically adjust computing resources, and they adopt a billing model based on SQL usage. Leveraging this capability, UNRE split a single database instance into multiple Serverless instances by customer, reducing single-table sizes by several orders of magnitude and effectively improving read and write performance.
 
-![Angrui Case 2](/content/zh/angrui-case/angrui-case2.png)
+![Angrui Case 2](./images/angrui-case2.png)
 
 Because MatrixOne adopts a multi-tenant architecture, data can be conveniently shared between tenants. MatrixOne Cloud provides a graphical data publish-and-subscribe feature, allowing databases or tables to be quickly (at the second level) shared by a tenant administrator with another tenant. During data sharing, the data is not duplicated (within the same region), and the subscribing party does not need to pay for data storage. As a result, UNRE separated the data ingestion workload from the reporting and analytics workload, using two instances to both eliminate performance interference between different workloads and naturally prevent analytics application code from accidentally modifying production data.
 
-![Angrui Case 3](/content/zh/angrui-case/angrui-case3.png)
+![Angrui Case 3](./images/angrui-case3.png)
 
 During data uploads to the platform or modifications to the datapipeline after data has been ingested into the database, situations frequently arise where data needs to be restored to a specific point in time due to accidental operations. MatrixOne Cloud supports a fast and cost-efficient snapshot backup mechanism. Based on each user's actual usage patterns, UNRE configures snapshot backups for the corresponding database instances.
 

@@ -20,9 +20,9 @@ status: published
 
 9月27日，首届粤港澳大湾区创业大赛总决赛在广东省佛山市圆满落幕。矩阵起源携「**Data+AI-新一代AI原生多模态数据智能平台**」出征"人工智能与机器人"赛道，一路闯关登上全国总决赛舞台，经过激烈角逐最终**斩获全国总决赛铜奖，并现场赢得多家头部资本青睐！**
 
-![1.png](/content/zh/matrixorigin-competition-award/1.png)
+![1.png](./images/1.png)
 
-![2.png](/content/zh/matrixorigin-competition-award/2.png)
+![2.png](./images/2.png)
 
 _AI研发VP赵晨阳路演介绍参赛项目_
 
@@ -30,7 +30,7 @@ _AI研发VP赵晨阳路演介绍参赛项目_
 
 同时，大赛设置了创业资源对接活动，为创业者与资本市场搭建了高效对接的桥梁。24个优秀创业项目与头部投资机构面对面洽谈。矩阵起源凭借技术与商业模式的创新性，获得**5000万**最高意向投资金额，成为现场"资本宠儿"。
 
-![3.png](/content/zh/matrixorigin-competition-award/3.png)
+![3.png](./images/3.png)
 
 _创业资源对接活动_
 

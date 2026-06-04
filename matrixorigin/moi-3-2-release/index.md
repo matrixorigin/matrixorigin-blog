@@ -37,7 +37,7 @@ A full upgrade of data workflow capabilities—from data parsing and cleansing t
 ● **Audio/Video Parsing Operators**: Support automatic parsing of more common media formats, enabling enterprises to convert customer service recordings, meeting videos, educational materials, etc., into high-value structured content. This bridges the critical path from unstructured data to knowledge bases.  
 ● **Data Cleansing Operators**: Built-in capabilities including deduplication, desensitization, and format standardization ensure data accuracy and usability.  
 ● **Data Augmentation Operators**: One-click generation of Alpaca-format datasets suitable for instruction fine-tuning, dialogue training, and other scenarios, accelerating model optimization!
-![](/content/en/moi-3.2-release/1.png)
+![](./images/1.png)
 
 ### II. Multi-User Collaboration: Flexible Control, Efficient Governance
 
@@ -45,7 +45,7 @@ Introduces a flexible permission management mechanism through the RBAC model, en
 ● **RBAC (Role-Based Access Control) Model**: A three-tier "User-Role-Permission" structure enables unified permission assignment and centralized management, enhancing standardization and maintainability.  
 ● **Centralized Configuration & Permission Reuse**: Users inherit permissions via roles (not direct binding), supporting abstract permission configuration and cross-team reuse.  
 ● **Adaptability to Diverse Organizations**: Enables efficient, secure data collaboration and governance for both SMEs and large enterprises, improving operational efficiency and compliance.
-![](/content/en/moi-3.2-release/2.png)
+![](./images/2.png)
 
 ### III. GenAI Workspace API Key Management: Secure Integration, Hassle-Free Invocation
 
@@ -53,10 +53,10 @@ New API key management feature launched! Enables secure, efficient API calls by 
 ● **One-click generation & masked display** prevents key leakage!  
 ● **Supports key refresh** with unified control over API call permissions for better risk prevention!  
 ● **Seamless integration** with third-party apps, automation scripts, and internal services!
-![](/content/en/moi-3.2-release/3.png)
+![](./images/3.png)
 
 ### IV. New File Export Support: Complete Content, Efficient Archiving
 
 DOC/DOCX, PPT/PPTX, and TXT files can now be exported as **complete, unsegmented Markdown (`full.md`)**, facilitating holistic viewing and management!
-![](/content/en/moi-3.2-release/4.png)
-![](/content/en/moi-3.2-release/5.png)
+![](./images/4.png)
+![](./images/5.png)

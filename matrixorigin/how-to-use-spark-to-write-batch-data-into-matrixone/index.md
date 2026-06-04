@@ -56,7 +56,7 @@ This blog will introduce two examples of using the Spark computing engine to imp
 
 The hardware requirements for this practice are as follows:
 
-![Hardware Environment](/content/en/how-to-use-spark-to-write-batch-data-into-matrixone/picture1.jpg)
+![Hardware Environment](./images/picture1.jpg)
 
 ### Software Environment
 
@@ -197,7 +197,7 @@ After connecting to MatrixOne using the MySQL client, create the necessary datab
 
 3. Run `MoRead.Main()` in IDEA, and the execution result is as follows:
 
-   ![](/content/en/how-to-use-spark-to-write-batch-data-into-matrixone/picture2.jpg)
+   ![](./images/picture2.jpg)
 
 ### Step Three: Write MySQL Data into MatrixOne
 

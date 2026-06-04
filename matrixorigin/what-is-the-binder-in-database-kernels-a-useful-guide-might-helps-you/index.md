@@ -34,13 +34,13 @@ The external service process of a database typically involves: parsing the input
 
 The internal execution process of a database that provides services over a network can be simply understood as follows:
 
-![](/content/en/what-is-the-binder-in-database-kernels-a-useful-guide-might-helps-you/picture1.jpg)
+![](./images/picture1.jpg)
 
 The Listener, Codec, Protocol modules in the diagram are common modules of a general network server. Database systems typically use custom protocols to unpack, pack, and transmit network packets, which is not discussed in detail here
 
 The other parts in the diagram are the main modules of the database kernel. Brief descriptions of these modules are as follows:
 
-![](/content/en/what-is-the-binder-in-database-kernels-a-useful-guide-might-helps-you/picture2.jpg)
+![](./images/picture2.jpg)
 
 > Note:
 >
@@ -152,7 +152,7 @@ Why does this error occur, stating that `b` is not in the group by clause or an 
 
 Based on the execution order in the pseudocode, in most cases, the binding order of each clause and the corresponding computational nodes are as follows:
 
-![](/content/en/what-is-the-binder-in-database-kernels-a-useful-guide-might-helps-you/picture3.jpg)
+![](./images/picture3.jpg)
 
 There are some more complex clauses and computational nodes/operators (such as union, window functions, etc.), which are not discussed in detail here. Let us know if you are interested in more comprehensive information, we would explain these in later articles in detail.
 

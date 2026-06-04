@@ -51,31 +51,31 @@ status: published
   2.拉取代码，创建 conda 虚拟环境，安装依赖。
   注册登录后进入控制台，选择创建实例：
 
-![创建实例](/content/zh/valentine-special-AI-girlfriend/070701.png?width=800)
+![创建实例](./images/070701.png?width=800)
 
 由于我们的训练规模不大，选择 4090 单卡应该是足够的：
 
-![选择4090算力卡](/content/zh/valentine-special-AI-girlfriend/070702.png?width=800)
+![选择4090算力卡](./images/070702.png?width=800)
 
 选择了 miniconda 镜像后然后创建实例：
 
-![选择miniconda](/content/zh/valentine-special-AI-girlfriend/070703.png?width=800)
+![选择miniconda](./images/070703.png?width=800)
 
 创建后等待 2 分钟左右实例显示 “运行中” 即创建成功：
 
-![实例创建成功](/content/zh/valentine-special-AI-girlfriend/070704.png?width=800)
+![实例创建成功](./images/070704.png?width=800)
 
 点击进入实例详情，便可以通过 ssh 远程连接实例：
 
-![SSH连接实例](/content/zh/valentine-special-AI-girlfriend/070705.png?width=800)
+![SSH连接实例](./images/070705.png?width=800)
 
 复制 ssh 命令连接串和密码在终端执行，并可以直接 ssh 登录到实例进行操作：
 
-![实例操作](/content/zh/valentine-special-AI-girlfriend/070706.png?width=800)
+![实例操作](./images/070706.png?width=800)
 
 查看显卡以及 cuda 信息 👍
 
-![查看显卡及cuda信息](/content/zh/valentine-special-AI-girlfriend/070707.png?width=800)
+![查看显卡及cuda信息](./images/070707.png?width=800)
 
 在 /root/data 下拉取训练框架代码，我们基于开源项目 WeClone 工具进行模型训练，在项目的基础上添加了数据预处理等脚本（注意要使用数据盘，否则后续下载模型可能会导致磁盘容量超载）。
 
@@ -127,7 +127,7 @@ sftp> put yy.csv /root/data/WeClone-WeChatMsg/data/csv/yy/yy.csv
 
 因为文件大小不大，也可以在 neolink 实例控制台手动拖动上传，非常方便
 
-![上传文件](/content/zh/valentine-special-AI-girlfriend/070708.png?width=800)
+![上传文件](./images/070708.png?width=800)
 
 上传数据集后，我们需要对数据进行简单的处理，包括生成训练数据，去除敏感信息等，在 make_dataset/blocked_words.json下添加训练需要去除的敏感信息
 
@@ -248,7 +248,7 @@ data
 
 该命令会自动下载对应的 LLM 模型（模型大概 13GB），再进行微调训练，可以在任意新的终端会话上执行 tmux attach -t train连接到训练的会话查看进度：
 
-![查看训练进度](/content/zh/valentine-special-AI-girlfriend/070709.png?width=800)
+![查看训练进度](./images/070709.png?width=800)
 
 最终的训练情况如下：
 
@@ -281,13 +281,13 @@ $ ssh -p[实例ssh端口] -L [本地端口 8080]:127.0.0.1:7860 root@[实例host
 
 运行命令后，转发到本地8080端口，在本地打开 localhost:8080 即可访问聊天机器人了！
 
-![访问聊天机器人](/content/zh/valentine-special-AI-girlfriend/070710.png?width=800)
+![访问聊天机器人](./images/070710.png?width=800)
 
 训练集聊天记录的内容是去 1 年半用户和女友发生的事情，这段时间背景是女朋友的爱好是跳芭蕾舞，女友会经常去图书馆学习，聊天实测下来效果还是不错的~
 
-![对话聊天机器人](/content/zh/valentine-special-AI-girlfriend/070711.png?width=800)
+![对话聊天机器人](./images/070711.png?width=800)
 
-![对话机器人](/content/zh/valentine-special-AI-girlfriend/070712.png?width=800)
+![对话机器人](./images/070712.png?width=800)
 
 ### 声明
 

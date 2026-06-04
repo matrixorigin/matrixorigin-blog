@@ -87,13 +87,13 @@ The shuffle for the scan operator is done during the pipeline compilation stage,
 
 The shuffle for the group operator statically expands the group operator into multiple pipelines during pipeline compilation, shuffling the block data actually read by the scan operator, theoretically on a per-row basis. Each pipeline receives the data outputted by the shuffle. At this point, the group operator does not need to merge groups, as each separate pipeline can directly output data to the next pipeline.
 
-![](/content/en/why-is-shuffle-support-needed/picture1.jpg)
+![](./images/picture1.jpg)
 
 ### Join Operator
 
 The shuffle for the join operator also statically expands the join operator into multiple pipelines during the pipeline compilation. The input of a join is divided into the probe and build sides, and the same shuffle algorithm is used for the input data on both sides to ensure that the same data is distributed to the same bucket. Each join operator can also directly output the join result without needing to merge.
 
-![](/content/en/why-is-shuffle-support-needed/picture2.jpg)
+![](./images/picture2.jpg)
 
 To check if a statement's execution plan has shuffle enabled, you can use the explain statement to see if the execution plan contains the shuffle keyword.
 

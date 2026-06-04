@@ -43,13 +43,13 @@ The Hash table is a very fundamental data structure and is critically important 
 SELECT col, count(*) FROM table GROUP BY col
 ```
 
-![](/content/en/how-matrixone-uses-go-language-to-design-and-implement-high-performance-hash-tables/picture1.jpg)
+![](./images/picture1.jpg)
 
 It involves two processing stages: Stage 1 is to build a hash table using the data from the source. Each record in the hash table is associated with a counter. If the record is newly inserted, the associated counter is set to 1; otherwise, the counter is incremented. Stage 2 is to aggregate the records in the hash table into a format that can be used for further query processing.
 
 For join queries, take the following SQL as an example:
 
-![](/content/en/how-matrixone-uses-go-language-to-design-and-implement-high-performance-hash-tables/picture2.jpg)
+![](./images/picture2.jpg)
 
 ```sql
 SELECT A.left_col, B.right_col FROM A JOIN B USING (key_col)

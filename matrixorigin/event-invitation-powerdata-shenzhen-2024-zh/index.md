@@ -20,11 +20,11 @@ lang: zh
 status: published
 ---
 
-![活动海报](/content/zh/event-invitation-powerdata-shenzhen-2024/poster.jpg)
+![活动海报](./images/poster.jpg)
 
 ## 讲师介绍
 
-![谢泽雄](/content/zh/event-invitation-powerdata-shenzhen-2024/person.jpg)
+![谢泽雄](./images/person.jpg)
 
 **谢泽雄** 矩阵起源 云原生研发工程师
 

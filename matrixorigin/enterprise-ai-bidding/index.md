@@ -56,7 +56,7 @@ MatrixOne Intelligence is an AI data intelligence solution for multi-modal data,
 
 As shown in the figure below, the solution is divided into 3 layers from bottom to top: the Data Integration and Governance Layer, the Database and AI Service Layer, and the Application Interaction Layer. These layers are interconnected, jointly forming a robust AI data intelligence solution.
 
-![1.png](/content/zh/case-jinpan/1.png)
+![1.png](./images/1.png)
 
 ### Core Tasks
 
@@ -130,13 +130,13 @@ Multi-modal data parsing and recognition based on existing large models may lead
 
 An end-to-end process architecture encompassing multimodal data access, governance, storage, parsing, feature engineering, and model training & inference is established through MatrixOne Intelligence.
 
-![2.png](/content/zh/case-jinpan/2.png)
+![2.png](./images/2.png)
 
 **4. Workflow of Bid Document Preparation Agent**
 
 Full-process closed-loop management of the business is achieved through in-depth AI analysis, sensitive information processing, and end-to-end bid document generation.
 
-![3.png](/content/zh/case-jinpan/3.png)
+![3.png](./images/3.png)
 
 **5. Data Governance Solution**
 
@@ -146,7 +146,7 @@ Enhance Operational Efficiency and Automation Level: Over 80% of enterprise data
 
 Establish Data Assets and Knowledge Base: Extract entity relationships from unstructured data to form an enterprise knowledge base and accelerate innovation.
 
-![4.png](/content/zh/case-jinpan/4.png)
+![4.png](./images/4.png)
 
 **6. Benefits and Value of the Bid Document Intelligent Agent Project**
 

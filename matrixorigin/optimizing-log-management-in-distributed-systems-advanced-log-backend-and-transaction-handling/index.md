@@ -61,7 +61,7 @@ To reduce latency, log entries are written in batches to the Log Backend. For in
 
 In a file system-based Log Backend, after writing multiple entries, a single fsync is performed for all. The combined time cost for flushing these entries is roughly equivalent to flushing a single entry.
 
-![](/content/en/optimizing-log-management-in-distributed-systems-advanced-log-backend-and-transaction-handling/picture1.jpg)
+![](./images/picture1.jpg)
 
 The Log Service supports concurrent writing, allowing the flush times of individual entries to overlap, which can reduce the total time for writing entries and increase the concurrency of submissions.
 
@@ -71,7 +71,7 @@ To accelerate the process, entries are written concurrently to the Log Backend. 
 
 These out-of-order LSNs must be managed during truncation and restart processes.
 
-![](/content/en/optimizing-log-management-in-distributed-systems-advanced-log-backend-and-transaction-handling/picture2.jpg)
+![](./images/picture2.jpg)
 
 To ensure that the LSNs in the Log Backend are generally in order and to minimize the extent of disorder, a logical LSN window is maintained.
 

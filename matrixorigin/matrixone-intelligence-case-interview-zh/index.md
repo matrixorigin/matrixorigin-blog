@@ -17,7 +17,7 @@ lang: zh
 status: published
 ---
 
-![1.png](/content/zh/matrixone-intelligence-case-interview/1.png)
+![1.png](./images/1.png)
 
 作为 GenAI 数据基础设施服务商，矩阵起源通过 Matrix One Intelligence（MOI）平台打通 “数据→知识→智能” 全链路，已服务 10 + 行业、处理超 500PB 多模态数据。 这次我们走进戴尔企业解决方案中心，与戴尔产品专家深度对话，探讨 MOI 平台的多模态处理能力搭配戴尔 “小魔盒” 的灵活算力，帮助中小企业打破 “算力贵、部署难、合规险” 的壁垒。
 

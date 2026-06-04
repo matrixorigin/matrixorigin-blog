@@ -80,11 +80,11 @@ status: published
 
 1. **邮件批量提取**
    通过 IMAP 协议连接 QQ 邮箱，一键批量下载所有包含 PDF / OFD / XML 格式附件的邮件，自动按邮件分组存储，完整保留邮件元数据。提取一封邮件的所有附件，不到 1 秒。
-   ![1.png](/content/zh/martrixone-ai-agent/1.png)
+   ![1.png](./images/1.png)
 
 2. **AI 发票解析**
    调用硅基流动的 Qwen3-VL-32B-Instruct 多模态模型，对每一张发票或行程单进行识别。系统会自动判断文档类型（发票 or 行程单），并提取对应字段。对于打车行程单，还能解析出每一段行程的起终点、时间和金额。解析结果持久化存储，不重复调用 API。
-   ![2.png](/content/zh/martrixone-ai-agent/2.png)
+   ![2.png](./images/2.png)
 
 3. **智能分类与配对**
 
@@ -94,14 +94,14 @@ status: published
 - 打车发票必须配对行程单，缺一不可（合规校验）
 
 所有判断自动完成，用户无需手动选择类型。
-![3.png](/content/zh/martrixone-ai-agent/3.png)
-![4.png](/content/zh/martrixone-ai-agent/4.png)
+![3.png](./images/3.png)
+![4.png](./images/4.png)
 
 4. **报销小助手 Agent**
    这是整套系统最"聪明"的部分。用户只需要在对话框里说一句：“帮我报销最近的高德打车发票”
 
 Agent 会自动执行：搜索邮件 → 提取附件 → AI 解析 → 合规校验 → 生成报销草稿，最后以轮播弹窗的形式呈现每一张报销单，等待用户逐一确认后提交。
-![5.png](/content/zh/martrixone-ai-agent/5.png)
+![5.png](./images/5.png)
 
 ---
 
