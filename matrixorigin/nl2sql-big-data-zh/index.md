@@ -22,9 +22,9 @@ status: published
 
 近年来，大模型（LLMs）的热潮推动了自然语言处理（NLP）任务的广泛进展，NL2SQL（自然语言转SQL）作为热门任务之一也不例外。
 从下图可以看出，不同的benchmark以及测试方法在T5模型之后，出现了极速增长。
-![1.png](/content/zh/nl2sql-big-data/1.png)
+![1.png](./images/1.png)
 并且一些SOTA 模型在nl2sql任务的表现上和以往相比，有了极大的提升：
-![2.png](/content/zh/nl2sql-big-data/2.png)
+![2.png](./images/2.png)
 但是普遍的这些模型的参数量都在100B以上，而NL2SQL作为一个相对niche的场景，并且和业务场景结合密切的情况下，是否可以在一些小参数量的模型上也获得比较好的表现呢？
 
 ## NL2SQL的核心是什么？

@@ -158,7 +158,7 @@ AI工具的发展其实是一个循序渐进、不断迭代的过程，其实早
 
 For All Time. Always (为了所有时间，永远如此)
 
-![1.png](/content/zh/martrixone-saas-openclaw/1.png)
+![1.png](./images/1.png)
 （图片：漫威电影《洛基》剧照）
 
 ---

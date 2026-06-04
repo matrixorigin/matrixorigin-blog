@@ -21,9 +21,9 @@ lang: zh
 status: published
 ---
 
-![招聘海报](/content/zh/matrixorigin-hiring-2024/picture1.jpg)
+![招聘海报](./images/picture1.jpg)
 
-![小助手二维码](/content/zh/matrixorigin-hiring-2024/picture2.jpg)
+![小助手二维码](./images/picture2.jpg)
 
 推荐有礼！添加 MO 小助理
 

@@ -78,7 +78,7 @@ Based on high-quality datasets, the team successfully developed the IBS intellig
 
 - **Medical Record Report:** One-click automatic integration of the entire consultation process information to generate standardized electronic medical record reports.
 
-![1.png](/content/zh/hospital-ibs-matrixone-intelligence/1.png)
+![1.png](./images/1.png)
 
 ### Customer Benefits
 

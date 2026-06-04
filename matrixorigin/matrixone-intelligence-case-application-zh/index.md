@@ -89,7 +89,7 @@ status: published
 每个填充的字段，都能点击查看「这个数据是从哪个文件的哪个位置来的」。
 
 填错了？直接在页面上改。想核实一下？点进去就能看到原始文档。
-![1.png](/content/zh/matrixone-intelligence-case-application/1.png)
+![1.png](./images/1.png)
 
 ## 效果怎么样？
 

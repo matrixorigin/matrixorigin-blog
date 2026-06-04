@@ -27,7 +27,7 @@ status: published
 
 On October 24, Matrix Origin CEO and Founder Wang Long attended the “Hyper-Connectivity (Suzhou) Headquarters Node Launch Event,” jointly organized by the Zhongguancun Hyper-Connectivity New Infrastructure Industry Innovation Alliance and the Digital RMB Research Institute, and hosted by 21Vianet. During the event, Wang Long shared the collaborative achievements between Matrix Origin and 21Vianet in developing a multimodal AI data intelligence platform and a hyper-connectivity intelligent computing platform.
 
-![wanglong](/content/en/mo-ceo-attends-hyper-connectivity-headquarters-1024/wl.png?width=800)
+![wanglong](./images/wl.png?width=800)
 
 Wang began by reflecting on his 15 years of experience in big data, underscoring the pivotal role of data in the digital realm. He emphasized that data, as a critical element of digital transformation, has driven technological evolution from early computational networks to modern cloud and edge computing. Inspired by this perspective, Matrix Origin is dedicated to helping enterprises effectively manage and leverage data to drive business value.
 

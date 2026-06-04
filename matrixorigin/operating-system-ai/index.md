@@ -22,7 +22,7 @@ lang: en
 status: published
 ---
 
-![ai](/content/en/event-review-mo-ceo-giic/1-1.jpeg)
+![ai](./images/1-1.jpeg)
 
 It's been a month where AI continues to move forward at high speed: the technology is moving forward at a frenetic pace, and prices are dropping just as quickly.
 

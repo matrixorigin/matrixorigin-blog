@@ -32,7 +32,7 @@ In the era of the IoT, enterprises are accelerating digital transformation at an
 
 Skyable is a high-tech enterprise that provides IoT cloud services and solutions for enterprise users. Its core R&D team comes from top architects in the Internet software, hardware, and security fields at companies such as BAT, Datang Telecom, and 360. Matrix IoT Cloud Platform has successfully connected nearly ten million devices and serves nearly 300 enterprise customers in China and abroad, including Haier, Hisense, State Power Investment Corporation, Yadu, Supor, Konkais, Forland, Viessmann, Zhiyi, Mill, and Baomi. Its business mainly covers the Industrial Internet of Things (IIoT) and various business systems extended from IIoT, and it is committed to providing enterprises with intelligent device management and data analysis services.
 
-![1.png](/content/zh/mo-helps-xian-tianneng-replace-mysql-mongodb-es-create-iot-platform/tn1.png?width=800)
+![1.png](./images/tn1.png?width=800)
 
 ### Challenges
 
@@ -46,7 +46,7 @@ Third, devices and the platform also generate a large amount of log text data. T
 
 **Given these business characteristics, Skyable adopted a data architecture in which MySQL is used for core data and process management, Redis for real-time data, MongoDB for historical data, and Elasticsearch for log data.**
 
-![2.png](/content/zh/mo-helps-xian-tianneng-replace-mysql-mongodb-es-create-iot-platform/tn2.png?width=800)
+![2.png](./images/tn2.png?width=800)
 
 **Pressure from processing massive amounts of data**
 
@@ -92,7 +92,7 @@ MatrixOne is highly compatible with MySQL syntax, allowing Skyable to migrate da
 
 MatrixOne's hybrid workload capabilities enable it to handle both transaction processing (TP) and analytical processing (AP), while also supporting full-text search for text data. On the Skyable platform, core data processing leverages MatrixOne's TP capabilities to ensure efficient read and write performance. Queries on device-reported data and logs utilize MatrixOne's AP features and full-text search, satisfying both real-time requirements and analytical needs.
 
-![3.png](/content/zh/mo-helps-xian-tianneng-replace-mysql-mongodb-es-create-iot-platform/tn3.png?width=800)
+![3.png](./images/tn3.png?width=800)
 
 ### Client's Benefits
 

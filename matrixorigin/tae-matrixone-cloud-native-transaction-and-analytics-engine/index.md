@@ -49,13 +49,13 @@ LogService core requirements are the following:
 
 Log stores the data from the latest committed transaction, and when this data is dumped asynchronously to the object store, the associated log is also deleted. You can consider the log as a sliding window on the timeline, TAE pushes the window forward, data outside the window is cleared, and the TAE ensures that the amount of data which falls inside the window not to be very large. Therefore, there is no need to configure a large disk for the LogService.
 
-![](/content/en/tae-matrixone-cloud-native-transaction-and-analytics-engine/picture1.jpg)
+![](./images/picture1.jpg)
 
 ## Part 3 TN(Transaction Node)
 
 In the write process, the TAE writes the commit transaction to the log and asynchronously dumps it to the object store. All this happens at the TN(TN in the following diagram, we have changed the name to TN in 1.0.0-RC1 version).
 
-![](/content/en/tae-matrixone-cloud-native-transaction-and-analytics-engine/picture2.jpg)
+![](./images/picture2.jpg)
 
 The above figure shows the state of TN after performing some write operations — the top one is the memory state machine, the middle one is the log, and the bottom one is the object store:
 
@@ -67,15 +67,15 @@ The third transaction persists Block-1 to the object store and modifies the Bloc
 
 The TN state machine is committed to dumping the data in the log onto the object store, but the order of dumping is not entirely dependent on the monotonicity of the transaction log, as shown below:
 
-![](/content/en/tae-matrixone-cloud-native-transaction-and-analytics-engine/picture3.jpg)
+![](./images/picture3.jpg)
 
 LSN\[11–17]'s have been dumped, but LSN\[3–4,7–10] are still in the in-memory state machine (for reasons explained in the standalone TAE article). This is only a temporary state, and TN will drive the window of logs ever forward according to a specific policy.
 
-![](/content/en/tae-matrixone-cloud-native-transaction-and-analytics-engine/picture4.jpg)
+![](./images/picture4.jpg)
 
 TN will select a transaction as a snapshot candidate at an appropriate time, and wait for all transactions before this candidate to be dumped, and then save it as a snapshot using the timestamp of this candidate as the timestamp of the snapshot. When the snapshot is generated, all the logs before that transaction can be cleaned up:
 
-![](/content/en/tae-matrixone-cloud-native-transaction-and-analytics-engine/picture5.jpg)
+![](./images/picture5.jpg)
 
 Here we refer all logs after the snapshot as LogTail. e.g., in the above figure, before "ckp-1" is generated, LSNs \[1–17] are all LogTail. After the TN fails, we only need to read the latest snapshot from the object storage and LogTail from the LogService to recover the complete state machine.
 
@@ -95,7 +95,7 @@ Join a CN to the cluster, at this point the TN's state can be described as \[1,1
 
 At this point the newly joined CN state can be described as [0, 0]
 
-![](/content/en/tae-matrixone-cloud-native-transaction-and-analytics-engine/picture6.jpg)
+![](./images/picture6.jpg)
 
 **CN receives a query request, assuming the request has a timestamp of 118:**
 
@@ -105,7 +105,7 @@ At this point the newly joined CN state can be described as [0, 0]
 4. Update the state of the CN state machine to [1, 118];
 5. Starts the query.
 
-![](/content/en/tae-matrixone-cloud-native-transaction-and-analytics-engine/picture7.jpg)
+![](./images/picture7.jpg)
 
 **CN receives a query request with a timestamp of 130:**
 
@@ -115,7 +115,7 @@ At this point the newly joined CN state can be described as [0, 0]
 4. Update the state of the CN state machine to [1, 130];
 5. Starts the query.
 
-![](/content/en/tae-matrixone-cloud-native-transaction-and-analytics-engine/picture8.jpg)
+![](./images/picture8.jpg)
 
 ## Part 5 Cooperative Work
 
@@ -123,7 +123,7 @@ MatrixOne supports dynamic expansion of CN as well as multiple TNs (dynamic expa
 
 When defining the table structure, you can specify partition keys to distribute the table data over multiple TNs. Each CN table data contains data from multiple TN partitions, which facilitates some cross-partition queries.
 
-![](/content/en/tae-matrixone-cloud-native-transaction-and-analytics-engine/picture9.jpg)
+![](./images/picture9.jpg)
 
 **Looking at the responsibilities of the TN, there are three main points:**
 

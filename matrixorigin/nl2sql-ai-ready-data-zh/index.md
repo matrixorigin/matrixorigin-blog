@@ -19,7 +19,7 @@ lang: zh
 status: published
 ---
 
-![1.gif](/content/zh/nl2sql-ai-ready-data/1.gif)
+![1.gif](./images/1.gif)
 
 作者 | 矩阵起源
 
@@ -79,11 +79,11 @@ status: published
 
 根据 scaling laws：质量与参数/数据/算力相关，但在企业场景必须把**推理成本与延迟**纳入目标函数。这里我们参考了 DeepMind 的理论【Training Compute-Optimal Large Language Models】，在更高质量，更加密集的数据集上，参数较小的模型也能够在固定任务上超越大参数量模型。
 
-![2.png](/content/zh/nl2sql-ai-ready-data/2.png)
+![2.png](./images/2.png)
 
 在 Closed-book question answering 场景上，70B 的 Chinchilla 甚至能够超越 128B 的 GPT-3。
 
-![3.png](/content/zh/nl2sql-ai-ready-data/3.png)
+![3.png](./images/3.png)
 
 微软的 phi 系列模型也从侧面证实了这一点。
 
@@ -153,11 +153,11 @@ status: published
 
 ## Key Results
 
-![4.png](/content/zh/nl2sql-ai-ready-data/4.png)
+![4.png](./images/4.png)
 
 ## 流程概览
 
-![5.png](/content/zh/nl2sql-ai-ready-data/5.png)
+![5.png](./images/5.png)
 
 通过**M-Schema（结构与示例值）**、**约束池（口径与规则）**、**BM25→SIC 两级 Linking**与**小模型 LoRA 精调 + 训练-推理一致性**，我们在不依赖超大通用模型的前提下，**显著压降结构/语义幻觉并提升 EX 指标**；在企业库与业务小样本上也获得了稳定收益。
 

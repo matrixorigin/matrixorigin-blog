@@ -34,7 +34,7 @@ Extreme Vision Technology Co., Ltd. (Extreme Vision) founded in June 2015, it is
 
 As a company whose core capabilities center on machine learning and AI algorithms, Extreme Vision's business involves extensive AI/ML-related engineering work, in which feature engineering plays a particularly critical role. Feature engineering refers to the process of transforming raw data into feature vectors. It is one of the most important steps in machine learning, directly affecting model performance, and typically requires a significant amount of time. Typical feature engineering processes include data cleaning, feature extraction, and feature selection.
 
-![jsj2](/content/zh/jishijiao-case/jsj2.jpg)
+![jsj2](./images/jsj2.jpg)
 
 In the overall feature engineering process, the storage and management of feature data is a critical component. Traditionally, AI engineers tend to store feature data in relatively simple file-based formats and then load these features into subsequent training or inference pipelines through code. Extreme Vision's approach to feature data storage and usage has followed a similar pattern.
 
@@ -98,7 +98,7 @@ MatrixOne support certain streaming data transformations and processing through 
 
 With these capabilities, MatrixOne enables the one-stop construction of an AI feature data platform, greatly simplifying the traditionally complex architectures that rely on multiple database components.
 
-![jsj1](/content/zh/jishijiao-case/jsj1.jpg)
+![jsj1](./images/jsj1.jpg)
 
 After completing the AI feature platform built on MatrixOne as the underlying foundation, Extreme Vision's AI engineers were able to completely move away from the previous model in which a separate feature engineering pipeline had to be built for each AI algorithm or model. In terms of model development efficiency, by precomputing and storing features, the model development cycle was reduced by 30%, shortening the average timeline from four weeks to 2.8 weeks. At the same time, feature reuse reduced the feature engineering pipelines required for each model iteration by 40%. A large number of repetitive pipelines were identified and replaced by existing feature engineering workflows or by directly using prebuilt feature datasets. In addition, through the sharing of business features, overall business flexibility increased significantly. When different departments and projects encountered business requirements, cross-department and cross-project feature data sharing improved overall data utilization by 40%.
 

@@ -40,6 +40,6 @@ MatrixOne 是一款高度兼容 MySQL 语法的 HTAP 数据库，采用云原生
 
 此次，小编将该系列的推文内容做了系统归档，整理为 pdf 文档，感兴趣的朋友可以通过如下二维码一键下载、阅读。
 
-![合集下载二维码](/content/zh/matrixone-vs-mysql/qrcode.jpg)
+![合集下载二维码](./images/qrcode.jpg)
 
 **如果有更多对 MatrixOne 感兴趣的内容，欢迎添加微信号：MatrixOrigin001，进行留言沟通。**

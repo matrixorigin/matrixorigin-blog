@@ -83,7 +83,7 @@ MatrixOne Intelligence's architecture comprises four layers:
 4. **Application Interaction Layer**:  
    Empowers enterprises to build efficient business applications through multimodal search and Chat2BI functionalities.
 
-<!-- ![](/content/en/moi-whitepaper-release/mo-structure.png) -->
+<!-- ![](./images/mo-structure.png) -->
 <img src="/content/en/moi-whitepaper-release/new-mo-structure.png" alt=""  style="width: 800px; max-width: 800px;" />
 
 ## Industry Applications and Case Studies

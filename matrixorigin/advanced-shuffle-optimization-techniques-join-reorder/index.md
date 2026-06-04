@@ -44,7 +44,7 @@ During this process, it will also undergo multiple recursive scans to determine 
 
 Taking `tpch1T` Q10 as an example, the optimal execution plan obtained in a single-machine environment, and the execution plan found in a distributed scenario after incorporating a shuffle execution plan are as follows:
 
-![](/content/en/advanced-shuffle-optimization-techniques-join-reorder/picture1.jpg)
+![](./images/picture1.jpg)
 
 The left side represents the optimal execution plan in a single-machine scenario.
 

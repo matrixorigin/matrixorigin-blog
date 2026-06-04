@@ -42,13 +42,13 @@ status: published
 
 结合MatrixOne（以下简称MO）的向量能力和MatrixGenesis（以下简称MG）的Agent服务能力，理解用户的自然语言并检索出匹配的指令，再向终端设备发出一系列动作。
 
-![1.png](/content/zh/jixian-aiot-matrixone-agent/1.png)
+![1.png](./images/1.png)
 
 MatrixGenesis是MatrixOrigin提供的另一款AI服务产品，在这个案例中，MG的Agent服务可以将文字信息理解并转化成MO的数据检索SQL，MO作为向量数据的存储和服务方提供了快速的向量检索服务，将指令返回给MG，最终由智能管理平台向多个终端设备发送操作指令。
 
-![2.png](/content/zh/jixian-aiot-matrixone-agent/2.png)
+![2.png](./images/2.png)
 
-![3.png](/content/zh/jixian-aiot-matrixone-agent/3.png)
+![3.png](./images/3.png)
 
 ## 客户收益
 

@@ -48,7 +48,7 @@ The slag layer, mainly composed of oxides such as Fe and Si, usually contains a 
 
 To achieve rational operational control, it is necessary to properly schedule slag tapping and matte tapping operations, including timing and discharge locations. Only in this way can the matte grade be effectively controlled while better coordinating with the subsequent converter blowing process.
 
-![1.png](/content/zh/mo-helps-copper-build-aiot-bigdata-system/sj.png?width=800)
+![1.png](./images/sj.png?width=800)
 
 **● Significant Limitations of Traditional Manual Operations**
 
@@ -78,7 +78,7 @@ Finally, as this system is a smart operation system closely related to flash sme
 
 Faced with such data-processing requirements, the traditional approach is to divide and conquer, with each module using a separate database component. The OLTP part typically uses a relational database such as MySQL; the IoT data acquisition part uses a time-series database such as InfluxDB; the OLAP data analysis part uses a data warehouse such as Greenplum; and for image-based unstructured data, an additional object storage system and AI algorithm system must be built. However, this construction approach places extremely high demands on IT personnel and makes it difficult to meet overall real-time requirements. Moreover, the ETL processes built between these database components face tremendous maintenance pressure. Even for a smelting giant like Jiangxi Copper, it is difficult to possess sufficient IT capabilities to effectively manage such a complex architectural system.
 
-![2.png](/content/zh/mo-helps-copper-build-aiot-bigdata-system/jg.png?width=800)
+![2.png](./images/jg.png?width=800)
 
 ### Solution
 
@@ -100,7 +100,7 @@ MatrixOne provides a complete user-defined function (UDF) mechanism, allowing AI
 
 In terms of development and usage, MatrixOne is highly compatible with MySQL. Whether it is SQL syntax, communication protocols, middleware for commonly used programming languages, or even mainstream database development and visualization tools are fully consistent with MySQL. As a result, even entry-level developers can work with it effortlessly.
 
-![3.png](/content/zh/mo-helps-copper-build-aiot-bigdata-system/gxjg.png?width=800)
+![3.png](./images/gxjg.png?width=800)
 
 As shown in the figure, supported by these overall capabilities, the architecture of the entire data layer is greatly simplified. All data processing tasks are handled by a single database component, fully freeing application developers' time so they no longer need to devote significant effort to heavy underlying data movement and integration work.
 

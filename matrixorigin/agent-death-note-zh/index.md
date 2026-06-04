@@ -133,7 +133,7 @@ status: published
 
 ## 05 临终备忘录 vs 其他方案
 
-![1.png](/content/zh/agent-death-note/1.png)
+![1.png](./images/1.png)
 
 ---
 

@@ -24,9 +24,9 @@ status: published
 
 自 6 月启动到现在，历时半年，矩阵起源一路披荆斩棘，从 1万余家参赛企业中脱颖而出，取得全国赛成长组优秀企业！此外，还荣获深创赛企业组三等奖！这些奖项不仅是对公司项目的认可，更是对公司未来发展的激励！
 
-![全国赛-优秀企业](/content/zh/mo-won-national-competition/x1.png?width=500)
+![全国赛-优秀企业](./images/x1.png?width=500)
 
-![深创赛-三等奖](/content/zh/mo-won-national-competition/x2.png?width=500)
+![深创赛-三等奖](./images/x2.png?width=500)
 
 ### 相关链接:
 

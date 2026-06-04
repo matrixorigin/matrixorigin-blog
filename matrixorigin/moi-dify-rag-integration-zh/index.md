@@ -106,7 +106,7 @@ _(注意：此步骤可能需要一些时间，因为它会下载依赖并构建
 
 至此，您的 Dify 平台已经成功搭建并与 MatrixOne 集成。
 
-![1.png](/content/zh/moi-dify-rag-integration/1.png)
+![1.png](./images/1.png)
 
 ## Part 2: 核心流程：从 MOI 导出数据至 Dify
 
@@ -120,11 +120,11 @@ _(注意：此步骤可能需要一些时间，因为它会下载依赖并构建
 2. 进入"知识库"模块。
 3. 点击"创建知识库"，输入一个名称（例如 moi_data_repository），然后点击"创建"。
 
-![2.png](/content/zh/moi-dify-rag-integration/2.png)
+![2.png](./images/2.png)
 
-![3.png](/content/zh/moi-dify-rag-integration/3.png)
+![3.png](./images/3.png)
 
-![4.png](/content/zh/moi-dify-rag-integration/4.png)
+![4.png](./images/4.png)
 
 ### 2.2 在 MOI 中配置 Dify 连接器
 
@@ -142,9 +142,9 @@ _(注意：此步骤可能需要一些时间，因为它会下载依赖并构建
      - 在 Dify 的同一"API 访问"页面中，复制"个人 API Token"（访问令牌）。
 5. 保存连接器。
 
-![5.png](/content/zh/moi-dify-rag-integration/5.png)
+![5.png](./images/5.png)
 
-![6.png](/content/zh/moi-dify-rag-integration/6.png)
+![6.png](./images/6.png)
 
 ### 2.3 在 MOI 中创建并执行导出任务
 
@@ -159,7 +159,7 @@ _(注意：此步骤可能需要一些时间，因为它会下载依赖并构建
    - **向量模型**：如果是首次向这个知识库导出，您需要选择一个向量化模型。请确保该模型与您 Dify 中配置的 Embedding 模型一致或兼容。
 3. 点击"创建"后，导出任务开始执行。等待任务状态从"进行中"变为"完成"。
 
-![7.png](/content/zh/moi-dify-rag-integration/7.png)
+![7.png](./images/7.png)
 
 ### 2.4 验证数据导入成功
 
@@ -207,7 +207,7 @@ _(注意：此步骤可能需要一些时间，因为它会下载依赖并构建
 
 在页面底部"添加功能"中，可以启用"对话开场白"，为用户提供一个友好的欢迎语和一些示例问题。
 
-![8.png](/content/zh/moi-dify-rag-integration/8.png)
+![8.png](./images/8.png)
 
 ### 3.3 调试和发布
 
@@ -223,7 +223,7 @@ _(注意：此步骤可能需要一些时间，因为它会下载依赖并构建
 
 ### 观看直播回放，获取更详尽的实战演示与内容解析
 
-![9.png](/content/zh/moi-dify-rag-integration/9.png)
+![9.png](./images/9.png)
 
 ### 直播 Q&A 环节
 

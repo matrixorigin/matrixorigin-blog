@@ -20,4 +20,4 @@ lang: zh
 status: published
 ---
 
-![1.jpg](/content/zh/live-preview-0711/1.png)
+![1.jpg](./images/1.png)

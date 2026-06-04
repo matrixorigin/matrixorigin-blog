@@ -31,9 +31,9 @@ BeeDa Software is a domestic professional software provider for the wallpaper in
 
 BeeDa has independently developed a "purchase–sales–inventory" (PSI) ERP system that connects applications, devices, and customers. Through this system, users can quickly access upstream factory product codes and inventory data, as well as order information from downstream distributors at all levels and retail stores, enabling customers to manage sales data more efficiently. The system integrates functions into a unified platform, including mobile online ordering, customer management, order shipment tracking, customized executive reports, procurement and stock preparation, and decision support into a unified platform.
 
-![1.png](/content/zh/bida-wallpaper-erp-matrixone/1.png)
+![1.png](./images/1.png)
 
-![2.png](/content/zh/bida-wallpaper-erp-matrixone/2.png)
+![2.png](./images/2.png)
 
 ### Business Pain Points
 

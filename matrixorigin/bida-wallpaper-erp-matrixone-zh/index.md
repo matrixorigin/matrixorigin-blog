@@ -28,9 +28,9 @@ status: published
 
 壁达自研了一套"供销存"ERP系统，可关联应用程序、设备和客户，通过该系统可以快速查找上游工厂的货号、库存数据和下游各级分销商以及门店的订单业务信息，帮助客户更加便捷的管理销售数据。集移动在线下单、客户管理、订单出货跟踪、老板定制报表、采购备货、决策支持等功能于一体。
 
-![1.png](/content/zh/bida-wallpaper-erp-matrixone/1.png)
+![1.png](./images/1.png)
 
-![2.png](/content/zh/bida-wallpaper-erp-matrixone/2.png)
+![2.png](./images/2.png)
 
 ## 业务痛点
 

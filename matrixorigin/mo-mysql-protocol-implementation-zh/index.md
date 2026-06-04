@@ -137,7 +137,7 @@ func (mo *MOServer) startAccept(listener net.Listener) {
 
 handleConn主要进行服务端与客户端认证的相关操作，即handshake。MySQL协议中的handshake过程主要有handshake包的发送以及处理认证返回的handshake response来完成身份验证。确立服务端与客户端的连接。这其中客户端和服务端的主要交互如下：
 
-![tupian1](/content/zh/mo-mysql-protocol-implementation/mysql1.png)
+![tupian1](./images/mysql1.png)
 
 MatrixOne中的核心代码如下：
 
@@ -384,7 +384,7 @@ func checkPassword(pwd, salt, auth []byte) {
 
 SSL连接下的handshake主要交互如下：
 
-![tupian2](/content/zh/mo-mysql-protocol-implementation/mysql2.png)
+![tupian2](./images/mysql2.png)
 
 进一步，从wireshark抓下的数据包来分析，服务端发出的handshake包中，Server Capabilities的SSL标志位被置为1。
 
@@ -589,7 +589,7 @@ type Conn struct {    // 标识唯一ID
 
 在一次SELECT语句中，客户端和服务端的交互行为是这样的：
 
-![tupian3](/content/zh/mo-mysql-protocol-implementation/mysql3.png)
+![tupian3](./images/mysql3.png)
 
 select语句进入服务端经过解析分类后，调用executeStmtWithResponse进行执行。
 
@@ -940,7 +940,7 @@ func executeResultRowStmt() {
 
 JDBC中，Prepare操作发送的的数据包中，command type不再为query，而是prepare statement。客户端和服务端的交互也会发生变化，具体如下：
 
-![tupian4](/content/zh/mo-mysql-protocol-implementation/mysql4.png)
+![tupian4](./images/mysql4.png)
 
 Prepare command的结构如下：
 
@@ -1010,7 +1010,7 @@ func SendPrepareResponse() {
 
 jdbc中执行Execute的交互流程与直接执行的最大区别在于不再使用Text协议而是为了提高效率使用Binary的方式，具体交互流程如下：
 
-![tupian5](/content/zh/mo-mysql-protocol-implementation/mysql5.png)
+![tupian5](./images/mysql5.png)
 
 ```sql
 // Client Request
@@ -1114,7 +1114,7 @@ func appendResultSetBinaryRow() {
 
 LOAD DATA LOCAL INFILE 用于客户端从本地的文件加载数据到MatrixOne数据库表中。整个网络交互流程上，客户端首先发送给load local infile query command， 其中包括文件路径，目标表，分隔符等等数据。服务端返回包含filename的LOCAL INFILE Packet。客户端收到后开始正式发送文件内数据，以空包代表结束。整体交互流程如下：
 
-![tupian6](/content/zh/mo-mysql-protocol-implementation/mysql6.png)
+![tupian6](./images/mysql6.png)
 
 协议包结构如下：
 

@@ -154,7 +154,7 @@ Intelligence作为一套面向多模态数据的AI数据智能解决方案，正
 为解决这些挑战，MatrixOne
 Intelligence通过统一的底层资源管理、全链路数据治理、多模态数据融合存储、建模及搜索能力，搭建了一套端到端的数据智能架构。如下图所示，该解决方案自下而上分为四个层次，分别是基础设施层、数据集成与治理层、数据库及AI服务层，以及应用交互层。这四个层次环环相扣，共同构建出一个强大的数据智能解决方案。
 
-![structure](/content/zh/moi-whitepaper1/structure.png)
+![structure](./images/structure.png)
 
 #### 基础设施层
 

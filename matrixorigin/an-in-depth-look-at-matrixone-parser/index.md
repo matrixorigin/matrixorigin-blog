@@ -54,7 +54,7 @@ integer : digit digit*
 
 Implementing regular matching can be done by FA, for example, if we want to recognize the regular syntax `r = (a | b) * abb`, the state transition diagram is as follows:
 
-![](/content/en/an-in-depth-look-at-matrixone-parser/picture1.jpg)
+![](./images/picture1.jpg)
 
 In this way, when the state reaches the termination state 3, the recognition is successful. A closer look reveals a problem, at state 0, the reception of a, which can go from 0 to 0 or from 0 to 1. This uncertainty cannot be programmed. We call it a Non-deterministic Finite Automata (NFA).
 
@@ -62,13 +62,13 @@ In this way, when the state reaches the termination state 3, the recognition is 
 
 For the above example, the state diagram after converting NFA to DFA is as follows:
 
-![](/content/en/an-in-depth-look-at-matrixone-parser/picture2.jpg)
+![](./images/picture2.jpg)
 
 From the above figure it can be seen that no matter which state a or b is received, the next state arrived is determined.
 
 In this way, by making state diagrams and integrating for different types of tokens, a simple identification token DFA is as follows:
 
-![](/content/en/an-in-depth-look-at-matrixone-parser/picture3.jpg)
+![](./images/picture3.jpg)
 
 For different MySQL tokens, such as numbers, strings, identifiers, mathematical symbols, comments, etc., you can refer to their definitions, write the corresponding DFAs, and ultimately form a Lexer. If you're interested, you can take a look at MatrixOne's Lexer, which is implemented in [scanner.go](https://github.com/matrixorigin/matrixone/blob/main/pkg/vm/engine/tae/db/scanner.go), and wrapped up in [mysql_lexer.go](https://github.com/matrixorigin/matrixone/blob/main/pkg/sql/parsers/dialect/mysql/mysql_lexer.go).
 
@@ -124,7 +124,7 @@ E : id
 
 By Shift-Reduce Parsing, we can conclude the expression is syntactically correct.
 
-![](/content/en/an-in-depth-look-at-matrixone-parser/picture4.jpg)
+![](./images/picture4.jpg)
 
 ### >>> Conflict
 
@@ -255,7 +255,7 @@ select a, b from t1 where a > 3 and b = 4;
 
 The following syntax tree is generated:
 
-![](/content/en/an-in-depth-look-at-matrixone-parser/picture5.jpg)
+![](./images/picture5.jpg)
 
 Then, the syntax tree can be transformed and optimized into a logical plan.
 

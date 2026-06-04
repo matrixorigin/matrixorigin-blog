@@ -63,7 +63,7 @@ Logservice uses an in-memory-based state machine, which does not record user dat
 
 Under this separated state machine design, a simple snapshot mechanism can cause problems:
 
-![](/content/en/advanced-operations-in-log-service-write-read/picture1.jpg)
+![](./images/picture1.jpg)
 
 1. As shown in the diagram, TAE sends a truncate request, with the truncate index being 100, but at this point, the applied index of the logservice state machine is 200, meaning logs before 200 will be deleted, and then a snapshot is generated at this position.
 
@@ -79,7 +79,7 @@ Under this separated state machine design, a simple snapshot mechanism can cause
 
 **To solve the problem described above, the overall workflow of truncation is as follows**
 
-![](/content/en/advanced-operations-in-log-service-write-read/picture2.jpg)
+![](./images/picture2.jpg)
 
 TAE sends a truncate request, updating the truncateLsn in the logservice state machine. At this point, only the value is updated without performing any snapshot/truncate operations. Each logservice server internally starts a truncation worker that sends a Truncate Request periodically. Note that the Exported parameter in this Request is set to true, indicating that the snapshot is invisible to the system and is merely exported to a specific directory.
 

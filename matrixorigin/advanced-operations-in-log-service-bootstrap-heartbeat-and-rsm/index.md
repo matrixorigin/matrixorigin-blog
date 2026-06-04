@@ -46,7 +46,7 @@ This heartbeat is sent from logservice, CN, and TN to HAKeeper and is not the he
 
 The heartbeat process of Logservice is as shown in the following diagram, similar to that of CN and TN.
 
-![](/content/en/advanced-operations-in-log-service-bootstrap-heartbeat-and-rsm/picture1.jpg)
+![](./images/picture1.jpg)
 
 The heartbeat is executed by default every 1 second, and its principle is as follows:
 

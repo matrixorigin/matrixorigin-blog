@@ -40,7 +40,7 @@ We will delve into the architectural design of MatrixOne, the next generation hy
 
 When enterprises undergo digital transformation, they often establish a technology middleware and develop a comprehensive suite of data processing systems using Hadoop. The diagram below illustrates the typical data components present within the Hadoop system. As depicted, various components have different versions and compatibility requirements, which entail managing numerous intricate details. This complexity increases the costs associated with learning, maintenance, and troubleshooting.
 
-![](/content/en/matrixone-system-architecture/picture1.jpg)
+![](./images/picture1.jpg)
 
 Building and maintaining a data center can be compared to assembling building blocks. Each individual component is developed separately and functions independently. While these components may work individually, the system becomes fragile and unreliable. If any of these components encounter issues, it can lead to the entire system becoming unavailable. Additionally, managing and maintaining the entire system becomes challenging, and the cost of building such a system increases significantly.
 
@@ -66,7 +66,7 @@ From the above developments, it can be observed that convergence is the trend in
 
 The diagram shows the architecture of MatrixOne：
 
-![The Architecture of MatrixOne](/content/en/matrixone-system-architecture/architecture-of-matrixone.jpg)
+![The Architecture of MatrixOne](./images/architecture-of-matrixone.jpg)
 
 - First of all, the top layer is the compute layer, and the compute nodes in this are called CN. CNs can do analytics, streaming computation, and background task processing. The user level and the frontend business cannot perceive the background processing tasks of the compute node.
 - The main nodes in the transaction layer below the compute layer are TN, which share nothing and horizontally scalable. The data slices between and within each TN are disjoint. The current scheme is to do the horizontal distribution of data expansion according to the data primary key. The data ranges handled by each TN do not intersect with each other, and there is no need for conflict detection.
@@ -107,7 +107,7 @@ HA Keeper maintains the state of each node in the cluster, keeps a heartbeat wit
 
 MatrixOne uses a two-phase commit (2PC) implementation of transactions that is slightly different from the current NewSQL solution. The specific writing process is as follows:
 
-![](/content/en/matrixone-system-architecture/picture2.jpg)
+![](./images/picture2.jpg)
 
 The client writes data using the write interface and saves the read/write space of the transaction on the CN node after the request reaches the CN node. The data starts conflict detection only regarding the TN(TN in the diagram) node.
 
@@ -121,13 +121,13 @@ The two-phase transaction is asynchronous; the TN node commit process is asynchr
 
 ### 02 Clock SI
 
-![](/content/en/matrixone-system-architecture/picture3.jpg)
+![](./images/picture3.jpg)
 
 The Clock SI itself is defined as circled in the red box above. Any transaction opens a consistency snapshot, the start of which is determined by a snapshot timestamp, and all transactions that have been committed before this timestamp are visible in this snapshot. The commit timestamps are in full order. Transactions are canceled if a concurrent write-write conflict occurs.
 
 Clock SI mainly solves the problem of distributing timestamps without a central node, i.e., using each node's own timestamp. However, there is the problem of always clock drift between nodes and nodes, and clock drift faces two error bugs:
 
-![](/content/en/matrixone-system-architecture/picture4.jpg)
+![](./images/picture4.jpg)
 
 The first error is the snapshot unavailability problem, Fig.1 on the left side shows two transaction participants P1 and P2 on different nodes, there is a clock drift between them, which will lead to the problem that the snapshot is unavailable before P2 reaches t.
 
@@ -141,7 +141,7 @@ MatrixOne combines Clocks SI and HLC, HLC is a hybrid logic clock, the two parti
 
 For read requests with high data consistency requirements, the read request needs to pull the latest distribution of data from the TN after the read request reaches the CN node, and the TN(TN in the diagram) returns both the latest metadata and meta to the CN node. Based on this information, the CN node pulls the data from the File Service interface.
 
-![](/content/en/matrixone-system-architecture/picture5.jpg)
+![](./images/picture5.jpg)
 
 MatrixOne uses a single column memory to store data, each column's block and segment's tree structure and bloom filter, minmax index and other information are stored in the meta, index zone, all data writes are append only, no matter updating, inserting or deleting are just All data writing is append only, no matter updating, inserting or deleting, it is just adding new files. Merge on read is used to do the merge when querying.
 
@@ -155,7 +155,7 @@ For TP query, CN can do consistency read after getting the latest data. For AP q
 
 We can use the CN to scan the data to decide whether to do the compaction or the TN node to determine whether to do the compaction. The following figure shows the operation flow of using TN for compaction.
 
-![](/content/en/matrixone-system-architecture/picture6.jpg)
+![](./images/picture6.jpg)
 
 When a TN node finds that too much data has been deleted and the data is fragmented, it performs a data merge. The data merge triggers a dedicated compaction node to run the merge, the CN node will collect the data where the compaction is going to happen, merge it within the CN node and submit it.
 
@@ -167,6 +167,6 @@ Compaction process to modify the data, the foreground task may also modify this 
 
 Currently, streaming is done by two schemes, one is that the data is modified, and the delta snapshot is pushed to the CN node based on the last generated snapshot and the current snapshot, and the CN node itself generates a DAG graph based on the streaming task, and does the incremental computation on the DAG graph. The incremental computation also obtains the result of the last query and does incremental computation based on it.
 
-![](/content/en/matrixone-system-architecture/picture7.jpg)
+![](./images/picture7.jpg)
 
 The final query result combines the delta and base query results in the figure above. The part that stores the intermediate results uses the push model. Another way is to pull the base result, pull a delta snapshot from the CN node periodically when the user does a streaming query, and then do an incremental query. After the query is finished, the latest base result is stored on a reliable storage such as S3, HDFS, etc., and the stored base result can be used next time when doing incremental computation.

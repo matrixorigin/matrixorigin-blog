@@ -22,11 +22,11 @@ status: published
 
 From July 4th to 7th, 2024, the globally anticipated 2024 World Artificial Intelligence Conference and High-Level Conference on Global AI Governance (WAIC 2024) was grandly held in Shanghai. The Future Tech 100 Innovation Incubation Exhibition once again became the focus of the conference. It was not only a showcase of technological achievements but also a gathering of global innovation forces. Future Tech 100 covered multiple cutting-edge directions in the AI field. These projects represented the latest developments in AI technology and heralded new directions for the future of artificial intelligence **MatrixOrigin was invited to participate in this conference and was honored with the "FUTURE TECH100—Innovation Partner of the First Phase of the Venture Capital Ecosystem."**
 
-![](/content/en/WAIC-2024/picture1.jpeg?width=300)
+![](./images/picture1.jpeg?width=300)
 
 At the exhibition, MatrixOrigin attracted numerous visitors with its innovative technologies in computing power, data, and models through its MatrixOS Data Intelligent Universal Operating System. Many participants showed great interest in the MatrixOS Data Intelligent Universal Operating System and had in-depth discussions with MatrixOrigin team members about the practical applications of MatrixOS in various industries.
 
-![](/content/en/WAIC-2024/picture2.jpeg?width=300)
+![](./images/picture2.jpeg?width=300)
 
 ## AI Accelerator MatrixOS
 

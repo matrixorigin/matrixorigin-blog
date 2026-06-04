@@ -62,7 +62,7 @@ int main()
 
 ##### C 语言的编译与运行
 
-![Compilation and Execution of a C Program](/content/zh/bpf-development-from-scratch/compilation-and-execution-of-c-program.png)
+![Compilation and Execution of a C Program](./images/compilation-and-execution-of-c-program.png)
 
 #### eBPF 程序
 
@@ -81,7 +81,7 @@ int helloworld(void *ctx)
 
 ##### eBPF 程序的编译与运行
 
-![Compilation and Execution of a BPF program](/content/zh/bpf-development-from-scratch/compilation-and-execution-of-bpf.png)
+![Compilation and Execution of a BPF program](./images/compilation-and-execution-of-bpf.png)
 
 eBPF 的编译、加载、运行比标准 C 程序要麻烦一些。接下来会一步一步介绍全流程。
 
@@ -169,7 +169,7 @@ Disassembly of section .text:
 
 #### 流程
 
-![The Process of Running a BPF Program](/content/zh/bpf-development-from-scratch/bpf-event.webp)
+![The Process of Running a BPF Program](./images/bpf-event.webp)
 
 Linux 内核中支持 eBPF 的事件很多。挂载 eBPF 程序后，需要等待事件异步触发才能看到效果。
 

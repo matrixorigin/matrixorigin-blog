@@ -54,7 +54,7 @@ b. Embedding: It invokes industry-leading vector models such as BAAI/bge-m3 to c
 
 All processed, enhanced, and vectorized AI-Ready data is ultimately stored uniformly in the MatrixOne database. As the core vector database, MatrixOne provides a unified, high-performance, and highly available knowledge entry point for all upper-layer AI applications.
 
-![1.png](/content/zh/moi-matrixone-copilot/1.png)
+![1.png](./images/1.png)
 
 ### Implement Effect
 

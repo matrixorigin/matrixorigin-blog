@@ -46,7 +46,7 @@ Memoria 解决了以上所有问题。它用按需语义检索取代全文件加
 
 ## 第 1 步 — 获取你的 API 密钥
 
-![1.png](/content/zh/memoria-openclaw-install/1.png)
+![1.png](./images/1.png)
 
 前往 thememoria.ai，一键登录（支持 GitHub / Google），在控制台复制你的 API Key。
 
@@ -78,11 +78,11 @@ openclaw memoria health
 ```
 看到 `"status": "ok"` 即表示成功。
 
-![2.png](/content/zh/memoria-openclaw-install/2.png)
+![2.png](./images/2.png)
 
 ### 选项 B：粘贴到 OpenClaw 对话框
 
-![3.png](/content/zh/memoria-openclaw-install/3.png)
+![3.png](./images/3.png)
 
 复制下面的提示，将 `sk-YOUR_API_KEY` 替换为你的实际密钥后，直接发送给 OpenClaw。Agent 将运行所有步骤并汇报结果。
 ```
@@ -117,7 +117,7 @@ List my memoria memories
 ```
 如果 Memoria 已成功连接，Agent 会调用记忆工具并返回当前记忆数量（首次使用显示空列表是正常的）。
 
-![4.png](/content/zh/memoria-openclaw-install/4.png)
+![4.png](./images/4.png)
 
 如果列表为空，前往 Memoria Playground 存入几条记忆——比如你的名字、常用编程语言或当前项目。再回来问 Agent，你会看到它精准召回你存入的内容，确认端到端连接完全正常。
 

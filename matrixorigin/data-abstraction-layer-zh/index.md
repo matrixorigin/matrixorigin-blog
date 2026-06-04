@@ -41,7 +41,7 @@ status: published
 
 **数据库没有消失，只是范式变了。**
 
-![1.jpg](/content/zh/data-abstraction-layer/1.jpg)
+![1.jpg](./images/1.jpg)
 
 ## 一、关系型数据库并不是技术升级，而是一层新的抽象
 
@@ -213,7 +213,7 @@ multi-agent shared cognition state
 
 这种状态不是单一类型的数据，而是一个多维状态空间：
 
-![2.jpg](/content/zh/data-abstraction-layer/2.jpg)
+![2.jpg](./images/2.jpg)
 
 - 当前状态（OLTP）
 - 历史状态（OLAP）
@@ -251,7 +251,7 @@ Markdown 不会消失，但它不会成为终点。
 
 它更可能成为下一代数据抽象层出现之前的入口格式，并沿着这样的路径演进：
 
-![3.jpg](/content/zh/data-abstraction-layer/3.jpg)
+![3.jpg](./images/3.jpg)
 
 Markdown
 → metadata

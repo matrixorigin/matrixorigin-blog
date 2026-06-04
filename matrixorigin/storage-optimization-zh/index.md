@@ -47,7 +47,7 @@ status: published
 - 重叠度(overlap count，简称 oc)：和文件有重叠关系的文件数量。与其他文件无重叠的单个文件，oc 为 0。
 - 常量文件：文件的最大值和最小值相同，这样的通常不再参与数据合并，这已经是最紧密的状态。
 
-![1.png](/content/zh/storage-optimization/1.png)
+![1.png](./images/1.png)
 
 其次是在 Matrixone 的针对 HTAP 场景改进后新增的概念：
 
@@ -71,7 +71,7 @@ status: published
 1. 该层的所有文件的内存大小超过 128 mb，立即执行 merge，确保及时性。
 2. 0 层中允许的最大文件数量，随着距离上次 merge 的时间衰减，从而避免过于频繁的 merge，并且确保在有负载的情况下，尽可能累积更多小文件，减小写放大。衰减过程如下：- 初始值 32，终点值 1，衰减全程为 1 小时 - 衰减过程由 (0,0),(0.70, 0.0), (0.0, 1.0), (1,1) 控制点表示的贝塞尔曲线控制
 
-![2.png](/content/zh/storage-optimization/2.png)
+![2.png](./images/2.png)
 
 通过动态衰减机制平衡双重目标：前期允许累积小文件减少合并频率（降低写放大），后期强制收紧阈值避免元数据膨胀影响查询效率。
 
@@ -85,7 +85,7 @@ status: published
 
 如下图中，a组表示宽距和窄距混合 merge，并没有产生密度更大的数据文件，反而将本来紧密的数据分散到新数据文件中，稀释了密度。b组中宽距和宽距 merge，高密度的数据文件从两端挤出，留在当前层等待下次 merge。c组中窄距与窄距 merge，形成了更高密度的文件，可以推往下一层级别
 
-![3.png](/content/zh/storage-optimization/3.png)
+![3.png](./images/3.png)
 
 #### 空洞分析：更主动的冗余清理
 
@@ -125,7 +125,7 @@ Merge Scheduler 由事件驱动，调度器主体是两个处理 goroutine，一
 | MMsgKindConfig          | 配置表策略参数 | 临时更改单个表的 merge 行为                |
 | MMsgKindConfigBootstrap | 读取启动配置   | 调度器启动时 IO 读取持久化的表配置         |
 
-![4.png](/content/zh/storage-optimization/4.png)
+![4.png](./images/4.png)
 
 ### 基于多项式拟合的可视化
 
@@ -133,7 +133,7 @@ Merge Scheduler 由事件驱动，调度器主体是两个处理 goroutine，一
 
 Matrixone 使用多项式拟合的形式展现重叠情况。默认配置下，通过 4 次多项式 $pd(x)=a_{0} +a_{1}x+a_{2}x^2 +a_{3}x^3+a_{4}x^4$ 函数拟合文件的 pd 序列 (按照文件排序键最大值排序)，输出的参数只有 5 个浮点数，显著少于直方图的 16 个，并且通过绘图代码，可以复原出拟合图形，更直观地看到数据分布状态。如下图，通过函数拟合替换传统直方图，将 2800 个文件的“位置-pd”序列转化为连续曲线，仅用 5 个参数，直观展示了数据重叠的分布形态，峰值位置，波动趋势等信息，例如曲线两端的峰值表示重叠集中在排序键取值区间的两侧，可以大约这部分是是数据密集写入的区域。
 
-![5.png](/content/zh/storage-optimization/5.png)
+![5.png](./images/5.png)
 
 ### Merge Simulator
 

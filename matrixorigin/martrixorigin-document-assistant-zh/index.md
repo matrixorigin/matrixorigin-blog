@@ -40,7 +40,7 @@ status: published
 基于 MOI 的数据底座能力，我们把散落在各处的资料——不管是 PDF、Word、PPT，还是系统里的结构化数据——统一接入、清洗、加工，变成 AI 真正能理解和检索的知识库。
 然后在企业微信里做了一个入口，叫“矩阵工作助手”，让大家可以直接用自然语言提问。
 
-![1.png](/content/zh/martrixorigin-document-assistant/1.png)
+![1.png](./images/1.png)
 
 ## 用起来有什么不同？
 
@@ -57,7 +57,7 @@ status: published
 源头文档更新了，知识库自动同步。不会出现“机器人还在用去年的制度回答问题”的情况。
 除了问答，我们还把一些高频入口整合了进去：新人必读、常用系统链接、公司公告。一个入口，少切换几个系统。
 
-![2.png](/content/zh/martrixorigin-document-assistant/2.png)
+![2.png](./images/2.png)
 
 ## 一点感受
 

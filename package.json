@@ -7,7 +7,9 @@
   "scripts": {
     "validate": "tsx scripts/validate.ts",
     "migrate": "tsx scripts/migrate-from-website.ts",
-    "migrate:dry": "tsx scripts/migrate-from-website.ts --dry-run"
+    "migrate:dry": "tsx scripts/migrate-from-website.ts --dry-run",
+    "migrate:images": "tsx scripts/migrate-images-from-website.ts",
+    "migrate:images:dry": "tsx scripts/migrate-images-from-website.ts --dry-run"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",

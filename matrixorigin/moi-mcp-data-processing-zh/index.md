@@ -48,7 +48,7 @@ MOI MCP 【[MCP 使用说明 - MatrixOne Intelligence 文档](https://docs.matri
 
 _请注意_：请务必将 moi-key 的值替换为您目标工作区的实际 moi-key。
 
-![1.png](/content/zh/moi-mcp-data-processing/1.png)
+![1.png](./images/1.png)
 
 **客户端 JSON 配置**：
 
@@ -146,7 +146,7 @@ _请注意_：请务必将 moi-key 的值替换为您目标工作区的实际 mo
 
 将第一部分中的所有配置合并到一个 JSON 文件中，并加载到您的 MCP 客户端。
 
-![2.png](/content/zh/moi-mcp-data-processing/2.png)
+![2.png](./images/2.png)
 
 **综合配置示例：**
 
@@ -208,7 +208,7 @@ MCP 客户端将调用 oss-mcp 服务的 upload_to_oss 工具。
 
 此指令将调用 mcp-moi-server 的 CreateConnector 和 CreateVolume 工具。
 
-![3.png](/content/zh/moi-mcp-data-processing/3.png)
+![3.png](./images/3.png)
 
 ### STEP 5: 创建数据加载任务
 
@@ -220,7 +220,7 @@ MCP 客户端将调用 oss-mcp 服务的 upload_to_oss 工具。
 
 此指令将调用 mcp-moi-server 的 CreateLoadTask 工具。
 
-![4.png](/content/zh/moi-mcp-data-processing/4.png)
+![4.png](./images/4.png)
 
 ### STEP 6: 创建工作流处理数据
 
@@ -234,7 +234,7 @@ MCP 客户端将调用 oss-mcp 服务的 upload_to_oss 工具。
 
 新建一个名为 moi_mcp_test_workflow 的工作流。这个工作流的任务是处理 moi_mcp_test 数据卷中的所有文件，将结果生成为适合RAG的chunks，并存放在一个新建的名为 moi_mcp_target_chunks 的处理数据卷下。
 
-![5.png](/content/zh/moi-mcp-data-processing/5.png)
+![5.png](./images/5.png)
 
 #### **路径 B：解析 + 分段 + 增强 (生成 Datasets)**
 

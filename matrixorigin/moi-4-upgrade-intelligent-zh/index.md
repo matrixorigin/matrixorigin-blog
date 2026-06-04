@@ -34,7 +34,7 @@ MatrixOne Intelligence 致力于帮助企业充分挖掘和释放私域数据的
 
 全新引入的Agent模式，让系统能根据用户意图和数据特征自动选择最优执行路径。无需再手动设计复杂的逻辑流程，平台自动感知业务需求，智能做出决策并执行，打造具备"感知 + 决策 + 行动"能力的智能任务，显著降低操作复杂度和时间成本。
 
-![1.png](/content/zh/moi-4-upgrade-intelligent/1.png)
+![1.png](./images/1.png)
 
 ### 二、丰富工作流模板，极速搭建自动化流程
 
@@ -46,13 +46,13 @@ MatrixOne Intelligence 致力于帮助企业充分挖掘和释放私域数据的
 - **人才简历信息提取**：自动抓取简历中的核心字段，实现简历数据结构化管理，助力HR高效筛选。
 - **法律知识数据生成**：从海量法律文本中提取高质量问答对，助力法律大模型的微调与优化。
 
-![2.png](/content/zh/moi-4-upgrade-intelligent/2.png)
+![2.png](./images/2.png)
 
 ### 三、多模态信息提取更强大
 
 全新升级的信息提取节点，内置多款针对财务报告、发票、简历等场景的智能模板。用户无需手动定义复杂schema，只需一键即可获得精准结构化结果。结合最新多模态模型技术，实现图文混合内容的深度理解与抽取，极大提升提取准确率和效率。
 
-![3.png](/content/zh/moi-4-upgrade-intelligent/3.png)
+![3.png](./images/3.png)
 
 ### 四、数据中心结构再进化
 
@@ -62,7 +62,7 @@ MatrixOne Intelligence 致力于帮助企业充分挖掘和释放私域数据的
 - **库**：组织结构化与非结构化数据，灵活按业务或阶段分类；
 - **卷**：非结构化文件的逻辑容器，提供高效存储与访问。
 
-![4.png](/content/zh/moi-4-upgrade-intelligent/4.png)
+![4.png](./images/4.png)
 
 ### 五、复杂文档解析更精准，文件处理更灵活
 
@@ -72,13 +72,13 @@ MatrixOne Intelligence 致力于帮助企业充分挖掘和释放私域数据的
 
 新增支持将处理结果直接导出至 MatrixOne、标准 S3、阿里云 OSS 等平台，帮助企业在多种系统间实现更高效的数据流转与管理。
 
-![5.png](/content/zh/moi-4-upgrade-intelligent/5.png)
+![5.png](./images/5.png)
 
 ### 七、HDFS 连接器支持 Kerberos 认证
 
 全新 HDFS 连接器已支持企业级 Kerberos 安全认证，在保障数据安全与合规的同时，兼容简单认证模式，让切换更灵活。
 
-![6.png](/content/zh/moi-4-upgrade-intelligent/6.png)
+![6.png](./images/6.png)
 
 ### 八、用户体验全面焕新
 
@@ -89,4 +89,4 @@ MatrixOne Intelligence 致力于帮助企业充分挖掘和释放私域数据的
 - **快速上手模块**：新增快速开始功能，将核心流程和功能整合，帮助用户快速熟悉产品。
 - **流程辅助优化**：在数据处理及工作流中增加操作辅助与帮助提示，使使用流程更顺畅、直观。
 
-![7.png](/content/zh/moi-4-upgrade-intelligent/7.png)
+![7.png](./images/7.png)

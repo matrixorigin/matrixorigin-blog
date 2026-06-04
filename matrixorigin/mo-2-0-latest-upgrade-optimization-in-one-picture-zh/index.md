@@ -19,4 +19,4 @@ lang: zh
 status: published
 ---
 
-![一图看懂 MO 2.0](/content/zh/mo-2-0-latest-upgrade-optimization-in-one-picture/20p.png?width=600)
+![一图看懂 MO 2.0](./images/20p.png?width=600)

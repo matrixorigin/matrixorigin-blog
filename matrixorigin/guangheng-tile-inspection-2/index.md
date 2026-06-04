@@ -36,7 +36,7 @@ The core team of Guangheng has long been involved in major national scientific r
 
 In recent years, ceramic enterprises have been under urgent pressure to "reduce costs and improve efficiency," making automated inspection equipment increasingly essential. Guangheng has visited more than 30 representative ceramic enterprises, conducting on-site research and technical exchanges with senior management to capture real-world frontline requirements. In addition, the company organized a 20-member team from the Shanghai Institute of Optics and Fine Mechanics, Chinese Academy of Sciences, and invested tens of millions of RMB in an R&D platform to develop an original technical approach: using laser inspection to detect 3D defects and vision-based inspection to detect 2D defects, enabling effective detection of more than 60 types of defects.
 
-![1.png](/content/zh/guangheng-industrial-defect-matrixone/1.png)
+![1.png](./images/1.png)
 
 ### Business Pain Points
 

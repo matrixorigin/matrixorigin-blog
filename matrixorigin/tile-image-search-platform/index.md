@@ -38,7 +38,7 @@ With the support of a mobile application, salesperson can quickly locate and obt
 
 2. Significant performance improvement: Benefiting from convenient operations and rich information, salesperson achieve higher conversion rates and customer satisfaction, which in turn drives overall performance growth.
 
-![1.png](/content/zh/tile-image-search-matrixone/1.png)
+![1.png](./images/1.png)
 
 ### Solution
 

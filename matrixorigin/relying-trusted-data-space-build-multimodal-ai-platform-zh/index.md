@@ -37,7 +37,7 @@ status: published
 
 为了应对多模态数据处理的挑战，矩阵起源公司已推出完整的端到端多模态AI数据智能解决方案，可帮助企业一站式将异构多模态数据进行统一纳管、解析、治理、查询及搜索，使用户可以将多模态数据的数据沼泽变成具有真正财富的数据森林。
 
-![架构图](/content/zh/relying-trusted-data-space-build-multimodal-ai-platform/chl.png?width=800)
+![架构图](./images/chl.png?width=800)
 
 ### 该平台共分为四个重要模块：
 

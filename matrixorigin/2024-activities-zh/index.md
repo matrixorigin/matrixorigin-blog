@@ -42,8 +42,8 @@ status: published
   <img src="/content/zh/2024-activities/act2.png" alt="act2" style="width: 45%;">
 </div>
 
-![act3](/content/zh/2024-activities/act3.png)
-![act4](/content/zh/2024-activities/act4.png)
+![act3](./images/act3.png)
+![act4](./images/act4.png)
 
 ## 欢歌笑语，佳节同庆
 
@@ -51,12 +51,12 @@ status: published
 
 MO为各位MOer送上新年礼物，每份新年礼物都传递着MO对大家的关爱和心意，为即将到来的春节增添了一抹别样的温暖。
 
-![act5](/content/zh/2024-activities/act5.png)
+![act5](./images/act5.png)
 
 #### 元宵节
 
 在这个洋溢着团圆与喜庆的元宵节，MO为大家准备了热气腾腾的元宵，每一颗都蕴含着MO对MOer的温馨祝福与深情厚意。祝愿所有的MOer，无论是在家庭还是职场，都能享受到团圆的幸福与节日的欢乐。
-![act6](/content/zh/2024-activities/act6.png)
+![act6](./images/act6.png)
 
 #### 三八妇女节
 
@@ -80,14 +80,14 @@ MO为各位MOer送上新年礼物，每份新年礼物都传递着MO对大家的
 
 从盛夏到金秋，从新月到满月，每到中秋佳节，欢乐不能少。花灯在手，明月我有，先选好心仪的花灯样式，历经定型、粘合等步骤，一盏盏绚烂的花灯便应运而生。每一盏花灯都承载着我们对团圆和美好的向往，象征着中秋夜的温馨与祥和。祝愿各位MOer中秋节快乐，阖家幸福，万事如意。
 
-![act11](/content/zh/2024-activities/act11.png)
-![act12](/content/zh/2024-activities/act12.png)
+![act11](./images/act11.png)
+![act12](./images/act12.png)
 
 ## 心愿绽放，岁岁平安
 
 在每个月的生日会，MOer共同庆祝生命的又一个精彩篇章。每一块蛋糕、每一支蜡烛都承载着我们对寿星们的深深祝愿。在每一个生日会上，我们不仅分享甜蜜，更分享快乐和回忆。祝愿所有寿星生日快乐未来的每一天都充满阳光和希望。
 
-![act13](/content/zh/2024-activities/act13.png)
+![act13](./images/act13.png)
 
 ## 学海无涯，行舟致远
 
@@ -115,8 +115,8 @@ MO为各位MOer送上新年礼物，每份新年礼物都传递着MO对大家的
   <img src="/content/zh/2024-activities/act19.png" alt="act19" style="width: 45%;">
 </div>
 
-![act20](/content/zh/2024-activities/act20.png)
-![act21](/content/zh/2024-activities/act21.png)
+![act20](./images/act20.png)
+![act21](./images/act21.png)
 
 回望属于我们的2024，
 

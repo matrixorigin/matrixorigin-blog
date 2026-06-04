@@ -18,4 +18,4 @@ lang: zh
 status: published
 ---
 
-![1.png](/content/zh/moi-rag-livestream-preview/1.png)
+![1.png](./images/1.png)

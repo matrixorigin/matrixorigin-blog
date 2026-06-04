@@ -24,7 +24,7 @@ status: published
 
 Memoria 的备份与恢复功能现已上线。你可以在任何时间点对智能体的记忆进行快照，并在出现问题时即时恢复。免费版提供两个快照。
 
-![1.png](/content/zh/memoria-backup-restore/1.png)
+![1.png](./images/1.png)
 
 但在介绍具体使用方法之前，我们想聊聊为什么要做这个功能。
 
@@ -61,11 +61,11 @@ Memoria 的备份与恢复功能现已上线。你可以在任何时间点对智
 
 ### 步骤1 —进入备份与恢复页面，点击右上角「新建快照」
 
-![2.png](/content/zh/memoria-backup-restore/2.png)
+![2.png](./images/2.png)
 
 ### 步骤2-为快照命名，并备注当前保存的状态
 
-![3.png](/content/zh/memoria-backup-restore/3.png)
+![3.png](./images/3.png)
 
 完成。接下来你可以放心大胆地进行实验。
 
@@ -77,11 +77,11 @@ Memoria 的备份与恢复功能现已上线。你可以在任何时间点对智
 
 ### 步骤 3：列表会展示所有快照，包含记忆条数与时间戳
 
-![4.png](/content/zh/memoria-backup-restore/4.png)
+![4.png](./images/4.png)
 
 ### 步骤 4: 点击恢复并确认
 
-![5.png](/content/zh/memoria-backup-restore/5.png)
+![5.png](./images/5.png)
 
 记忆将恢复至实验前的状态，新增的风格记录会被清除，智能体重回你精心打磨的版本。整个过程耗时不到一分钟，无需逐条梳理记忆，也不用盲目猜测删除。
 

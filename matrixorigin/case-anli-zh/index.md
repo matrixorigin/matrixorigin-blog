@@ -38,7 +38,7 @@ status: published
    a. 智能解析与切分：利用layout-doc-yolo等版式分析模型和Paddle-OCR等OCR引擎，精准解析文档结构，并将长文本智能切分为适合RAG的片段 。
    b. 向量化（Embedding）：调用BAAI/bge-m3等业界领先的向量模型，将处理后的数据转化为高质量的向量，以便进行语义检索 。
 3. 构建统一的向量知识库：所有经过处理、增强和向量化的AI-Ready数据，最终被统一存储在MatrixOne数据库中 。MatrixOne作为核心的向量数据库，为上层所有的AI应用提供了一个统一、高性能、高可用的知识入口。
-   ![2.png](/content/zh/case-anli/2.png)
+   ![2.png](./images/2.png)
 
 ### 实施效果
 

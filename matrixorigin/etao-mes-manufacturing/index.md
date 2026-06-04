@@ -36,7 +36,7 @@ ETAO Innovation has already served hundreds of digital factories in the electron
 
 ETAO Innovation has independently developed an intelligent manufacturing MES software system. MES is a production information management system oriented toward the manufacturing execution layer. ETAO's MES provides factories with modules such as data management, production planning and scheduling, production dispatching, inventory management, supply chain management, equipment management, and quality management, building a comprehensive and reliable manufacturing collaboration management platform for factories.
 
-![1.png](/content/zh/mo-helps-build-AIOT-system/yd2.png?width=800)
+![1.png](./images/yd2.png?width=800)
 
 This system has been successfully delivered to hundreds of customers. However, in the context of intelligent manufacturing and digital transformation, customer requirements have continued to rise, and ETAO's software system is now facing several new challenges:
 
@@ -64,7 +64,7 @@ After learning about the product philosophy of MatrixOrigin's MatrixOne, ETAO's 
 
 The technical architecture after project implementation is shown in the figure below:
 
-![2.png](/content/zh/mo-helps-build-AIOT-system/yd3.png?width=800)
+![2.png](./images/yd3.png?width=800)
 
 It can be clearly seen that a single MatrixOne cluster is capable of handling both structured and semi-structured data. At the same time, it eliminates the original ETL tasks between systems, removes the need to maintain multiple types of database systems, and unifies the access interface between the database and applications. As a result, the entire MES application returns to a minimalist architecture based on a single database.
 

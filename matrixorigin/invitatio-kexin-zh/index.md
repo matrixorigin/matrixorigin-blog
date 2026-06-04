@@ -31,4 +31,4 @@ status: published
 
 我们诚邀您前来讨论交流！
 
-![1.jpg](/content/zh/invitatio-kexin/1.jpg)
+![1.jpg](./images/1.jpg)

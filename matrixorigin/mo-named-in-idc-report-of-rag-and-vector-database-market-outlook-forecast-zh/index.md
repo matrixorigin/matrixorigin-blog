@@ -28,7 +28,7 @@ status: published
 
 向量数据库的核心优势在于能够通过语义相似性算法实现海量非结构化数据的快速检索，与传统数据库相比更适用于复杂的知识库、客户服务等高效搜索场景。报告中强调，向量数据库在特定的业务领域提供了实时性、隐私性和推理效率等优势，助力企业应对生成式AI应用的挑战。
 
-![向量数据库](/content/zh/mo-named-in-idc-report-of-rag-and-vector-database-market-outlook-forecast/idc1.png?width=800)
+![向量数据库](./images/idc1.png?width=800)
 
 ### 矩阵起源的定位与技术布局
 

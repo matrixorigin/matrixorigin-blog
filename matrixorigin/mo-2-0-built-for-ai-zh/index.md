@@ -22,14 +22,14 @@ lang: zh
 status: published
 ---
 
-![MO 2.0](/content/zh/mo-2-0-built-for-ai/mo20.png?width=600)
+![MO 2.0](./images/mo20.png?width=600)
 
 <center>我们非常高兴地宣布：</center>
 <center>MatrixOne内核v2.0.0版本</center>
 <center>于 2024 年 10 月 31 日正式发布！</center>
 <center>点击查看<a href="https://docs.matrixorigin.cn" target="_blank" rel="noopener noreferrer">项目文档网站</a></center>
 
-![架构图](/content/zh/mo-2-0-built-for-ai/mo21.png?width=600)
+![架构图](./images/mo21.png?width=600)
 
 MatrixOne 是一款AI驱动的云原生超融合数据库，采用存算分离架构并充分利用云上的基础设施，兼容MySQL，并且支持混合负载场景，结合向量数据类型和全文检索，能够高效处理生成式AI 应用的多模态数据查询与管理场景。
 

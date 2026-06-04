@@ -20,7 +20,7 @@ lang: zh
 status: published
 ---
 
-![矩阵起源资深研发工程师张旭海报](/content/zh/event-invitation-database-show-off/zhangxu.jpg)
+![矩阵起源资深研发工程师张旭海报](./images/zhangxu.jpg)
 
 ## 讲师介绍
 

@@ -27,7 +27,7 @@ status: published
 
 Big news! The former VP of Tencent Cloud, Mr. Zhang Shuxiang, has joined MatrixOrigin as a Partner and Senior VP. He brings with him a wealth of experience to MatrixOrigin. With Mr. Zhang leading the commercialization efforts, the future is promising! Stay tuned for more updates!
 
-![Portrait of Zhang Shuxiang](/content/en/welcome-my-new/zhangxuxiang.jpeg)
+![Portrait of Zhang Shuxiang](./images/zhangxuxiang.jpeg)
 
 Recently, Mr. Zhang Shuxiang, the former Vice President of Tencent Cloud, officially joined MatrixOrigin as a Partner and Senior Vice President, taking full responsibility for MatrixOrigin's commercialization efforts.
 
