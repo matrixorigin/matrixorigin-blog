@@ -12,6 +12,7 @@ keywords:
   - Vector Database
 
 publishTime: "2026-06-02 18:00:00+08:00"
+date: '2026-06-02'
 
 image:
   "1": "/content/en/shared/tech.png"
