@@ -12,8 +12,8 @@ keywords:
   - database
 publishTime: '2025-09-01 17:30:00+08:00'
 image:
-  '1': ./images/hdhg.png
-  '235': ./images/hdhg.png
+  '1': /images/blog-covers/news.png
+  '235': /images/blog-covers/news.png
 date: '2025-09-01 17:30:00+08:00'
 lang: en
 status: published

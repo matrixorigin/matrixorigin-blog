@@ -11,8 +11,8 @@ keywords:
   - 产业智能化
 publishTime: '2025-09-15 17:00:00+08:00'
 image:
-  '1': /content/zh/shared/acti-review.png'
-  '235': /content/zh/shared/acti-review.png
+  '1': /images/blog-covers/news.png
+  '235': /images/blog-covers/news.png
 date: '2025-09-15 17:00:00+08:00'
 lang: zh
 status: published

@@ -14,8 +14,8 @@ keywords:
   - MatrixOne
 publishTime: '2024-09-13 17:00:00+08:00'
 image:
-  '1': ./images/tech.png
-  '235': ./images/tech.png
+  '1': /images/blog-covers/technical.png
+  '235': /images/blog-covers/technical.png
 date: '2024-09-13 17:00:00+08:00'
 lang: en
 status: published

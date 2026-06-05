@@ -13,8 +13,8 @@ keywords:
   - automated workflow
 publishTime: '2025-07-10 17:30:00+08:00'
 image:
-  '1': ./images/public.png
-  '235': ./images/public.png
+  '1': /images/blog-covers/product.png
+  '235': /images/blog-covers/product.png
 date: '2025-07-10 17:30:00+08:00'
 lang: en
 status: published

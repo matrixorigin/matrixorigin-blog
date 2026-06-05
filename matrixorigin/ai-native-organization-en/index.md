@@ -15,8 +15,8 @@ date: '2026-05-07'
 lang: en
 status: published
 image:
-  '1': ./images/tech.png
-  '235': ./images/tech.png
+  '1': /images/blog-covers/technical.png
+  '235': /images/blog-covers/technical.png
 translations:
   zh: ai-native-organization
 ---

@@ -3,7 +3,12 @@ title: "Unlocking the Potential of RAG Deep Search Applications: A Practical Gui
 author: "MatrixOrigin"
 mail: "contact@matrixorigin.io"
 description: "This guide explains how to integrate the open-source RAG application development engine Deerflow with MOI's RAG service, helping developers quickly build powerful deep retrieval augmented generation applications."
+tags:
+  - Technical Insights
 date: "2025-11-10 17:00:00+08:00"
+image:
+  "1": /images/blog-covers/technical.png
+  "235": /images/blog-covers/technical.png
 lang: en
 status: published
 translations:

@@ -22,10 +22,8 @@ keywords:
   - OLAP
 publishTime: '2023-08-17 17:00:00+00:00'
 image:
-  '1': >-
-    /content/en/how-matrixone-uses-go-language-to-design-and-implement-high-performance-hash-tables/how-matrixone-uses-go-language-to-design-and-implement-high-performance-hash-tables.png
-  '235': >-
-    /content/en/how-matrixone-uses-go-language-to-design-and-implement-high-performance-hash-tables/how-matrixone-uses-go-language-to-design-and-implement-high-performance-hash-tables.png
+  '1': /images/blog-covers/technical.png
+  '235': /images/blog-covers/technical.png
 date: '2023-08-17 17:00:00+00:00'
 lang: en
 status: published

@@ -12,8 +12,8 @@ keywords:
   - LoRA
 publishTime: '2025-06-20 17:30:00+08:00'
 image:
-  '1': /content/zh/shared/tech.jpeg
-  '235': /content/zh/document-parsing-models-and-sft/tech.jpeg
+  '1': /images/blog-covers/technical.png
+  '235': /images/blog-covers/technical.png
 date: '2025-06-20 17:30:00+08:00'
 lang: zh
 status: published

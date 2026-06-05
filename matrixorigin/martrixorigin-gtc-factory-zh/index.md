@@ -13,8 +13,8 @@ keywords:
   - AI数据底座
 publishTime: '2026-03-12T17:00:00+08:00'
 image:
-  '1': /content/zh/shared/news.png
-  '235': /content/zh/shared/news.png
+  '1': /images/blog-covers/news.png
+  '235': /images/blog-covers/news.png
 date: '2026-03-12T17:00:00+08:00'
 lang: zh
 status: published

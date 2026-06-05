@@ -15,8 +15,8 @@ publishTime: '2024-07-04 17:00:00+00:00'
 tags:
   - news
 image:
-  '1': /content/en/shared/monews.png
-  '235': /content/en/shared/monews.png
+  '1': /images/blog-covers/news.png
+  '235': /images/blog-covers/news.png
 date: '2024-07-04 17:00:00+00:00'
 lang: en
 status: published

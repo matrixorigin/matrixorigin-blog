@@ -13,8 +13,8 @@ keywords:
   - 数据基础设施
 publishTime: '2025-09-01 17:30:00+08:00'
 image:
-  '1': /content/zh/shared/hj.jpg
-  '235': /content/zh/shared/hj.jpg
+  '1': /images/blog-covers/news.png
+  '235': /images/blog-covers/news.png
 date: '2025-09-01 17:30:00+08:00'
 lang: zh
 status: published

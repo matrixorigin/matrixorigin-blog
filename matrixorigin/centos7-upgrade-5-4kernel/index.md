@@ -14,8 +14,8 @@ keywords:
   - Golang
 publishTime: '2024-04-08 17:00:00+08:00'
 image:
-  '1': ./images/tech.png
-  '235': ./images/tech.png
+  '1': /images/blog-covers/news.png
+  '235': /images/blog-covers/news.png
 date: '2024-04-08 17:00:00+08:00'
 lang: en
 status: published

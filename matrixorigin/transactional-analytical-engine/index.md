@@ -18,10 +18,8 @@ keywords:
   - HTAP Database
 publishTime: '2023-08-30 17:00:00+00:00'
 image:
-  '1': >-
-    /content/en/transactional-analytical-engine/transactional-analytical-engine.png
-  '235': >-
-    /content/en/transactional-analytical-engine/transactional-analytical-engine.png
+  '1': /images/blog-covers/technical.png
+  '235': /images/blog-covers/technical.png
 date: '2023-08-30 17:00:00+00:00'
 lang: en
 status: published

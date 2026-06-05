@@ -12,8 +12,8 @@ keywords:
   - 企业文化
 publishTime: '2025-07-04 17:30:00+08:00'
 image:
-  '1': /content/zh/sports-month-summary/7.png
-  '235': /content/zh/sports-month-summary/7.png
+  '1': /images/blog-covers/news.png
+  '235': /images/blog-covers/news.png
 date: '2025-07-04 17:30:00+08:00'
 lang: zh
 status: published

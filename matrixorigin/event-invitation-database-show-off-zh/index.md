@@ -13,8 +13,8 @@ keywords:
   - 云原生数据库
 publishTime: '2024-03-15 17:00:00+08:00'
 image:
-  '1': /content/zh/event-invitation-database-show-off/event-invitation.png
-  '235': /content/zh/event-invitation-database-show-off/event-invitation.png
+  '1': /images/blog-covers/news.png
+  '235': /images/blog-covers/news.png
 date: '2024-03-15 17:00:00+08:00'
 lang: zh
 status: published

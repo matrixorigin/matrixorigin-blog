@@ -7,8 +7,8 @@ keywords: ["MOI Agent", "intelligent procurement", "data fusion", "procurement d
 publishTime: "2026-05-08T17:00:00+08:00"
 date: '2026-05-08'
 image:
-  "1": "./images/tech.png"
-  "235": "./images/tech.png"
+  "1": /images/blog-covers/technical.png
+  "235": /images/blog-covers/technical.png
 lang: en
 status: published
 translations:

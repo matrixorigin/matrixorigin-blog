@@ -13,8 +13,8 @@ keywords:
   - hyper-converged database
 publishTime: '2024-03-15 17:00:00+08:00'
 image:
-  '1': ./images/news.webp
-  '235': ./images/news.webp
+  '1': /images/blog-covers/news.png
+  '235': /images/blog-covers/news.png
 date: '2024-03-15 17:00:00+08:00'
 lang: en
 status: published

@@ -16,8 +16,8 @@ keywords:
   - MySQL Migration
 publishTime: '2025-01-09T17:00:00+08:00'
 image:
-  '1': /content/zh/shared/case.png
-  '235': /content/zh/shared/case.png
+  '1': /images/blog-covers/customer-case.png
+  '235': /images/blog-covers/customer-case.png
   annotation: 金融与数据分析 - StoneCastle 金融分析系统
 date: '2025-01-09T17:00:00+08:00'
 lang: en

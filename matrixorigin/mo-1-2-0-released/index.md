@@ -19,8 +19,8 @@ keywords:
   - AIDC
 publishTime: '2024-05-30 17:00:00+08:00'
 image:
-  '1': /content/en/mo-1.2.0-released/banner1.png'
-  '235': /content/en/mo-1.2.0-released/banner1.png
+  '1': /images/blog-covers/product.png
+  '235': /images/blog-covers/product.png
 date: '2024-05-30 17:00:00+08:00'
 lang: en
 status: published

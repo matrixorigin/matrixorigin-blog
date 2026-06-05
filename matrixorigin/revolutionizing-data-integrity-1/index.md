@@ -19,8 +19,8 @@ keywords:
   - Database Kernel
 publishTime: '2024-01-12 17:00:00+00:00'
 image:
-  '1': /content/en/shared/revolutionizing-data-integrity.png
-  '235': /content/en/shared/revolutionizing-data-integrity.png
+  '1': /images/blog-covers/technical.png
+  '235': /images/blog-covers/technical.png
 date: '2024-01-12 17:00:00+00:00'
 lang: en
 status: published

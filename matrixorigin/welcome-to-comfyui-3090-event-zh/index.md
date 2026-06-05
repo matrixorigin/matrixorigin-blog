@@ -15,8 +15,8 @@ keywords:
   - 算力
 publishTime: '2024-10-25 17:00:00+08:00'
 image:
-  '1': /content/zh/shared/event-invitation.png
-  '235': content/zh/shared/event-invitation.png
+  '1': /images/blog-covers/news.png
+  '235': /images/blog-covers/news.png
 date: '2024-10-25 17:00:00+08:00'
 lang: zh
 status: published

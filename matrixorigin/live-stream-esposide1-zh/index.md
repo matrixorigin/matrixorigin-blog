@@ -13,8 +13,8 @@ keywords:
   - MatrixOne
 publishTime: '2024-12-06 18:00:00+08:00'
 image:
-  '1': /content/zh/shared/mo2.jpg
-  '235': /content/zh/shared/mo2.jpg
+  '1': /images/blog-covers/news.png
+  '235': /images/blog-covers/news.png
 date: '2024-12-06 18:00:00+08:00'
 lang: zh
 status: published

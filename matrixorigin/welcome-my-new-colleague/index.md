@@ -18,8 +18,8 @@ keywords:
   - AIDC
 publishTime: '2024-06-13 17:00:00+08:00'
 image:
-  '1': /content/en/shared/LatestNews.png'
-  '235': /content/en/shared/LatestNews.png
+  '1': /images/blog-covers/news.png
+  '235': /images/blog-covers/news.png
 date: '2024-06-13 17:00:00+08:00'
 lang: en
 status: published

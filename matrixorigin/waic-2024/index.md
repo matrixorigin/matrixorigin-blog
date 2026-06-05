@@ -13,8 +13,8 @@ keywords:
   - MatrixOrigin
 publishTime: '2024-07-17 17:00:00+00:00'
 image:
-  '1': /content/en/shared/mo-news.webp
-  '235': /content/en/shared/mo-news.webp
+  '1': /images/blog-covers/news.png
+  '235': /images/blog-covers/news.png
 date: '2024-07-17 17:00:00+00:00'
 lang: en
 status: published

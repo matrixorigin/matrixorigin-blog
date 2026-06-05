@@ -11,8 +11,8 @@ keywords:
   - multimodal data
 publishTime: '2025-12-15 17:00:00+08:00'
 image:
-  '1': ./images/case.png
-  '235': ./images/case.png
+  '1': /images/blog-covers/product.png
+  '235': /images/blog-covers/product.png
 date: '2025-12-15 17:00:00+08:00'
 lang: en
 status: published

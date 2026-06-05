@@ -18,10 +18,8 @@ keywords:
   - HTAP Database
 publishTime: '2024-03-19 17:00:00+00:00'
 image:
-  '1': >-
-    /content/en/why-is-shuffle-support-needed-an-introduction-to-colocate-shuffle/introduction-to-colocate-shuffle.png
-  '235': >-
-    /content/en/why-is-shuffle-support-needed-an-introduction-to-colocate-shuffle/introduction-to-colocate-shuffle.png
+  '1': /images/blog-covers/technical.png
+  '235': /images/blog-covers/technical.png
 date: '2024-03-19 17:00:00+00:00'
 lang: en
 status: published

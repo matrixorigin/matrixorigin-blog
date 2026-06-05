@@ -18,10 +18,8 @@ keywords:
   - TPCH Testing
 publishTime: '2024-03-31 17:00:00+00:00'
 image:
-  '1': >-
-    /content/en/advanced-shuffle-optimization-techniques-how-do-we-handle-uneven-data/advanced-shuffle-optimization-techniques-how-do-we-handle-uneven-data.png
-  '235': >-
-    /content/en/advanced-shuffle-optimization-techniques-how-do-we-handle-uneven-data/advanced-shuffle-optimization-techniques-how-do-we-handle-uneven-data.png
+  '1': /images/blog-covers/technical.png
+  '235': /images/blog-covers/technical.png
 date: '2024-03-31 17:00:00+00:00'
 lang: en
 status: published

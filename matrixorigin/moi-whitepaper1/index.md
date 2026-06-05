@@ -13,8 +13,8 @@ keywords:
   - AI
 publishTime: '2024-12-13 17:00:00+08:00'
 image:
-  '1': ./images/news.png
-  '235': ./images/news.png
+  '1': /images/blog-covers/whitepaper.png
+  '235': /images/blog-covers/whitepaper.png
 date: '2024-12-13 17:00:00+08:00'
 lang: en
 status: published

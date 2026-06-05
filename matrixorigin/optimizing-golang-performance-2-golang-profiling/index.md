@@ -17,8 +17,8 @@ keywords:
   - Docker
 publishTime: '2023-12-08 17:00:00+00:00'
 image:
-  '1': /content/en/shared/optimizing-golang-performance.png
-  '235': /content/en/shared/optimizing-golang-performance.png
+  '1': /images/blog-covers/technical.png
+  '235': /images/blog-covers/technical.png
 date: '2023-12-08 17:00:00+00:00'
 lang: en
 status: published

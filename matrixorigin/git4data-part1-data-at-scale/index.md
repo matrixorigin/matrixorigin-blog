@@ -8,8 +8,8 @@ keywords: ["Git4Data", "MatrixOne", "Data Version Control", "Snapshot and Clone"
 publishTime: "2026-06-02T17:00:00+08:00"
 date: '2026-06-02'
 image:
-  "1": "/content/zh/shared/tech.png"
-  "235": "/content/zh/shared/tech.png"
+  "1": /images/blog-covers/technical.png
+  "235": /images/blog-covers/technical.png
 lang: en
 status: published
 translations:

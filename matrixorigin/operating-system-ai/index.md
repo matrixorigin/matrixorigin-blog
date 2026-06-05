@@ -15,8 +15,8 @@ keywords:
   - MatrixOne
 publishTime: '2024-06-03 17:00:00+00:00'
 image:
-  '1': /content/en/event-review-mo-ceo-giic/推文banner3.png
-  '235': /content/en/event-review-mo-ceo-giic/推文banner3.png
+  '1': /images/blog-covers/news.png
+  '235': /images/blog-covers/news.png
 date: '2024-06-03 17:00:00+00:00'
 lang: en
 status: published

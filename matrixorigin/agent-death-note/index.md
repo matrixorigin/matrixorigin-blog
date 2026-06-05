@@ -12,8 +12,8 @@ keywords:
   - Agent crash recovery
 publishTime: '2026-04-16T17:00:00+08:00'
 image:
-  '1': ./images/news.png
-  '235': ./images/news.png
+  '1': /images/blog-covers/technical.png
+  '235': /images/blog-covers/technical.png
 date: '2026-04-16T17:00:00+08:00'
 lang: en
 status: published

@@ -20,10 +20,8 @@ keywords:
   - Database Kernel
 publishTime: '2024-01-26 17:00:00+00:00'
 image:
-  '1': >-
-    /content/en/optimizing-log-management-in-distributed-systems-advanced-log-backend-and-transaction-handling/optimizing-log-management-in-distributed-systems-advanced-log-backend-and-transaction-handling.png
-  '235': >-
-    /content/en/optimizing-log-management-in-distributed-systems-advanced-log-backend-and-transaction-handling/optimizing-log-management-in-distributed-systems-advanced-log-backend-and-transaction-handling.png
+  '1': /images/blog-covers/technical.png
+  '235': /images/blog-covers/technical.png
 date: '2024-01-26 17:00:00+00:00'
 lang: en
 status: published

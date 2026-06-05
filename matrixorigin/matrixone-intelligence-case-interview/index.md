@@ -10,8 +10,8 @@ keywords:
   - multimodal processing
 publishTime: '2025-12-26 17:00:00+08:00'
 image:
-  '1': ./images/case.png
-  '235': ./images/case.png
+  '1': /images/blog-covers/customer-case.png
+  '235': /images/blog-covers/customer-case.png
 date: '2025-12-26 17:00:00+08:00'
 lang: en
 status: published

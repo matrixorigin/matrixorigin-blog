@@ -15,8 +15,8 @@ keywords:
   - 超融合数据库
 publishTime: '2024-03-15 17:00:00+08:00'
 image:
-  '1': /content/zh/matrixorigin-good-news-in-new-year/news.webp
-  '235': /content/zh/matrixorigin-good-news-in-new-year/news.webp
+  '1': /images/blog-covers/news.png
+  '235': /images/blog-covers/news.png
 date: '2024-03-15 17:00:00+08:00'
 lang: zh
 status: published
