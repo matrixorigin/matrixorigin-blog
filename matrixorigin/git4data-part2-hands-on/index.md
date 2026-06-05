@@ -1,21 +1,3 @@
----
-title: "MatrixOne Git4Data Deep Dive (Part 2): From Zero, Through Every Git Primitive"
-author: MatrixOrigin
-mail: contact@matrixorigin.io
-description: "Part 2 of the MatrixOne Git4Data series: a hands-on, copy-paste-runnable walkthrough. Install MatrixOne, load a million rows, then run every Git primitive — snapshot, clone, branch, row-level diff, merge with conflict modes, cherry-pick, and PITR — across table, database, account, and cluster levels, with measured numbers showing version-control cost is independent of data size."
-tags: ["Technical Insights"]
-keywords: ["Git4Data", "MatrixOne", "Data Version Control", "Snapshot and Clone", "Hands-on Tutorial"]
-publishTime: "2026-06-04T17:00:00+08:00"
-date: '2026-06-04'
-image:
-  "1": "/content/zh/shared/tech.png"
-  "235": "/content/zh/shared/tech.png"
-lang: en
-status: published
-translations:
-  zh: git4data-part2-hands-on-zh
----
-
 # MatrixOne Git4Data Deep Dive (Part 2): From Zero, Through Every Git Primitive
 
 In Part 1 we covered **what** Git4Data is and **why** it matters. This time we go straight to hands-on. Within ten minutes you'll have MatrixOne running on your own machine, load a million rows of realistic data, and then **run every Git primitive, one SQL statement at a time** — snapshot, clone, branch, row-level diff, merge, cherry-pick, point-in-time recovery. Every SQL is copy-paste runnable; finish the walkthrough and you'll have *actually worked with data the Git way*, at scale.
@@ -380,18 +362,21 @@ SELECT result + 2000000,
 FROM generate_series(1, 9000000) g;
 ```
 
-On a single-node Docker MatrixOne (4.0), we grew the same table to 1M, 10M, and 100M rows and ran the same set of git4data operations (diff / merge each touch only **1,000 rows**). Measured:
+On a single-node Docker MatrixOne (4.0.0), we grew the same table to 1M, 10M, and 100M rows and ran the same set of git4data operations (diff / merge each touch only **1,000 rows**). Measured (steady-state, median of several runs):
 
 | Table size | Load | `CREATE SNAPSHOT` | `CLONE` | `DATA BRANCH CREATE` | `DIFF` (1000) | `MERGE` (1000) |
 |---|---|---|---|---|---|---|
-| **1,000,000** | 0.55 s | 5.9 ms | 6.7 ms | 7.1 ms | 11 ms | 62 ms |
-| **10,000,000** | 5.5 s | 9.7 ms | 9.6 ms | 18.6 ms | 17.5 ms | 223 ms |
-| **100,000,000** | 42 s | 45 ms | 146 ms | 229 ms | 219 ms | 2.9 s |
+| **1,000,000** | 0.5 s | 6 ms | 6 ms | 7 ms | 13 ms | 64 ms |
+| **10,000,000** | 5.3 s | 8 ms | 8 ms | 7 ms | 21 ms | 178 ms |
+| **100,000,000** | 41 s | 5 ms | 25 ms | 19 ms | 23 ms | 1.3 s |
 
-Two things in this table are the whole point of Git4Data:
+Three things in this table are the whole point of Git4Data:
 
-- **Snapshot / clone / branch: data grew 100× (1M → 100M), yet the time stays ~constant in the millisecond range** — because they move metadata pointers, not data. Branching a 100M-row table is about as fast as branching a 1M-row one.
-- **Diff / merge: cost scales only with "how many rows changed," not "how big the table is"** — all three rows changed only 1,000 rows, so diff stayed in the tens-to-low-hundreds of milliseconds. There are 100M rows in the table, but you touched 1,000, so diff looks at only those 1,000.
+- **Snapshot: dead constant** — data grew 100× (1M → 100M), yet `CREATE SNAPSHOT` stays at **5–8 ms**. A snapshot just names the metadata directory of "which data objects make up the table right now" — it has nothing to do with how many rows are in it.
+- **Clone / branch: they copy the metadata directory, not the data** — across 100× the data, clone rises only from 6 ms to 25 ms. That directory grows slowly with the number of objects, but it's always a few MB of metadata being copied, never tens of GB of data.
+- **Diff / merge: scale only with "how many rows changed"** — all three changed only 1,000 rows, so `DIFF` stays in the tens of milliseconds; `MERGE` grows as the table gets bigger (it writes the changes back into the main table), but that growth is proportional to the write work and is expected.
+
+> An honest detail: the **first** snapshot of a freshly loaded large table is a bit slower (~10–12 ms measured), because it first flushes still-in-memory data to object storage — a one-time cost, after which it drops to the steady-state numbers above. We loaded the data, paused briefly, then measured, precisely so the numbers reflect the git4data operation itself rather than that one-time flush.
 
 This is the empirical proof of Part 1's line: **the hard part was never version control itself — it's keeping it cheap on massive data.**
 
