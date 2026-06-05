@@ -17,8 +17,8 @@ keywords:
   - MatrixOne
 publishTime: '2024-01-26 17:00:00+08:00'
 image:
-  '1': /content/zh/bpf-development-from-scratch/cover-1.jpeg
-  '235': /content/zh/bpf-development-from-scratch/cover-235.jpeg
+  '1': /images/blog-covers/technical.png
+  '235': /images/blog-covers/technical.png
 date: '2024-01-26 17:00:00+08:00'
 lang: zh
 status: published

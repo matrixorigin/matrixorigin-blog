@@ -11,8 +11,8 @@ keywords:
   - multimodal data
 publishTime: '2025-10-09 17:00:00+08:00'
 image:
-  '1': ./images/hj.jpg
-  '235': ./images/hj.jpg
+  '1': /images/blog-covers/news.png
+  '235': /images/blog-covers/news.png
 date: '2025-10-09 17:00:00+08:00'
 lang: en
 status: published

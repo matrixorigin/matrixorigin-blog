@@ -16,8 +16,8 @@ keywords:
   - 超融合数据库
 publishTime: '2024-06-21 17:00:00+08:00'
 image:
-  '1': /content/zh/three-years-anniversay-ceremony/news.png
-  '235': /content/zh/three-years-anniversay-ceremony/news.png
+  '1': /images/blog-covers/news.png
+  '235': /images/blog-covers/news.png
 date: '2024-06-21 17:00:00+08:00'
 lang: zh
 status: published

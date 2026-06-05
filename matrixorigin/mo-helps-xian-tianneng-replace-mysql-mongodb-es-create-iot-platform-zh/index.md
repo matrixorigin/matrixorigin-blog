@@ -14,10 +14,8 @@ keywords:
   - 物联网
 publishTime: '2024-11-01 17:00:00+08:00'
 image:
-  '1': >-
-    /content/zh/mo-helps-xian-tianneng-replace-mysql-mongodb-es-create-iot-platform/tn.png
-  '235': >-
-    /content/zh/mo-helps-xian-tianneng-replace-mysql-mongodb-es-create-iot-platform/tn.png
+  '1': /images/blog-covers/customer-case.png
+  '235': /images/blog-covers/customer-case.png
 date: '2024-11-01 17:00:00+08:00'
 lang: zh
 status: published

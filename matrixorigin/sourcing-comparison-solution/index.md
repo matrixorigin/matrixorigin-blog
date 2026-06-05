@@ -7,8 +7,8 @@ keywords: ["MOI 智能体", "智能采购", "数据融合", "采购数字化"]
 publishTime: "2026-05-08T17:00:00+08:00"
 date: '2026-05-08'
 image:
-  "1": "/content/zh/shared/tech.png"
-  "235": "/content/zh/shared/tech.png"
+  "1": /images/blog-covers/technical.png
+  "235": /images/blog-covers/technical.png
 lang: zh
 status: published
 ---

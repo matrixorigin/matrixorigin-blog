@@ -17,8 +17,8 @@ keywords:
   - HTAP Database
 publishTime: '2025-06-13 17:00:00+00:00'
 image:
-  '1': /content/en/moi-3.2-release/release.png
-  '235': /content/en/moi-3.2-release/release.png
+  '1': /images/blog-covers/product.png
+  '235': /images/blog-covers/product.png
 date: '2025-06-13 17:00:00+00:00'
 lang: en
 status: published

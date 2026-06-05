@@ -11,8 +11,8 @@ keywords:
   - 中国行业互联网大会
 publishTime: '2025-06-20 17:30:00+08:00'
 image:
-  '1': /content/zh/industry-internet-summit-ai-data-paradigm/news.png
-  '235': /content/zh/industry-internet-summit-ai-data-paradigm/news.png
+  '1': /images/blog-covers/news.png
+  '235': /images/blog-covers/news.png
 date: '2025-06-20 17:30:00+08:00'
 lang: zh
 status: published

@@ -14,8 +14,8 @@ keywords:
   - MatrixOne
 publishTime: '2024-10-11 17:00:00+08:00'
 image:
-  '1': /content/zh/mo-helps-copper-build-aiot-bigdata-system/jt.png
-  '235': /content/zh/mo-helps-copper-build-aiot-bigdata-system/jt.png
+  '1': /images/blog-covers/customer-case.png
+  '235': /images/blog-covers/customer-case.png
 date: '2024-10-11 17:00:00+08:00'
 lang: zh
 status: published

@@ -16,8 +16,8 @@ keywords:
   - Hyper-Converged Database
 publishTime: '2025-01-09T17:00:00+08:00'
 image:
-  '1': /content/zh/shared/case.png
-  '235': /content/zh/shared/case.png
+  '1': /images/blog-covers/customer-case.png
+  '235': /images/blog-covers/customer-case.png
 annotation: AI 智能体应用 - 素问智能 AIGC 平台
 date: '2025-01-09T17:00:00+08:00'
 lang: en

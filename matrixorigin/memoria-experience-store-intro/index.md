@@ -7,8 +7,8 @@ keywords: ['Memoria', 'MatrixOne', '全栈开发', 'AI开发记忆系统']
 publishTime: "2026-05-28 18:00:00+08:00"
 date: '2026-05-28'
 image:
-  '1': '/content/zh/shared/case.png'
-  '235': '/content/zh/shared/case.png'
+  '1': /images/blog-covers/technical.png
+  '235': /images/blog-covers/technical.png
 lang: zh
 status: published
 ---

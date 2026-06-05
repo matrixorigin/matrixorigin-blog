@@ -11,8 +11,8 @@ keywords:
   - AI
 publishTime: '2026-01-29T17:00:00+08:00'
 image:
-  '1': /content/zh/shared/news.png
-  '235': /content/zh/shared/news.png
+  '1': /images/blog-covers/news.png
+  '235': /images/blog-covers/news.png
 date: '2026-01-29T17:00:00+08:00'
 lang: zh
 status: published

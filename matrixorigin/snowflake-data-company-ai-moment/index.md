@@ -8,8 +8,8 @@ keywords: ["Snowflake", "Databricks", "AI Agent", "Data Platform", "Snowflake Su
 publishTime: "2026-06-04T17:00:00+08:00"
 date: '2026-06-04'
 image:
-  "1": "/content/zh/shared/tech.png"
-  "235": "/content/zh/shared/tech.png"
+  "1": /images/blog-covers/technical.png
+  "235": /images/blog-covers/technical.png
 lang: en
 status: published
 translations:

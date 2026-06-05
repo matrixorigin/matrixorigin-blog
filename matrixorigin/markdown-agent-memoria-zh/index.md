@@ -14,8 +14,8 @@ keywords:
   - git
 publishTime: '2026-03-27T17:00:00+08:00'
 image:
-  '1': /content/zh/shared/tech.png
-  '235': /content/zh/shared/tech.png
+  '1': /images/blog-covers/technical.png
+  '235': /images/blog-covers/technical.png
 date: '2026-03-27T17:00:00+08:00'
 lang: zh
 status: published

@@ -14,8 +14,8 @@ keywords:
   - Amazon S3
 publishTime: '2024-04-12 17:00:00+08:00'
 image:
-  '1': /content/zh/shared/tech.png
-  '235': /content/zh/shared/tech.png
+  '1': /images/blog-covers/news.png
+  '235': /images/blog-covers/news.png
 date: '2024-04-12 17:00:00+08:00'
 lang: zh
 status: published

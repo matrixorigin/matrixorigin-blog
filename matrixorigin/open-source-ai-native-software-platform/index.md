@@ -20,8 +20,8 @@ publishTime: '2024-05-24 17:00:00+00:00'
 tags:
   - product
 image:
-  '1': /content/en/open-source-AI-native-software-platform/banner1.png
-  '235': /content/en/open-source-AI-native-software-platform/banner1.png
+  '1': /images/blog-covers/product.png
+  '235': /images/blog-covers/product.png
 date: '2024-05-24 17:00:00+00:00'
 lang: en
 status: published

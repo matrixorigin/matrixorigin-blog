@@ -14,8 +14,8 @@ keywords:
   - MatrixOne Intelligence
 publishTime: '2025-01-17 17:00:00+08:00'
 image:
-  '1': /content/zh/jishijiao-case/jishijiao.jpg
-  '235': /content/zh/jishijiao-case/jishijiao.jpg
+  '1': /images/blog-covers/customer-case.png
+  '235': /images/blog-covers/customer-case.png
 date: '2025-01-17 17:00:00+08:00'
 lang: zh
 status: published

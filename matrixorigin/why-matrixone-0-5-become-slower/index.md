@@ -18,10 +18,8 @@ keywords:
   - HTAP Database
 publishTime: '2023-09-08 17:00:00+00:00'
 image:
-  '1': >-
-    /content/en/why-matrixone-0-5-become-slower/why-matrixone-0.5-become-slower.png
-  '235': >-
-    /content/en/why-matrixone-0-5-become-slower/why-matrixone-0.5-become-slower.png
+  '1': /images/blog-covers/technical.png
+  '235': /images/blog-covers/technical.png
 date: '2023-09-08 17:00:00+00:00'
 lang: en
 status: published

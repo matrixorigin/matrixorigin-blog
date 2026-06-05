@@ -11,8 +11,8 @@ keywords:
   - AI data intelligence
 publishTime: '2025-11-10 17:00:00+08:00'
 image:
-  '1': ./images/news.png
-  '235': ./images/news.png
+  '1': /images/blog-covers/news.png
+  '235': /images/blog-covers/news.png
 date: '2025-11-10 17:00:00+08:00'
 lang: en
 status: published

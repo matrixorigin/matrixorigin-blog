@@ -12,8 +12,8 @@ keywords:
   - 数据治理
 publishTime: '2025-10-24 17:00:00+08:00'
 image:
-  '1': /content/zh/shared/acti-review.png
-  '235': /content/zh/shared/acti-review.png
+  '1': /images/blog-covers/news.png
+  '235': /images/blog-covers/news.png
 date: '2025-10-24 17:00:00+08:00'
 lang: zh
 status: published

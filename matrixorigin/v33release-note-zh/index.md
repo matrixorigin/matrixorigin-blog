@@ -13,8 +13,8 @@ keywords:
   - 自动化工作流
 publishTime: '2025-07-10 17:30:00+08:00'
 image:
-  '1': /content/zh/shared/public.png
-  '235': /content/zh/shared/public.png
+  '1': /images/blog-covers/product.png
+  '235': /images/blog-covers/product.png
 date: '2025-07-10 17:30:00+08:00'
 lang: zh
 status: published

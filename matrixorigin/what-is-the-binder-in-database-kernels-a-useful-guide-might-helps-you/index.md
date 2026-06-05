@@ -17,10 +17,8 @@ keywords:
   - Database Kernel
 publishTime: '2024-01-18 17:00:00+00:00'
 image:
-  '1': >-
-    /content/en/what-is-the-binder-in-database-kernels-a-useful-guide-might-helps-you/what-is-the-binder-in-database-kernels-a-useful-guide-might-helps-you.png
-  '235': >-
-    /content/en/what-is-the-binder-in-database-kernels-a-useful-guide-might-helps-you/what-is-the-binder-in-database-kernels-a-useful-guide-might-helps-you.png
+  '1': /images/blog-covers/technical.png
+  '235': /images/blog-covers/technical.png
 date: '2024-01-18 17:00:00+00:00'
 lang: en
 status: published

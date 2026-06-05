@@ -15,8 +15,8 @@ keywords:
   - HTAP Database
 publishTime: '2024-03-01 17:00:00+00:00'
 image:
-  '1': /content/en/shared/quickly-start-matrixone-database-kernel-front-end.png
-  '235': /content/en/shared/quickly-start-matrixone-database-kernel-front-end.png
+  '1': /images/blog-covers/technical.png
+  '235': /images/blog-covers/technical.png
 date: '2024-03-01 17:00:00+00:00'
 lang: en
 status: published

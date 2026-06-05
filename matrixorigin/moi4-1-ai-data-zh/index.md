@@ -11,8 +11,8 @@ keywords:
   - 功能升级
 publishTime: '2026-02-27T17:00:00+08:00'
 image:
-  '1': /content/zh/shared/tech.png
-  '235': /content/zh/shared/tech.png
+  '1': /images/blog-covers/product.png
+  '235': /images/blog-covers/product.png
 date: '2026-02-27T17:00:00+08:00'
 lang: zh
 status: published

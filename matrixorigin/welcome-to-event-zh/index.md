@@ -10,8 +10,8 @@ keywords:
   - 数据库
 publishTime: '2024-07-01 17:00:00+08:00'
 image:
-  '1': /content/zh/shared/tyg.png
-  '235': /content/zh/shared/tyg.png
+  '1': /images/blog-covers/news.png
+  '235': /images/blog-covers/news.png
 date: '2024-07-01 17:00:00+08:00'
 lang: zh
 status: published

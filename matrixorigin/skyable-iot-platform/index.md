@@ -16,8 +16,8 @@ keywords:
   - Data Analytics
 publishTime: '2025-01-09T17:00:00+08:00'
 image:
-  '1': /content/zh/shared/case.png
-  '235': /content/zh/shared/case.png
+  '1': /images/blog-covers/customer-case.png
+  '235': /images/blog-covers/customer-case.png
 annotation: 物联网与智慧城市 - 西安天能 IoT 平台
 date: '2025-01-09T17:00:00+08:00'
 lang: en

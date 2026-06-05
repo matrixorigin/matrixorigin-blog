@@ -16,8 +16,8 @@ keywords:
   - OLAP
 publishTime: '2023-08-29 17:00:00+00:00'
 image:
-  '1': /content/en/matrixone-v1-0-0-rc1/matrixone-v1-0-0-rc1.png
-  '235': /content/en/matrixone-v1-0-0-rc1/matrixone-v1-0-0-rc1.png
+  '1': /images/blog-covers/product.png
+  '235': /images/blog-covers/product.png
 date: '2023-08-29 17:00:00+00:00'
 lang: en
 status: published

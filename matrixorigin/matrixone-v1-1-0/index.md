@@ -19,8 +19,8 @@ keywords:
   - HTAP Database
 publishTime: '2024-01-08 17:00:00+00:00'
 image:
-  '1': /content/en/matrixone-v1-1-0/matrixone-v1-1-0.jpg
-  '235': /content/en/matrixone-v1-1-0/matrixone-v1-1-0.jpg
+  '1': /images/blog-covers/product.png
+  '235': /images/blog-covers/product.png
 date: '2024-01-08 17:00:00+00:00'
 lang: en
 status: published

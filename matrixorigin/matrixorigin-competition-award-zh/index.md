@@ -11,8 +11,8 @@ keywords:
   - 多模态数据
 publishTime: '2025-10-09+17:00:00+08:00'
 image:
-  '1': /content/zh/shared/hj.jpg
-  '235': /content/zh/shared/hj.jpg
+  '1': /images/blog-covers/news.png
+  '235': /images/blog-covers/news.png
 date: '2025-10-09+17:00:00+08:00'
 lang: zh
 status: published

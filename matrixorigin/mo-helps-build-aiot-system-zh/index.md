@@ -13,8 +13,8 @@ keywords:
   - MatrixOne
 publishTime: '2024-09-20 17:00:00+08:00'
 image:
-  '1': /content/zh/mo-helps-build-AIOT-system/yd1.png
-  '235': /content/zh/mo-helps-build-AIOT-system/yd1.png
+  '1': /images/blog-covers/customer-case.png
+  '235': /images/blog-covers/customer-case.png
 date: '2024-09-20 17:00:00+08:00'
 lang: zh
 status: published

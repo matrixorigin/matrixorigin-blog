@@ -13,10 +13,8 @@ keywords:
   - MatrixOne
 publishTime: '2024-08-30 17:00:00+08:00'
 image:
-  '1': >-
-    /content/zh/transportation-dataplatform-based-hyper-Converged-database/szc.png
-  '235': >-
-    /content/zh/transportation-dataplatform-based-hyper-Converged-database/szc.png
+  '1': /images/blog-covers/customer-case.png
+  '235': /images/blog-covers/customer-case.png
 date: '2024-08-30 17:00:00+08:00'
 lang: zh
 status: published

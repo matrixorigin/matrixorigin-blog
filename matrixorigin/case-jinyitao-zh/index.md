@@ -13,8 +13,8 @@ keywords:
   - intelligent-tile-search-platform
 publishTime: '2025-07-24 17:00:00+08:00'
 image:
-  '1': /content/zh/shared/case.png
-  '235': /content/zh/shared/case.png
+  '1': /images/blog-covers/customer-case.png
+  '235': /images/blog-covers/customer-case.png
 date: '2025-07-24 17:00:00+08:00'
 lang: zh
 status: published

@@ -13,8 +13,8 @@ keywords:
   - 企业数据治理
 publishTime: '2026-04-13T17:00:00+08:00'
 image:
-  '1': /content/zh/shared/news.png
-  '235': /content/zh/shared/news.png
+  '1': /images/blog-covers/technical.png
+  '235': /images/blog-covers/technical.png
 date: '2026-04-13T17:00:00+08:00'
 lang: zh
 status: published

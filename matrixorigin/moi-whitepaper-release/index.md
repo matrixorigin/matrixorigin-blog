@@ -17,8 +17,8 @@ keywords:
   - HTAP Database
 publishTime: '2025-06-06 17:00:00+00:00'
 image:
-  '1': /content/en/moi-whitepaper-release/moi-whitepaper-banner.png
-  '235': /content/en/moi-whitepaper-release/moi-whitepaper-banner.png
+  '1': /images/blog-covers/technical.png
+  '235': /images/blog-covers/technical.png
 date: '2025-06-06 17:00:00+00:00'
 lang: en
 status: published

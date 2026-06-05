@@ -13,8 +13,8 @@ keywords:
   - database selection
 publishTime: '2024-03-22 17:00:00+08:00'
 image:
-  '1': ./images/weekly.jpg
-  '235': ./images/weekly.jpg
+  '1': /images/blog-covers/news.png
+  '235': /images/blog-covers/news.png
 date: '2024-03-22 17:00:00+08:00'
 lang: en
 status: published

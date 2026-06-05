@@ -16,8 +16,8 @@ keywords:
   - MySQL
 publishTime: '2024-03-22 17:00:00+08:00'
 image:
-  '1': /content/zh/matrixone-vs-mysql/size616.jpg
-  '235': /content/zh/matrixone-vs-mysql/size616.jpg
+  '1': /images/blog-covers/news.png
+  '235': /images/blog-covers/news.png
 date: '2024-03-22 17:00:00+08:00'
 lang: zh
 status: published

@@ -14,8 +14,8 @@ keywords:
   - Smart Home
 publishTime: '2025-01-09T17:00:00+08:00'
 image:
-  '1': /content/zh/shared/case.png
-  '235': /content/zh/shared/case.png
+  '1': /images/blog-covers/customer-case.png
+  '235': /images/blog-covers/customer-case.png
   annotation: AI 智能体应用 - 集贤科技 AI 语音助手
 date: '2025-01-09T17:00:00+08:00'
 lang: en

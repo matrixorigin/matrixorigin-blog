@@ -7,8 +7,8 @@ keywords: ["MOI 简历筛选", "招聘初筛", "多模态解析", "智能评分�
 publishTime: "2026-06-01T17:00:00+08:00"
 date: '2026-06-01'
 image:
-  "1": "/content/zh/shared/tech.png"
-  "235": "/content/zh/shared/tech.png"
+  "1": /images/blog-covers/technical.png
+  "235": /images/blog-covers/technical.png
 lang: zh
 status: published
 translations:

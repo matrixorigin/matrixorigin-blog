@@ -11,8 +11,8 @@ keywords:
   - workflow automation
 publishTime: '2025-11-28 17:00:00+08:00'
 image:
-  '1': ./images/tech.png
-  '235': ./images/tech.png
+  '1': /images/blog-covers/product.png
+  '235': /images/blog-covers/product.png
 date: '2025-11-28 17:00:00+08:00'
 lang: en
 status: published
