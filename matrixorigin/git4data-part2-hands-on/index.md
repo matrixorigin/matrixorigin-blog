@@ -138,8 +138,6 @@ Not just looking, actually going back:
 
 ```sql
 RESTORE TABLE git4data_demo.orders {SNAPSHOT = v1};
--- Equivalent form:
--- RESTORE TABLE git4data_demo.orders FROM SNAPSHOT v1;
 
 SELECT COUNT(*) FROM orders;                       -- 1000000, all back
 ```
@@ -196,12 +194,13 @@ SELECT COUNT(*) FROM orders;                       -- still 1000000
 DATA BRANCH DIFF orders_dev AGAINST orders OUTPUT SUMMARY;
 ```
 
-On a million-row table it returns in **milliseconds** — and precise to the row:
+On a million-row table it returns in **milliseconds** — and precise to the row. The result is a table giving the changed-row counts on the branch and on the mainline:
 
 ```
-INSERTED  1     -- Frank's row
-UPDATED   1000  -- the rows whose status changed
-DELETED   0
+metric   | orders_dev | orders
+INSERTED |          1 |      0     -- Frank's row
+DELETED  |          0 |      0
+UPDATED  |       1000 |      0     -- the rows whose status changed
 ```
 
 It scans only the changed part, not the whole table, so it doesn't matter whether the table holds a million or a hundred million rows — we'll prove that with numbers in Step 11.
@@ -218,11 +217,14 @@ DATA BRANCH DIFF orders_dev AGAINST orders OUTPUT COUNT;
 -- Compare only a few columns
 DATA BRANCH DIFF orders_dev AGAINST orders COLUMNS (status, amount) OUTPUT SUMMARY;
 
--- Export the diff as an executable SQL patch file (DELETE + REPLACE INTO)
+-- Export the diff as an executable SQL patch file. Note: the output directory
+-- must already exist, and it's a path on the MatrixOne server (inside the
+-- container). For Docker, create it first:
+--   docker exec matrixone mkdir -p /tmp/orders_diff
 DATA BRANCH DIFF orders_dev AGAINST orders OUTPUT FILE '/tmp/orders_diff/';
 ```
 
-That last one is nice: the generated `.sql` file can be applied to any MatrixOne instance with `mysql … < diff_xxx.sql` — the branch's changes frozen into a **portable patch**.
+That last one is nice: the generated `.sql` is a single transaction — it loads the rows to delete/insert into two temp tables, then applies them to the target with `DELETE` + `INSERT INTO`, and drops the temp tables. You can apply it to any MatrixOne instance with `mysql … < diff_xxx.sql` — the branch's changes frozen into a **portable patch**.
 
 ---
 
@@ -308,6 +310,12 @@ CREATE PITR demo_pitr FOR DATABASE git4data_demo RANGE 1 'd';
 ```
 
 `RANGE` units: `h` (hours) / `d` (days, default) / `mo` (months) / `y` (years).
+
+⚠ A timing detail: a PITR has a "valid-from" boundary (roughly its creation time). **If you record a second-precision timestamp to restore to immediately after creating the PITR, you may hit `input timestamp ... is less than the pitr valid time`.** The safe move is to wait 1–2 seconds after creating the PITR — or run `SHOW PITR` to check its valid-from boundary — before recording your restore point:
+
+```sql
+SHOW PITR;              -- confirm demo_pitr is active (check its start time)
+```
 
 Now any past moment — whether or not you took an explicit snapshot at it — is reachable. Note "now", then do something destructive:
 
