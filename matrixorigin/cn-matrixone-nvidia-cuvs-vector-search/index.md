@@ -4,7 +4,8 @@ author: MatrixOrigin
 description: MatrixOne 深度集成 NVIDIA cuVS 与 RAFT，将向量索引构建、量化压缩和向量检索全面迁移至 GPU，在 8800 万级向量数据集上实现最高 19 倍索引构建加速和超过 200 倍检索性能提升，为企业级 AI 应用提供高性能混合查询能力。
 tags: ['技术干货']
 keywords: ['MatrixOne', 'NVIDIA cuVS', 'GPU向量检索', '企业AI']
-publishTime: "2026-06-04 18:00:00+08:00"
+publishTime: "2026-06-04T18:00:00+08:00"
+date: '2026-06-04'
 image:
   '1': '/content/zh/shared/tech.png'
   '235': '/content/zh/shared/tech.png'
