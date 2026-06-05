@@ -39,7 +39,7 @@ MatrixOne natively handles multiple data types and workloads (OLTP, OLAP, time s
 The fastest path is one Docker command:
 
 ```bash
-docker run -d -p 6001:6001 --name matrixone matrixorigin/matrixone:latest
+docker run -d -p 6001:6001 --name matrixone matrixorigin/matrixone:4.0.0-rc1
 ```
 
 Once the container is up, connect with any MySQL client (default user `root`, password `111`, port `6001`):
@@ -380,19 +380,19 @@ SELECT result + 2000000,
 FROM generate_series(1, 9000000) g;
 ```
 
-On a single-node Docker MatrixOne (4.0.0), we grew the same table to 1M, 10M, and 100M rows and ran the same set of git4data operations (diff / merge each touch only **1,000 rows**). Measured (steady-state, median of several runs):
+On a single-node Docker MatrixOne (4.0.0-rc1), we grew the same table to 1M, 10M, and 100M rows and ran the same set of git4data operations (diff / merge each touch only **1,000 rows**). Measured (steady-state, median of several runs):
 
 | Table size | Load | `CREATE SNAPSHOT` | `CLONE` | `DATA BRANCH CREATE` | `DIFF` (1000) | `MERGE` (1000) |
 |---|---|---|---|---|---|---|
 | **1,000,000** | 0.5 s | 6 ms | 6 ms | 7 ms | 13 ms | 64 ms |
 | **10,000,000** | 5.3 s | 8 ms | 8 ms | 7 ms | 21 ms | 178 ms |
-| **100,000,000** | 41 s | 5 ms | 25 ms | 19 ms | 23 ms | 1.3 s |
+| **100,000,000** | 41 s | 5 ms | 25 ms | 19 ms | 23 ms | 189 ms |
 
 Three things in this table are the whole point of Git4Data:
 
 - **Snapshot: dead constant** — data grew 100× (1M → 100M), yet `CREATE SNAPSHOT` stays at **5–8 ms**. A snapshot just names the metadata directory of "which data objects make up the table right now" — it has nothing to do with how many rows are in it.
 - **Clone / branch: they copy the metadata directory, not the data** — across 100× the data, clone rises only from 6 ms to 25 ms. That directory grows slowly with the number of objects, but it's always a few MB of metadata being copied, never tens of GB of data.
-- **Diff / merge: scale only with "how many rows changed"** — all three changed only 1,000 rows, so `DIFF` stays in the tens of milliseconds; `MERGE` grows as the table gets bigger (it writes the changes back into the main table), but that growth is proportional to the write work and is expected.
+- **Diff / merge: scale only with "how many rows changed"** — all three changed only 1,000 rows, so whether the table holds 1M or 100M rows, `DIFF` stays in the tens of milliseconds and `MERGE` in the tens-to-low-hundreds. `MERGE` is a bit heavier than `DIFF` (it actually writes the changes back into the main table), but it's likewise driven by how many rows changed, not by table size.
 
 > An honest detail: the **first** snapshot of a freshly loaded large table is a bit slower (~10–12 ms measured), because it first flushes still-in-memory data to object storage — a one-time cost, after which it drops to the steady-state numbers above. We loaded the data, paused briefly, then measured, precisely so the numbers reflect the git4data operation itself rather than that one-time flush.
 
