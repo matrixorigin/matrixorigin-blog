@@ -1,3 +1,21 @@
+---
+title: "MatrixOne Git4Data Deep Dive (Part 2): From Zero, Through Every Git Primitive"
+author: MatrixOrigin
+mail: contact@matrixorigin.io
+description: "Part 2 of the MatrixOne Git4Data series: a hands-on, copy-paste-runnable walkthrough. Install MatrixOne, load a million rows, then run every Git primitive — snapshot, clone, branch, row-level diff, merge with conflict modes, cherry-pick, and PITR — across table, database, account, and cluster levels, with measured numbers showing version-control cost is independent of data size."
+tags: ["Technical Insights"]
+keywords: ["Git4Data", "MatrixOne", "Data Version Control", "Snapshot and Clone", "Hands-on Tutorial"]
+publishTime: "2026-06-04T17:00:00+08:00"
+date: '2026-06-04'
+image:
+  "1": "/content/zh/shared/tech.png"
+  "235": "/content/zh/shared/tech.png"
+lang: en
+status: published
+translations:
+  zh: git4data-part2-hands-on-zh
+---
+
 # MatrixOne Git4Data Deep Dive (Part 2): From Zero, Through Every Git Primitive
 
 In Part 1 we covered **what** Git4Data is and **why** it matters. This time we go straight to hands-on. Within ten minutes you'll have MatrixOne running on your own machine, load a million rows of realistic data, and then **run every Git primitive, one SQL statement at a time** — snapshot, clone, branch, row-level diff, merge, cherry-pick, point-in-time recovery. Every SQL is copy-paste runnable; finish the walkthrough and you'll have *actually worked with data the Git way*, at scale.

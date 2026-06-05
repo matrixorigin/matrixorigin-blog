@@ -1,3 +1,20 @@
+---
+title: "MatrixOne Git4Data 技术详解（二）：从零跑通所有 Git 原语"
+author: MatrixOrigin
+description: "Git4Data 系列（二）：手把手、可直接复制运行的实操。装好 MatrixOne，灌进一百万行数据，把所有 Git 原语——快照、克隆、分支、行级 diff、带冲突策略的合并、cherry-pick、任意时间点恢复——在表 / 库 / 租户 / 集群四个粒度上跑一遍，并用实测数字证明：版本控制的成本与数据量无关。"
+tags: ["技术干货"]
+keywords: ["Git4Data", "MatrixOne", "数据版本控制", "快照克隆", "上手教程"]
+publishTime: "2026-06-04T17:00:00+08:00"
+date: '2026-06-04'
+image:
+  "1": "/content/zh/shared/tech.png"
+  "235": "/content/zh/shared/tech.png"
+lang: zh
+status: published
+translations:
+  en: git4data-part2-hands-on
+---
+
 # MatrixOne Git4Data 技术详解（二）：从零跑通所有 Git 原语
 
 上一篇我们讲了Git4Data是什么已经**为什么**它对我们有用。这一篇我们直接开始上手。十分钟之内，你会在自己的机器上把 MatrixOne 跑起来，灌进一百万行真实规模的数据，然后**一条条 SQL 把所有 Git 原语都跑一遍**——快照、克隆、分支、行级 diff、合并、cherry-pick、任意时间点恢复。所有 SQL 都可以直接复制运行；做完整段，你就有了在大规模的数据上“以 Git 的方式工作”的真实体验。
