@@ -2,13 +2,13 @@
 title: "A Front-Line Developer Shares: I Built a Full-Stack Project with Memoria — What It Remembers and What It Doesn't "
 author: MatrixOrigin
 description: Using the store-app project as a case study, exploring the real-world experience, value, and limitations of Memoria in software development.
-tags: ['Tech Insights']
+tags: ['Technical Insights']
 keywords: ['Memoria', 'MatrixOne', 'Full-Stack Development', 'AI Development Memory System']
 publishTime: "2026-05-29T19:00:00+08:00"
 date: '2026-05-29'
 image:
-  '1': "/content/en/memoria-experience-store-intro-en/1.png"
-  '235': "/content/en/memoria-experience-store-intro-en/2.png"
+  '1': "/images/blog-covers/technical.png"
+  '235': "/images/blog-covers/technical.png"
 lang: en
 status: published
 ---
