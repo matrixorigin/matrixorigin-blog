@@ -20,7 +20,7 @@ status: published
 ---
 
 ## Background: What Is store-app?
-![1.png](/content/en/memoria-experience-store-intro-en/1.png)
+![1.png](./images/1.png)
 store-app is a mobile store template with a frontend built on React + TypeScript + Vite, a backend built on Go + Gin, and MatrixOne as the database. It supports switching between multiple business types (convenience store / coffee shop), and includes five pages — Home, Categories, Product Details, Cart, and Orders — with five groups of RESTful APIs on the backend. Project repository: https://github.com/daviszhen/store-app.
 
 > **Memoria Memory** — `019e2bfd958d7c93bd5690249e09dc37`
@@ -124,7 +124,7 @@ This was the most complex change in the project. Memoria recorded the complete d
 ### 5. Iterations on the Cart UI
 
 Three UI iterations, with Memoria's memories updating along the way:
-![2.png](/content/en/memoria-experience-store-intro-en/2.png)
+![2.png](./images/2.png)
 | Iteration | Change | Memory Status |
 |---|---|---|
 | v1 | Added an "Add" button to the bottom-right of product cards | Overwrote old memory (Home layout) |
