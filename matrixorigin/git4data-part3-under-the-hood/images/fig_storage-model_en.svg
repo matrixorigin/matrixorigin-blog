@@ -1,0 +1,66 @@
+<svg viewBox="0 0 1200 620" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif">
+  <defs>
+    <pattern id="g" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M40 0H0V40" fill="none" stroke="#161B22" stroke-width="1"/>
+    </pattern>
+    <radialGradient id="glow" cx="50%" cy="45%" r="55%">
+      <stop offset="0%" stop-color="#1F6FEB" stop-opacity="0.16"/>
+      <stop offset="100%" stop-color="#1F6FEB" stop-opacity="0"/>
+    </radialGradient>
+    <marker id="arr" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto">
+      <path d="M0 0L7 3L0 6Z" fill="#6E7681"/>
+    </marker>
+    <style>
+      .mono{font-family:ui-monospace,'SF Mono','JetBrains Mono',Menlo,Consolas,monospace;}
+      .h{fill:#E6EDF3;} .m{fill:#9DA7B3;} .dim{fill:#6E7681;}
+    </style>
+  </defs>
+
+  <rect width="1200" height="620" fill="#0D1117"/>
+  <rect width="1200" height="620" fill="url(#g)"/>
+  <ellipse cx="600" cy="320" rx="380" ry="260" fill="url(#glow)"/>
+
+  <text x="70" y="74" class="h" font-size="32" font-weight="700">How data is stored: immutable objects + a directory</text>
+  <text x="72" y="106" class="mono dim" font-size="16">a table = a directory of pointers to immutable objects</text>
+
+  <rect x="80" y="170" width="300" height="300" rx="8" fill="#10182B" stroke="#1F6FEB" stroke-width="1.5"/>
+  <text x="100" y="205" class="h" font-size="20" font-weight="700">metadata directory</text>
+  <text x="100" y="230" class="mono dim" font-size="14">what makes up the table now</text>
+  <text x="100" y="266" class="m mono" font-size="15">&#8594; obj #1</text>
+  <text x="100" y="302" class="m mono" font-size="15">&#8594; obj #2</text>
+  <text x="100" y="338" class="m mono" font-size="15">&#8594; obj #3</text>
+  <text x="100" y="374" class="m mono" font-size="15">&#8594; tombstone #1</text>
+  <text x="100" y="432" class="dim" font-size="14">the table's shape is fully</text>
+  <text x="100" y="452" class="dim" font-size="14">determined by this directory</text>
+
+  <text x="640" y="150" class="dim" font-size="15">object storage (S3) &#183; immutable once written</text>
+
+  <g>
+    <rect x="640" y="178" width="320" height="58" rx="6" fill="#1C2330" stroke="#3B66B0" stroke-width="1.5"/>
+    <text x="660" y="206" class="h mono" font-size="15">obj #1</text>
+    <text x="660" y="226" class="dim mono" font-size="13">row group &#183; columnar &#183; immutable</text>
+  </g>
+  <g>
+    <rect x="640" y="248" width="320" height="58" rx="6" fill="#1C2330" stroke="#3B66B0" stroke-width="1.5"/>
+    <text x="660" y="276" class="h mono" font-size="15">obj #2</text>
+    <text x="660" y="296" class="dim mono" font-size="13">row group &#183; columnar &#183; immutable</text>
+  </g>
+  <g>
+    <rect x="640" y="318" width="320" height="58" rx="6" fill="#1C2330" stroke="#3B66B0" stroke-width="1.5"/>
+    <text x="660" y="346" class="h mono" font-size="15">obj #3</text>
+    <text x="660" y="366" class="dim mono" font-size="13">row group &#183; columnar &#183; immutable</text>
+  </g>
+  <g>
+    <rect x="640" y="388" width="320" height="58" rx="6" fill="#2A1A1E" stroke="#D2545C" stroke-width="1.5"/>
+    <text x="660" y="416" class="mono" font-size="15" fill="#F0A8AD">tombstone #1</text>
+    <text x="660" y="436" class="dim mono" font-size="13">a delete writes a tombstone, not an erase</text>
+  </g>
+
+  <path d="M380 261 C 540 207, 560 207, 638 207" fill="none" stroke="#6E7681" stroke-width="1.4" stroke-dasharray="5 4" marker-end="url(#arr)"/>
+  <path d="M380 297 C 540 277, 560 277, 638 277" fill="none" stroke="#6E7681" stroke-width="1.4" stroke-dasharray="5 4" marker-end="url(#arr)"/>
+  <path d="M380 333 C 540 347, 560 347, 638 347" fill="none" stroke="#6E7681" stroke-width="1.4" stroke-dasharray="5 4" marker-end="url(#arr)"/>
+  <path d="M380 369 C 540 417, 560 417, 638 417" fill="none" stroke="#6E7681" stroke-width="1.4" stroke-dasharray="5 4" marker-end="url(#arr)"/>
+
+  <text x="80" y="540" class="m" font-size="16">The real data sits in immutable objects and never changes; only <tspan class="h" font-weight="700">"who the directory points to"</tspan> changes.</text>
+  <text x="80" y="568" class="dim" font-size="15">&#8212; the entire foundation for why snapshot, clone, diff, and merge are all so cheap.</text>
+</svg>
