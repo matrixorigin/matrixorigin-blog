@@ -50,7 +50,7 @@ Pipeline的基本框架，这两者也可以同时存在并相互配合。而在
 
 整体Data Pipeline可以总结到如下流程图中：
 
-<img src="/content/zh/moi-whitepaper2/datapipeline.png" alt="datapipeline" width="1000">
+<img src="./images/datapipeline.png" alt="datapipeline" width="1000">
 
 接下来我们会逐个分析其中每个关键环节的场景，数据加工的技术要求，以及MatrixOne
 Intelligence解决方案中的产品能力如何匹配该环节的需求。

@@ -26,7 +26,7 @@ status: published
 
 5月21日，2024 GIIC (GPU Infrastructure Innovation Conference) 暨第四届中国 IDC 行业 DISCOVERY 大会由中关村超互联新基建产业创新联盟主办，互联科技实验室 NEOLINK LABS 承办，世纪互联、矩阵起源联合承办，北京市科学技术委员会，中关村科技园区管理委员会支持举办。矩阵起源创始人兼 CEO 王龙受邀参会，并在大会上发表主题为《算力+数据：AI原生世界的基石》的主旨演讲。
 
-<img src="/content/zh/event-review-mo-ceo--invited-to-giic/hd1.jpeg" width="1000">
+<img src="./images/hd1.jpeg" width="1000">
 
 王龙在会上发布了围绕算力和数据的开源 AI 原生软件平台 MatrixOS，这是一个开源开放的 AI-Native 操作系统，链接算力、数据、算法与应用，提供一整套端到端的 AI Stack 服务框架。MatrixOS 由算力服务平台 MatrixDC、超融合数据管理平台 MatrixOne 和 AI 智能体开发平台 MatrixGenesis 三个核心子产品构成，既可以一站式组合服务，也可以由每个子产品独立提供服务。
 

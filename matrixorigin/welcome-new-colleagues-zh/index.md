@@ -24,7 +24,7 @@ status: published
 
 **近日，原腾讯云副总裁张纾翔先生正式加入矩阵起源，担任合伙人兼高级副总裁，全面负责矩阵起源商业化工作。**
 
-<img src="/content/zh/welcome-new-colleagues/svp.jpg" width="300">
+<img src="./images/svp.jpg" width="300">
 
 矩阵起源成立于 2021 年。公司创始团队来自腾讯云、Snowflake 等国内外一流的互联网企业、软件公司、数字化企业和开源社区，核心团队为产品、研发、解决方案、生态和开源社区等领域的专家，在分布式架构、数据库、云计算、大数据及人工智能等领域积累了丰富经验。不久前，矩阵起源完成千万美元 Pre A 轮融资，由世纪互联领投，Honour Base 跟投。本轮融资后，矩阵起源将在超融合异构数据库 MatrixOne 的基础上，扩展业务至 AI Infra 和 AI Platform 领域，并与世纪互联的 AIDC 业务深度融合和协作。
 

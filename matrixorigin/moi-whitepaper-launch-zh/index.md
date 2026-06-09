@@ -73,7 +73,7 @@ MatrixOne Intelligence的架构分为四大层次：
 
 4. **应用交互层**：通过多模态搜索与Chat2BI等功能，赋能企业构建更高效的业务应用。
 
-<img src="/content/zh/moi-whitepaper-launch/moi-structure.png" alt="moi structure" style="width:100%;max-width:100%" />
+<img src="./images/moi-structure.png" alt="moi structure" style="width:100%;max-width:100%" />
 
 ### 适用场景与行业案例
 
