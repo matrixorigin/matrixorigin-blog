@@ -26,9 +26,9 @@ status: published
 在数字化时代，质量是我们不变的追求。近日，矩阵起源迎来了一个值得庆祝的时刻——三项 ISO 体系年度考核顺利通过！分别为：ISO9001 质量管理体系标准认证、ISO20000 信息技术服务管理体系认证及 ISO27001 信息安全管理体系认证。
 
 <div style="display: flex; justify-content: space-around;">
-  <img src="/content/zh/mo-passed-annual-iso/iso1.png" alt="Certificate of ISO9001" style="width: 33.3%;"/>
-  <img src="/content/zh/mo-passed-annual-iso/iso2.png" alt="Certificate of ISO20000 " style="width: 33.3%;"/>
-  <img src="/content/zh/mo-passed-annual-iso/iso3.png" alt="Certificate of ISO27001" style="width: 33.3%;"/>
+  <img src="./images/iso1.png" alt="Certificate of ISO9001" style="width: 33.3%;"/>
+  <img src="./images/iso2.png" alt="Certificate of ISO20000 " style="width: 33.3%;"/>
+  <img src="./images/iso3.png" alt="Certificate of ISO27001" style="width: 33.3%;"/>
 </div>
 
 ISO 标准是全球公认的质量管理体系标杆，它要求我们以高标准、高要求来审视和优化每一个环节，为客户提供更高质量的产品和服务。本次年审顺利通过，不但彰显了矩阵起源在行业内的突出实力，同时也为增强企业核心竞争力、助力公司高质量发展奠定了坚实基础。这不仅是对我们工作流程和管理体系的全面认可，更是对我们不断追求卓越精神的高度赞扬。

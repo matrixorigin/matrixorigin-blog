@@ -189,7 +189,7 @@ drop database demo_branch;
 
 ## 3. 一张图把流程连起来（主表 / 分支表 / diff / merge / restore）
 
-![mermaid diagram](./pics/mermaid.svg)
+![mermaid diagram](./images/mermaid.svg)
 
 ---
 

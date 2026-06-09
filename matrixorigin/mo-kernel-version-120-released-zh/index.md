@@ -32,7 +32,7 @@ status: published
 
 MatrixOne 是一款分布式超融合异构数据库，MatrixOne 旨在提供一个云原生、高性能、高弹性、高度兼容 MySQL 的 HSTAP 数据库，让用户面对事务、分析、时序、流计算等混合负载时，通过 MatrixOne 一站式的完成整个数据处理过程。
 
-<img src="/content/zh/mo-kernel-version-120-released/nh1.png" width="1000">
+<img src="./images/nh1.png" width="1000">
 
 ## MatrixOne 1.2.0
 

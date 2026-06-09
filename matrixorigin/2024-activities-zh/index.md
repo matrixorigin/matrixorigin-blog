@@ -38,8 +38,8 @@ status: published
 24年的开篇，我们以一场盛大的年会开篇共同庆祝龙年的到来，这不仅为了庆祝过去一年的辛勤与成就，更为了展望未来那无限的可能性和梦想，MOer共同携手开启了新一年的征程，期待那些即将到来的辉煌篇章。
 
 <div style="display: flex; justify-content: space-between;">
-  <img src="/content/zh/2024-activities/act1.png" alt="act1" style="width: 45%;">
-  <img src="/content/zh/2024-activities/act2.png" alt="act2" style="width: 45%;">
+  <img src="./images/act1.png" alt="act1" style="width: 45%;">
+  <img src="./images/act2.png" alt="act2" style="width: 45%;">
 </div>
 
 ![act3](./images/act3.png)
@@ -63,8 +63,8 @@ MO为各位MOer送上新年礼物，每份新年礼物都传递着MO对大家的
 三月，正值春日美好节气。伴着春风，我们迎来了三八妇女节。她们在各自岗位上发光发热，为公司的发展贡献出不可缺乏的"她力量"。在这个充满尊重与庆祝的三八妇女节里，MO为每一位女性MOer准备了精心挑选的礼物，每一份礼物都代表着公司对女性同事们的敬意和感激。愿每一位女性MOer在生活和工作中，都能继续绽放光彩，展现独立与自信的魅力。
 
 <div style="display: flex; justify-content: space-between;">
-  <img src="/content/zh/2024-activities/act7.png" alt="act7" style="width: 45%;">
-  <img src="/content/zh/2024-activities/act8.png" alt="act8" style="width: 45%;">
+  <img src="./images/act7.png" alt="act7" style="width: 45%;">
+  <img src="./images/act8.png" alt="act8" style="width: 45%;">
 </div>
 
 #### 端午节
@@ -72,8 +72,8 @@ MO为各位MOer送上新年礼物，每份新年礼物都传递着MO对大家的
 在这个充满传统色彩的端午节里，MO为大家准备了手工彩绳，邀请每位员工亲手编织属于自己的端午节手串。每一根彩绳都蕴含着祈福纳吉的美好寓意，象征着健康与平安。通过亲手编织这一传统饰物，我们不仅能够体验到端午节丰富的文化内涵，更能在这一过程中感受团队的温馨与合作的乐趣，编织出属于自己的节日记忆。
 
 <div style="display: flex; justify-content: space-between;">
-  <img src="/content/zh/2024-activities/act9.png" alt="act9" style="width: 45%;">
-  <img src="/content/zh/2024-activities/act10.png" alt="act10" style="width: 45%;">
+  <img src="./images/act9.png" alt="act9" style="width: 45%;">
+  <img src="./images/act10.png" alt="act10" style="width: 45%;">
 </div>
 
 #### 中秋节
@@ -96,14 +96,14 @@ MO为各位MOer送上新年礼物，每份新年礼物都传递着MO对大家的
 我们致力于将分享内容与每位MOer的实际需求相融合，从前沿技术到行业趋势，我们鼓励团队成员超越当前角色，突破限制，与公司携手进步。我们相信，通过每一期的MO大讲堂，每位MOer都能获得宝贵的知识和灵感，共同推动公司的创新发展。
 
 <div style="display: flex; justify-content: space-between;">
-  <img src="/content/zh/2024-activities/act14.png" alt="act14" style="width: 45%;">
-  <img src="/content/zh/2024-activities/act15.png" alt="act15" style="width: 45%;">
+  <img src="./images/act14.png" alt="act14" style="width: 45%;">
+  <img src="./images/act15.png" alt="act15" style="width: 45%;">
 </div>
 11月我们也联合3节课开展了线上学习周的活动，准备了非常丰富的线上课程，其中涵盖了软件开发、职场通用能力及非常火热的AIGC应用等板块，整个活动累计学习时长超过60小时，单周平均每个学员学习超过3小时。
 
 <div style="display: flex; justify-content: space-between;">
-  <img src="/content/zh/2024-activities/act16.png" alt="act16" style="width: 45%;">
-  <img src="/content/zh/2024-activities/act17.png" alt="act17" style="width: 45%;">
+  <img src="./images/act16.png" alt="act16" style="width: 45%;">
+  <img src="./images/act17.png" alt="act17" style="width: 45%;">
 </div>
 
 ## 缤纷茶点，共享时刻
@@ -111,8 +111,8 @@ MO为各位MOer送上新年礼物，每份新年礼物都传递着MO对大家的
 每一期的Beer Bash让MOer聚在一起，共同享受一段轻松愉快的时光。精美的小事和诱人的奶茶伴随着欢声笑语，让紧张的工作节奏暂时放缓，不仅让MOer们放松身心，也增进了团队间的交流。期待未来能与MOer有更多这样的时刻。
 
 <div style="display: flex; justify-content: space-between;">
-  <img src="/content/zh/2024-activities/act18.png" alt="act18" style="width: 45%;">
-  <img src="/content/zh/2024-activities/act19.png" alt="act19" style="width: 45%;">
+  <img src="./images/act18.png" alt="act18" style="width: 45%;">
+  <img src="./images/act19.png" alt="act19" style="width: 45%;">
 </div>
 
 ![act20](./images/act20.png)
