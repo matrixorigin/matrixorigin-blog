@@ -146,7 +146,7 @@ In the above figure, TN1–1 represents the first transaction node of transactio
 
 Usually, a Checkpoint is a safe point. During restart, the state machine can apply Log Entries from this safe point. Log Entries before the Checkpoint are no longer needed and will be physically destroyed at the appropriate time. A Checkpoint can represent the data equivalent within its indicated range. For example, CKPLSN-11(-∞, 10]) is equivalent to the Log Entries from EntryLSN=1 to EntryLSN=10, the logs within that range are no longer needed. During restart, replaying from the last Checkpoint CKPLSN-11(-∞, 10]) is sufficient. Due to being columnar, TAE needs a two-level structure to record the last Checkpoint info, using Group in WAL to distinguish.
 
-![](public/content/en/transactional-analytical-engine/picture8.jpg)
+![](./images/picture8.jpg)
 
 Implementing WAL and log replay in TAE is abstracted into an independent code module logstore, which abstracts access to underlying logs and can connect to different implementations from a single node to distributed. At the physical layer, the logstore behaviors relies are similar to message queue semantics. Starting with MatrixOne 0.6, the system architecture will evolve to the cloud native version, and the corresponding log service will run independently as a shared log, so at that time logstore in TAE will be slightly modified to directly access the external shared log service instead of relying on any local storage.
 
@@ -160,11 +160,11 @@ In TAE, a table contains multiple segments, a segment is the result of multiple 
 
 Background asynchronous tasks perform the generation and changes of segments,so TAE also incorporates these asynchronous tasks into the transaction processing framework to ensure data read consistency, for example:
 
-![](public/content/en/transactional-analytical-engine/picture9.jpg)
+![](./images/picture9.jpg)
 
 _Block_1_L_0 is created at \_t1_, it contains data from _Txn1_, _Txn2_, _Txn3_, _Txn4_. _Block_1_L_0 starts sorting at \_t_11, its Read View is the baseline plus an uncommitted update node. Sorting and persisting a block can take a long time. Before committing sorted \_Block_2_L_1 at \_t21_, there are two committed transactions _Txn5_, _Txn6_ and one uncommitted transaction _Txn7_. When _Txn7_ commits at _t_16, it will fail, because \_Block_1_L_0 has already been terminated. The update nodes from \_Txn5_, _Txn6_ committed between (\_t_11 ,\_t_16 ) will be merged into a new update node, which will be committed with \_Block_2_L_1 at_t_16.
 
-![](public/content/en/transactional-analytical-engine/picture10.jpg)
+![](./images/picture10.jpg)
 
 The Compaction process terminates a series of blocks or segments, while atomically creating a new block or segment (or building an index). Compared to normal transactions, it usually takes a long time, and we do not want to block update or delete transactions on the involved blocks or segments. Here we extend the content of the Read View to include the metadata of blocks and segments. When committing a normal transaction, it will fail once a write operation is detected on a block (or segment) whose metadata has been changed (committed). For a Compaction transaction, the write operations include soft deletion and adding blocks (or segments). Conflicts between writes are detected on each write during transaction execution. Once a conflict occurs, the transaction will be terminated prematurely.
 
@@ -172,7 +172,7 @@ The Compaction process terminates a series of blocks or segments, while atomical
 
 Let's look at TAE's MVCC version information storage mechanism. The version storage mechanism of a database determines how the system stores these versions and what information each version contains. Creating a latch free linked list based on the pointer field of the data Tuple is called a version chain. This version chain allows the database to locate the required version of a Tuple. Therefore, the storage mechanism of these version data is an important consideration in the design of database storage engines. One approach is to use Append Only, where all Tuple versions of a table are stored in the same storage space. This method is used in Postgres. To update an existing Tuple, the database first gets an empty slot from the table for the new version, then copies the content of the current version to the new version. Finally, it applies modifications to the Tuple in the newly allocated slot. The key decision of the Append Only scheme is how to sort the version chain for Tuples, since it is impossible to maintain a lock free bidirectional linked list, the version chain only points in one direction, either from Old to New (O2N), or from New to Old (N2O). Another similar scheme is called Time-Travel, which stores version chain information separately, while the main table maintains the main version data. The third scheme maintains the main version of the Tuple in the main table, and holds a series of delta versions in a separate delta storage. This storage is called rollback segments in MySQL and Oracle. To update an existing Tuple, the database obtains a contiguous space from the delta storage to create a new delta version. This delta version contains the original values of the modified attributes, instead of the entire Tuple. Then the database directly performs In Place Update on the main version in the main table.
 
-![](public/content/en/transactional-analytical-engine/picture11.jpg)
+![](./images/picture11.jpg)
 
 These schemes have different characteristics that affect their performance in OLTP workloads. For LSM Tree, since it is inherently Append-only structure, it is closer to the first one. The linked list of the version chain may need to be reflected. For example, in RocksDB, all write operations are later merged, so naturally there are also multiple versions of the Key (different versions may be on different Levels). When the amount of updates is not large, this structure is simple and can easily achieve better performance. TAE currently chooses a variant of the third scheme, as shown below:
 

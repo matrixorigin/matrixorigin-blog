@@ -181,13 +181,13 @@ Before showing the head-to-head numbers, it's worth explaining how the parameter
 
 We ran a Pareto sweep for IVF over nprobe ∈ {1, 8, 16, 32, 64, 128, 256}:
 
-![nprobe](images/1.png)
+![nprobe](./images/1.png)
 
 The curve shows a classic IVF knee: recall climbs steeply until nprobe = 16 (0.79), then flattens - beyond that, each doubling of nprobe adds at most ~1 point of recall but latency starts to drift up. **nprobe = 16** is the **Pareto-optimal point** for our 0.80 recall target.
 
 We then validated at 88M:
 
-![88M Recall vs Latency](images/2.png)
+![88M Recall vs Latency](./images/2.png)
 
 The 88M curve shows the same result as the 10M curve: recall hits 0.83 at nprobe = 16 (~125 ms), and only creeps to 0.88 by nprobe = 256. The 10M-tuned setting (pq_bits = 8, nprobe = 16) holds well at a larger scale.
 
