@@ -84,7 +84,7 @@ By now, "why snapshots are cheap" is almost self-evident.
 > **Snapshotting a table is, essentially, copying its current metadata directory.**
 
 - `CREATE SNAPSHOT v1 FOR TABLE …` saves the current directory structure under the name `v1`. The directory is just a set of references to objects — **independent of whether those objects hold a million or a hundred million rows** — so a snapshot is always a few milliseconds, regardless of data size. (One detail: before saving a named snapshot, the system first flushes still-in-memory, not-yet-persisted data into objects — the source of the "first snapshot is slightly slower" from Part 2, a one-time cost.)
-- A timestamp snapshot `T{mo_ts='2025-09-12 12:34:56'}` is more direct: nothing to save up front; reading just filters the directory's objects by an MVCC timestamp. This is the equivalent of a Git commit.
+- Timestamp-based versions are even more direct: nothing needs to be saved up front at all — reading just filters the directory's objects by an MVCC timestamp to reconstruct the table at any moment. This is the foundation of PITR (point-in-time recovery), like having the system auto-commit for you continuously.
 - **Cloning** (`CLONE` / `DATA BRANCH CREATE`) is the same — **it copies the directory structure**, not any data object. The clone and the original go on to add/remove objects in their own directories, independently, but at the start they **share the same underlying data objects**. That's the entire reason "clone 600M rows in 0.2 s, 314 KB extra": those 314 KB are the newly copied directory; not one byte of the 600 million rows moved.
 
 ![Snapshot & clone: copy only the directory, share the underlying objects](./images/fig_snapshot-clone_en.svg)
@@ -197,7 +197,7 @@ Once the hood is up, that "counterintuitive" table at the start isn't counterint
 
 It also explains something bigger: why it's the **database**, not a file-versioning tool, that ended up carrying "version control for data at scale." Only a system that both understands the semantics of every row *and* can express changes as immutable increments can make branch, diff, and merge cheap enough on TB-scale data that you reach for them without thinking.
 
-Next time, we turn from "how it's built" back to "what you do with it" — back to the thread this series planted at the very start: **letting self-evolving AI agents explore, evaluate, merge, and roll back safely on versioned data.** That's where git4data really wants to go.
+From here, the series turns practical: from data operations (incident rescue, collaborative development, release gates), through AI training (continuous learning, SFT curation, collaborative labeling, RLHF, multimodal data), all the way to the thread planted at the very start — **letting self-evolving AI agents explore, evaluate, merge, and roll back safely on versioned data.** That's where git4data really wants to go.
 
 > 📎 Runnable companion SQL is at [github.com/matrixorigin/git4data-tutorial](https://github.com/matrixorigin/git4data-tutorial).
 > 📎 Source & community: [github.com/matrixorigin/matrixone](https://github.com/matrixorigin/matrixone)
