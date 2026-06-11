@@ -62,7 +62,7 @@ To understand why snapshots are cheap, go one level deeper: when a CN writes a t
 
 - Table data is sliced into **objects**, each holding a batch of rows in columnar form.
 - **Once an object is written, it is immutable** — the cornerstone of the whole mechanism. To add data, you write a new object.
-- A table's objects are ordered by primary key into an **LSM tree**.
+- Objects are organized **LSM-style**: immutable objects plus background compaction. Tables with a primary key or sort key (sort key / cluster by) keep data ordered by key, letting scans prune via zone maps and similar metadata; tables without a primary key take an internal fake-PK / full-row path.
 - **Deleting a row doesn't erase it from an object** (objects are immutable, so you can't); instead a record is written to a separate **tombstone object**, marking "this row is deleted."
 - The key one: **which objects make up the table right now** is recorded in a **metadata directory** — think of it as a manifest listing which data objects and tombstone objects this table points to at the moment.
 
@@ -77,22 +77,20 @@ Add a layer of **MVCC** (multi-version concurrency control, like PostgreSQL): ea
 
 ---
 
-## Snapshot and clone: all that's copied is the directory
+## Snapshot and clone: no data moves, only metadata
 
-By now, "why snapshots are cheap" is almost self-evident.
+By now, "why snapshots are cheap" is almost self-evident. But although neither snapshot nor clone moves data, **their mechanisms differ**, and they're worth separating:
 
-> **Snapshotting a table is, essentially, copying its current metadata directory.**
+- A **snapshot** (`CREATE SNAPSHOT v1 FOR TABLE …`) is, at its core, **recording a timestamp** and telling GC: "protect the object versions visible at this moment." It doesn't actually copy a directory — **independent of whether the table holds a million or a hundred million rows** — so a snapshot is always a few milliseconds. (One detail: before saving a named snapshot, the system first flushes still-in-memory, not-yet-persisted data into objects — the source of the "first snapshot is slightly slower" from Part 2, a one-time cost.)
+- Timestamp-based versions are even more direct: nothing needs to be saved up front at all — reading just filters objects by an MVCC timestamp to reconstruct the table at any moment. This is the foundation of PITR (point-in-time recovery), like having the system auto-commit for you continuously.
+- A **clone** (`CLONE` / `DATA BRANCH CREATE`) copies **object metadata references** — the new table records "which data objects and tombstone objects I point to" (plus their statistics), while **the object files themselves are not copied at all**. The clone and the original evolve independently from then on, but at the start they **share the same underlying data objects**. That's the entire reason "clone 600M rows in 0.2 s, 314 KB extra": those 314 KB are the new table's reference metadata; not one byte of the 600 million rows moved.
 
-- `CREATE SNAPSHOT v1 FOR TABLE …` saves the current directory structure under the name `v1`. The directory is just a set of references to objects — **independent of whether those objects hold a million or a hundred million rows** — so a snapshot is always a few milliseconds, regardless of data size. (One detail: before saving a named snapshot, the system first flushes still-in-memory, not-yet-persisted data into objects — the source of the "first snapshot is slightly slower" from Part 2, a one-time cost.)
-- Timestamp-based versions are even more direct: nothing needs to be saved up front at all — reading just filters the directory's objects by an MVCC timestamp to reconstruct the table at any moment. This is the foundation of PITR (point-in-time recovery), like having the system auto-commit for you continuously.
-- **Cloning** (`CLONE` / `DATA BRANCH CREATE`) is the same — **it copies the directory structure**, not any data object. The clone and the original go on to add/remove objects in their own directories, independently, but at the start they **share the same underlying data objects**. That's the entire reason "clone 600M rows in 0.2 s, 314 KB extra": those 314 KB are the newly copied directory; not one byte of the 600 million rows moved.
+![Snapshot & clone: no data moves, only metadata](./images/fig_snapshot-clone_en.svg)
+*A snapshot records a moment and protects its objects; a clone copies object references — both point at the same immutable objects, so even 600M rows take 0.2 s.*
 
-![Snapshot & clone: copy only the directory, share the underlying objects](./images/fig_snapshot-clone_en.svg)
-*Snapshot and clone both copy only the directory; the copies point at the same immutable objects — so even 600M rows take 0.2 s.*
+There's an easily-missed but crucial design point — **garbage collection is snapshot-aware.** MatrixOne compacts in the background and reclaims objects no longer needed; but **object versions protected by a named snapshot or a branch are not reclaimed.** This also adds an honest footnote on cost: **creating** a branch/snapshot is near-constant-cost and zero-copy; **holding** one long-term is not entirely free — the pinned historical objects keep occupying storage until the snapshot/branch is dropped and GC can reclaim them. Short-lived branches are essentially free; long-retained snapshots should budget for that retention cost.
 
-There's an easily-missed but crucial design point — **garbage collection is snapshot-aware.** MatrixOne compacts in the background and reclaims objects no longer needed; but **objects referenced by a named snapshot are never reclaimed.** That's what makes deriving a branch or keeping a snapshot truly "zero-cost": the system pins the objects it depends on so they aren't quietly cleaned up behind your back.
-
-So the "zero-cost branches" and "snapshots in seconds" from the first two parts all land here — **because they moved no data, only copied a directory.**
+So the "millisecond snapshots" and "second-scale branches" from the first two parts all land here — **because creating them moves no data.**
 
 ---
 
@@ -106,7 +104,7 @@ Back to Part 2's workflow: table `T` is cloned into `TClone` at snapshot `sn1`, 
 
 The key observation: because objects are append-only, **everything a branch changed from `sn1` to now shows up as "which objects it has beyond the common ancestor"** — an insert produces a new data object, a delete a new tombstone object, an update is a delete-plus-insert. We call "the objects `sn2` has beyond `sn1`" **Δ_sn2** (delta, the increment), and likewise Δ_sn3.
 
-> **So to diff `sn2` against `sn3`, MatrixOne only needs to read each branch's increment — Δ_sn2 and Δ_sn3 — and never scans either full table.**
+> **So — as long as lineage exists between the two tables and the common ancestor (LCA) can be located — diffing `sn2` against `sn3` only needs to read each branch's increment, Δ_sn2 and Δ_sn3, never scanning either full table.** (When lineage is unavailable, it falls back to a slower path — detailed in the "Two-way merge" section.)
 
 That's why, with 100 million rows in the table but only 1,000 changed, the diff is twenty-odd milliseconds — it reads only the few increment objects holding those 1,000 rows.
 
@@ -152,9 +150,9 @@ A careful reader will have noticed: the three-way merge above needs the common a
 
 Because MatrixOne **records the lineage itself.** When `DATA BRANCH CREATE` derives a branch, it records "which snapshot it branched from," so at merge time it can **trace back to the common ancestor automatically** — the "two-way merge" you see is, underneath, "a three-way merge with the common ancestor filled in for you."
 
-What if the common ancestor is no longer available (say the original table and its snapshots were deleted)? MatrixOne falls back to computing with an **empty common ancestor**, and the result is still correct; and as long as the two tables really share an origin, they still **share many underlying objects**, so the aggregation simply **skips the objects common to both** and stays fast.
+What if the lineage is broken (say the original table and its snapshots were deleted, so no LCA can be located)? MatrixOne falls back to a **whole-history comparison** — collecting both tables' changes from the earliest visible point and then aggregating. **Correctness is still guaranteed, but performance is no longer equivalent to the LCA-based incremental fast path**: it's essentially comparing the two tables' full histories. The practical advice: if you want the fast path long-term, create branches with `DATA BRANCH CREATE` and keep the upstream snapshots alive — don't let the LCA go missing.
 
-This pinpoints the fundamental gap between git4data and "comparing two tables with hand-written SQL": the latter has to **scan two full tables** every time; git4data, because it records the lineage and stores only incremental objects, **always reads just that small set of changes.**
+This also pinpoints the fundamental gap between git4data and "comparing two tables with hand-written SQL": the latter has to **scan two full tables** every time; git4data, when lineage is available, **reads only the small window of changes along the path from the LCA to each endpoint.**
 
 ---
 
@@ -193,7 +191,7 @@ Spelling out these boundaries is, in fact, the clearest outline of what "buildin
 
 Once the hood is up, that "counterintuitive" table at the start isn't counterintuitive at all:
 
-> A snapshot just copies a **metadata directory**, so it's independent of data size; a clone just copies the directory and shares the same objects, so even 600M rows take 0.2 s; diff/merge read only the **increment objects Δ** and use a ±-signed aggregation to tell true conflicts from false, so they track only the number of rows changed. **Immutable objects + one directory + read only the increment** — version control grows naturally out of these three things.
+> A snapshot, at heart, **records a moment** and protects the object versions of that moment, so it's independent of data size; a clone copies only **object metadata references** and shares the same underlying objects, so even 600M rows take 0.2 s; diff/merge, when lineage is available, read only the **increment objects Δ** and use a ±-signed aggregation to tell true conflicts from false, so they track only the number of rows changed. **Immutable objects + metadata references + reading only the increment along the lineage** — version control grows naturally out of these three things.
 
 It also explains something bigger: why it's the **database**, not a file-versioning tool, that ended up carrying "version control for data at scale." Only a system that both understands the semantics of every row *and* can express changes as immutable increments can make branch, diff, and merge cheap enough on TB-scale data that you reach for them without thinking.
 
