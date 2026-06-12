@@ -1,12 +1,12 @@
 
 ---
-title: ‘Human in the Loop，不该只停留在“一个人”’
+title: 'Human in the Loop，不该只停留在“一个人”'
 author: MatrixOrigin
 description: 从 Human in the Loop 到 Team in the Loop，本文通过一次真实 Debug 场景，展示 Memoria 如何利用 Branch、Diff、Review、Apply 和 Rollback，将 Oncall、Dev、Ops 与 Agent 接入同一条共享记忆链路，实现团队上下文的审查、接力与可追溯管理。
 tags: ["技术干货"]
 keywords: ["Memoria", "AI Agent", "Agent Memory", "多智能体协作"]
-date: "2026-06-12T19:00:00+08:00"
-publishTime: "2026-06-12T19:00:00+08:00"
+date: "2026-06-12T17:00:00+08:00"
+publishTime: "2026-06-12T17:00:00+08:00"
 image:
   "1": "/images/blog-covers/technical.png"
   "235": "/images/blog-covers/technical.png"
