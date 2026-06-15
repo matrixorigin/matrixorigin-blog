@@ -237,45 +237,24 @@ The same landscape, as a positioning map — finer granularity to the right, mor
 
 ---
 
-## MatrixOne's coordinates, and its honest boundaries
+## MatrixOne's positioning
 
 Condense the map into one position:
 
-> **MatrixOne ≈ "Dolt's row-level git completeness + a warehouse's zero-copy clone/time-travel + Neon's database branching," with row-level merge-with-conflict, cherry-pick, and PITR all filled in, across table-to-cluster granularities, inside one open-source, MySQL-compatible database.**
+> **MatrixOne ≈ "Dolt's row-level git completeness + a warehouse's zero-copy clone/time-travel + Neon's database branching," with row-level merge-with-conflict, cherry-pick, and PITR all filled in, across table-to-cluster granularities, inside one open-source, MySQL-compatible cloud-native HTAP database.**
 
 Against the four actions: **A see the change** (row-level DIFF), **B parallel collaboration** (row-level three-way merge + conflict policy), **C cherry-pick / pull data** (`PICK` + direct SQL), **D incident recovery** (snapshot + PITR) — it's one of the few that does all four **at the row level, in a single engine.**
 
-But "comprehensive" also means being clear about what it **isn't**:
+But on the other hand, it's worth being just as clear about what it **isn't**:
 
 - **It doesn't replace DVC**: none of the "data+model+code" triad reproduction of `dvc repro/exp` — for pure ML pipeline versioning, DVC is still handier.
 
 - **It doesn't replace lakeFS**: massive byte-level unstructured versioning and cross-format whole-repo atomic commits are lakeFS's turf; MatrixOne versions only the file *reference*. → **best used together**.
 
-- **Its git isn't as "deep" as Dolt's**: no distributed git workflow (remotes / push-pull / DoltHub / per-cell blame).
+- **Its git workflow trails Dolt's**: no distributed git workflow (remotes / push-pull / DoltHub / per-cell blame).
 
-- **It isn't an open lakehouse format** (Iceberg/Delta): not built for multi-engine interoperability or PB-scale lakehouse ecosystems.
-
-- **It isn't a serverless warehouse** (Snowflake/Neon): it trails on the per-branch scale-to-zero form factor.
-
-Stating the boundaries isn't weakness — this is exactly the spot on this track **most prone to confusion**, and only by spelling it out can a reader know when to use MatrixOne, when to use someone else, and when to combine them.
+Knowing these differences is what tells a developer when to use MatrixOne, when to use something else, and when to combine them.
 
 ---
-
-## Picking one, in a sentence
-
-- Want **complete, row-level, conflict-aware git, inside a MySQL-compatible database** → **MatrixOne** (this series' subject).
-- Want a **full distributed git workflow (push/pull/DoltHub/blame)** → **Dolt**.
-- Want **byte-level versioning of massive raw files (images/video/weights)** → **lakeFS** (and combine with MatrixOne).
-- Want **pure ML reproduction, versioning data + model + code together** → **DVC**.
-- Data already in an **open lakehouse**, shared across engines → **Iceberg/Delta + Nessie**.
-- Want **serverless, branch-per-PR, scale-to-zero** (no row-level merge needed) → **Neon**.
-
----
-
-## Closing
-
-The map is drawn. From this article on, the series leaves theory and enters practice — and you set out with a clear coordinate system: knowing what we mean by "git4data," where it stands on the track (row-level + complete git, sharing the top-right corner with Dolt), and where its edges are.
-
-Next is the first practical stop, and git4data's most unglamorous, most frequent use: **incident rescue** — from a fat-fingered UPDATE to a dropped table, how to bring data back in seconds with snapshots, DIFF, and PITR.
 
 > 📎 Runnable SQL: [github.com/matrixorigin/git4data-tutorial](https://github.com/matrixorigin/git4data-tutorial) ｜ Source & community: [github.com/matrixorigin/matrixone](https://github.com/matrixorigin/matrixone)
