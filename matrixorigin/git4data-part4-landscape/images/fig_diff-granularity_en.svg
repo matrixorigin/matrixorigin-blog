@@ -61,7 +61,7 @@
   <!-- card 4: row/cell level (highlight) -->
   <rect x="520" y="465" width="610" height="100" rx="8" fill="#10233F" stroke="#1F6FEB" stroke-width="2"/>
   <text x="544" y="500" class="h" font-size="17" font-weight="700">row &#183; cell level</text>
-  <text x="544" y="526" class="dim" font-size="13">Dolt &#183; MatrixOne git4data</text>
+  <text x="544" y="526" class="dim" font-size="13">Dolt &#183; MatrixOne</text>
   <text x="1106" y="500" class="h mono" font-size="15" text-anchor="end">id 88231  amount 100 &#8594; 110</text>
   <text x="1106" y="524" class="h mono" font-size="15" text-anchor="end">id 88232  amount  98 &#8594; 108  &#8230;</text>
   <text x="1106" y="550" class="mono" fill="#79C0FF" font-size="16" font-weight="700" text-anchor="end">UPDATED 310</text>
