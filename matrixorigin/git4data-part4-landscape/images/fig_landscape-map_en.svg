@@ -1,81 +1,58 @@
 <svg viewBox="0 0 1200 640" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif">
   <defs>
-    <pattern id="g" width="40" height="40" patternUnits="userSpaceOnUse">
-      <path d="M40 0H0V40" fill="none" stroke="#161B22" stroke-width="1"/>
-    </pattern>
-    <radialGradient id="sweet" cx="50%" cy="50%" r="55%">
-      <stop offset="0%" stop-color="#1F6FEB" stop-opacity="0.30"/>
-      <stop offset="100%" stop-color="#1F6FEB" stop-opacity="0"/>
-    </radialGradient>
-    <marker id="arr" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto">
-      <path d="M0 0L7 3L0 6Z" fill="#6E7681"/>
-    </marker>
-    <style>
-      .mono{font-family:ui-monospace,'SF Mono','JetBrains Mono',Menlo,Consolas,monospace;}
-      .h{fill:#E6EDF3;} .m{fill:#9DA7B3;} .dim{fill:#6E7681;}
-    </style>
+    <pattern id="g" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0V40" fill="none" stroke="#161B22" stroke-width="1"/></pattern>
+    <radialGradient id="sweet" cx="50%" cy="50%" r="55%"><stop offset="0%" stop-color="#1F6FEB" stop-opacity="0.30"/><stop offset="100%" stop-color="#1F6FEB" stop-opacity="0"/></radialGradient>
+    <marker id="arr" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0 0L7 3L0 6Z" fill="#6E7681"/></marker>
+    <style>.mono{font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace;} .h{fill:#E6EDF3;} .m{fill:#9DA7B3;} .dim{fill:#6E7681;}</style>
   </defs>
-
-  <rect width="1200" height="640" fill="#0D1117"/>
-  <rect width="1200" height="640" fill="url(#g)"/>
+  <rect width="1200" height="640" fill="#0D1117"/><rect width="1200" height="640" fill="url(#g)"/>
 
   <text x="70" y="62" class="h" font-size="30" font-weight="700">The data-versioning landscape, on one map</text>
-  <text x="72" y="92" class="mono dim" font-size="15">finer granularity &#215; richer compute &#8594; toward the top-right corner</text>
+  <text x="72" y="92" class="mono dim" font-size="15">finer granularity &#215; more complete git &#8594; toward the top-right corner</text>
 
-  <!-- sweet-spot glow top-right -->
-  <ellipse cx="980" cy="190" rx="220" ry="150" fill="url(#sweet)"/>
+  <ellipse cx="975" cy="195" rx="230" ry="155" fill="url(#sweet)"/>
 
-  <!-- axes -->
   <line x1="150" y1="540" x2="1140" y2="540" stroke="#30363D" stroke-width="1.5" marker-end="url(#arr)"/>
   <line x1="150" y1="540" x2="150" y2="120" stroke="#30363D" stroke-width="1.5" marker-end="url(#arr)"/>
 
-  <!-- x axis label -->
   <text x="645" y="612" class="m" font-size="16" text-anchor="middle">granularity  (coarse &#8594; fine)</text>
-  <!-- x ticks -->
   <text x="250" y="566" class="dim mono" font-size="13" text-anchor="middle">file</text>
   <text x="410" y="566" class="dim mono" font-size="13" text-anchor="middle">object</text>
   <text x="585" y="566" class="dim mono" font-size="13" text-anchor="middle">snapshot</text>
   <text x="765" y="566" class="dim mono" font-size="13" text-anchor="middle">table / db</text>
   <text x="980" y="566" class="dim mono" font-size="13" text-anchor="middle">row &#183; cell</text>
 
-  <!-- y axis label -->
-  <text x="44" y="330" class="m" font-size="16" text-anchor="middle" transform="rotate(-90 44 330)">compute on a version  (none &#8594; rich)</text>
-  <!-- y gridlines + ticks -->
-  <line x1="150" y1="470" x2="1130" y2="470" stroke="#161B22" stroke-width="1" stroke-dasharray="3 5"/>
+  <text x="44" y="330" class="m" font-size="16" text-anchor="middle" transform="rotate(-90 44 330)">git-semantic completeness  (read-only &#8594; complete)</text>
+  <line x1="150" y1="455" x2="1130" y2="455" stroke="#161B22" stroke-width="1" stroke-dasharray="3 5"/>
   <line x1="150" y1="370" x2="1130" y2="370" stroke="#161B22" stroke-width="1" stroke-dasharray="3 5"/>
   <line x1="150" y1="270" x2="1130" y2="270" stroke="#161B22" stroke-width="1" stroke-dasharray="3 5"/>
   <line x1="150" y1="175" x2="1130" y2="175" stroke="#161B22" stroke-width="1" stroke-dasharray="3 5"/>
-  <text x="160" y="464" class="dim" font-size="12">none</text>
-  <text x="160" y="364" class="dim" font-size="12">external engine</text>
-  <text x="160" y="264" class="dim" font-size="12">built-in SQL</text>
-  <text x="160" y="169" class="dim" font-size="12">HTAP + vector</text>
+  <text x="160" y="449" class="dim" font-size="12">read-only history / time-travel</text>
+  <text x="160" y="364" class="dim" font-size="12">+ branch</text>
+  <text x="160" y="264" class="dim" font-size="12">+ diff</text>
+  <text x="160" y="169" class="dim" font-size="12">+ 3-way merge · conflict · cherry-pick</text>
 
-  <!-- family points -->
-  <!-- DVC / Git LFS : file, none -->
-  <circle cx="250" cy="470" r="11" fill="#1C2330" stroke="#6E7681" stroke-width="1.5"/>
-  <text x="250" y="446" class="m" font-size="14" text-anchor="middle" font-weight="600">DVC / Git LFS</text>
+  <circle cx="250" cy="452" r="11" fill="#1C2330" stroke="#6E7681" stroke-width="1.5"/>
+  <text x="250" y="430" class="m" font-size="14" text-anchor="middle" font-weight="600">DVC / Git LFS</text>
 
-  <!-- lakeFS / Pachyderm : object, none -->
-  <circle cx="410" cy="470" r="11" fill="#1C2330" stroke="#6E7681" stroke-width="1.5"/>
-  <text x="410" y="446" class="m" font-size="14" text-anchor="middle" font-weight="600">lakeFS / Pachyderm</text>
+  <circle cx="735" cy="452" r="11" fill="#1C2330" stroke="#6E7681" stroke-width="1.5"/>
+  <text x="735" y="480" class="m" font-size="14" text-anchor="middle" font-weight="600">Snowflake / BigQuery</text>
 
-  <!-- Iceberg/Delta + Nessie : snapshot, external -->
-  <circle cx="585" cy="370" r="11" fill="#1C2330" stroke="#6E7681" stroke-width="1.5"/>
-  <text x="585" y="346" class="m" font-size="14" text-anchor="middle" font-weight="600">Iceberg / Delta + Nessie</text>
+  <circle cx="795" cy="360" r="11" fill="#1C2330" stroke="#6E7681" stroke-width="1.5"/>
+  <text x="795" y="338" class="m" font-size="14" text-anchor="middle" font-weight="600">Neon</text>
 
-  <!-- Snowflake / Neon : table/db, built-in SQL -->
-  <circle cx="765" cy="270" r="11" fill="#1C2330" stroke="#6E7681" stroke-width="1.5"/>
-  <text x="765" y="246" class="m" font-size="14" text-anchor="middle" font-weight="600">Snowflake / Neon</text>
+  <circle cx="410" cy="215" r="11" fill="#1C2330" stroke="#6E7681" stroke-width="1.5"/>
+  <text x="410" y="193" class="m" font-size="14" text-anchor="middle" font-weight="600">lakeFS / Pachyderm</text>
 
-  <!-- Dolt : row/cell, built-in SQL (OLTP) -->
-  <circle cx="980" cy="285" r="11" fill="#1C2330" stroke="#8957E5" stroke-width="1.5"/>
-  <text x="980" y="312" class="m" font-size="14" text-anchor="middle" font-weight="600">Dolt</text>
+  <circle cx="585" cy="270" r="11" fill="#1C2330" stroke="#6E7681" stroke-width="1.5"/>
+  <text x="585" y="248" class="m" font-size="14" text-anchor="middle" font-weight="600">Iceberg / Delta + Nessie</text>
 
-  <!-- MatrixOne : row/cell, HTAP+vector -->
-  <circle cx="980" cy="175" r="17" fill="#1F6FEB" stroke="#79C0FF" stroke-width="2"/>
-  <text x="980" y="138" class="h" font-size="18" text-anchor="middle" font-weight="700">MatrixOne</text>
+  <circle cx="945" cy="198" r="12" fill="#1C2330" stroke="#8957E5" stroke-width="1.8"/>
+  <text x="922" y="225" class="m" font-size="14" text-anchor="end" font-weight="600">Dolt</text>
 
-  <!-- sweet-spot annotation -->
-  <text x="1118" y="218" class="dim" font-size="12.5" text-anchor="end">row-level git semantics</text>
-  <text x="1118" y="236" class="dim" font-size="12.5" text-anchor="end">&#215; a live HTAP engine</text>
+  <circle cx="1002" cy="172" r="17" fill="#1F6FEB" stroke="#79C0FF" stroke-width="2"/>
+  <text x="1002" y="138" class="h" font-size="18" text-anchor="middle" font-weight="700">MatrixOne</text>
+
+  <text x="1120" y="250" class="dim" font-size="12.5" text-anchor="end">row-level + complete git</text>
+  <text x="1120" y="268" class="dim" font-size="12.5" text-anchor="end">—— inside the DB kernel</text>
 </svg>

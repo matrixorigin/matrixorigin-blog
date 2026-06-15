@@ -1,8 +1,8 @@
 ---
-title: "MatrixOne Git4Data Deep Dive (Part 4): The Data-Versioning Landscape — How git4data, lakeFS, and Dolt Actually Differ"
+title: "MatrixOne Git4Data Deep Dive (Part 4): The Data-Versioning Landscape — How MatrixOne, lakeFS, DVC, Neon, and Dolt Actually Differ"
 author: MatrixOrigin
 mail: contact@matrixorigin.io
-description: "Part 4 of the MatrixOne Git4Data series: a map of the data-versioning landscape. 'git for data' is claimed by DVC/Git LFS, lakeFS, Iceberg/Delta+Nessie, Dolt, and Snowflake/Neon — but they don't mean the same thing. A five-question framework plus one running scenario (see the change / parallel merge / compute on a version / recovery) put every approach through the same exam, then pin down where MatrixOne sits and its honest boundaries."
+description: "Part 4 of the MatrixOne Git4Data series: a map of the data-versioning landscape. 'git for data' is claimed by DVC/Git LFS, lakeFS, Iceberg/Delta+Nessie, Snowflake/Neon, and Dolt — but they don't mean the same thing. A five-question framework, four categories by the layer where versioning lives (each with an architecture diagram), a git-primitive completeness matrix that aligns everyone's git semantics, and where MatrixOne actually sits — with its honest boundaries."
 tags: ["Technical Insights"]
 keywords: ["Git4Data", "MatrixOne", "Data Version Control", "lakeFS", "Dolt", "Snowflake", "Neon"]
 publishTime: "2026-06-15T17:00:00+08:00"
@@ -16,13 +16,13 @@ translations:
   zh: git4data-part4-landscape-zh
 ---
 
-# MatrixOne Git4Data Deep Dive (Part 4): The Data-Versioning Landscape — How git4data, lakeFS, and Dolt Actually Differ
+# MatrixOne Git4Data Deep Dive (Part 4): The Data-Versioning Landscape — How MatrixOne, lakeFS, DVC, Neon, and Dolt Actually Differ
 
 The first three articles established what MatrixOne's git4data is, how to use it, and how it works underneath. But before moving into practice, one thing must be settled:
 
 > **"Version control for data" is not something only MatrixOne does.** lakeFS, Dolt, Nessie, Snowflake, Neon, DVC — a crowd of products fly the "git for data" / "version control for data" banner. But what they mean by it is **not the same thing.**
 
-The term "git4data" has been stretched so far it blurs the boundaries. This article settles it properly: a framework first, then **one running scenario** that puts every approach on this track through the same exam — same task, and the difference in each one's answer becomes obvious — and finally MatrixOne's exact coordinates and its honest boundaries.
+The term "git4data" has been stretched so far it blurs the boundaries. This article settles it properly: a framework first, then **four categories grouped by "which layer the versioning lives at"** (each with an architecture diagram), then a **git-primitive completeness matrix** that aligns everyone's git semantics — same word "git," but *how much* git, exactly — and finally MatrixOne's exact coordinates and its honest boundaries.
 
 ---
 
@@ -33,10 +33,10 @@ To compare "data version control," you can't just ask "does it have diff/merge?"
 1. **What does it version** — file bytes? objects in object storage? table snapshots? or data rows?
 2. **At which layer does it sit** — beside the code repo? on top of object storage? on top of a table format? or inside the database kernel?
 3. **How fine is the granularity** — a whole file? a whole object? a snapshot? or a single row / cell?
-4. **Can you compute directly on a version** — run SQL, aggregate, join dimension tables, do vector search?
-5. **What's the collaboration model** — a discrete commit chain? branch + merge? how are conflicts adjudicated?
+4. **How complete are the git semantics** — just "go back in time" (time-travel)? or branch, diff, three-way merge, cherry-pick — the full set?
+5. **How are conflicts adjudicated** — no merge at all? merge but only whole-file all-or-nothing? or row-level true/false conflict detection?
 
-Of these five, **#3 (granularity) and #4 (can you compute on a version) are the decisive ones** — together they all but determine whether a tool is versioning *data*, or merely versioning the *files that data happens to sit in*.
+Of these, **#2 (which layer) decides which category a tool belongs to**, while **#3 and #4 (granularity + git completeness) decide its standing within that category**. So we'll group everyone into four categories *by layer*.
 
 ---
 
@@ -46,10 +46,10 @@ To make the differences visible, fix a concrete scenario and make every approach
 
 > You maintain a data asset — picture a **50-million-row user-feature table** (or a **100GB multimodal training set of millions of files**, whichever fits below). The team repeatedly does four things:
 >
-> - **Action A | See the change**: after editing a batch of data, know precisely **which rows** changed, and to what.
-> - **Action B | Parallel collaboration**: several people each open a branch, edit in parallel, merge back to mainline, with conflicts adjudicated.
-> - **Action C | Compute on a version**: go back to a historical version and **directly** run analytical SQL, or pull a batch of training data, on that version.
-> - **Action D | Incident recovery**: a dropped table or a botched bulk edit — bring it back in seconds.
+> - **Action A | See the change**: after editing a batch of data, know precisely **which rows** changed, and to what (git diff).
+> - **Action B | Parallel collaboration**: several people each open a branch, edit in parallel, merge back to mainline, with conflicts adjudicated (git branch + merge).
+> - **Action C | Cherry-pick / pull data**: lift one change onto another branch (cherry-pick), or pull a batch of data directly on some version.
+> - **Action D | Incident recovery**: a dropped table or a botched bulk edit — bring it back in seconds (git reset / restore).
 
 Hold these four actions, and each approach's genes show themselves immediately.
 
@@ -57,10 +57,12 @@ Hold these four actions, and each approach's genes show themselves immediately.
 
 ## Category 1: Git-native file versioning — DVC / Git LFS
 
-**Approach**: treat data as "large files," store **pointers** in Git and **bytes** in a remote cache (S3, etc.). What you see in Git is a tens-of-bytes `.dvc` pointer file; the real data sits in a content-addressed cache.
+**Approach**: treat data as "large files," store **pointers** in Git and **bytes** in a remote cache (S3, etc.). What you see in Git is a tens-of-bytes `.dvc` pointer file; the real data sits in a content-addressed cache. Version control is entirely **borrowed from Git** — what you commit / branch / merge is the pointer files.
 
-- **Git LFS**: purely solves "don't blow up the Git repo with big files," handling storage only — it **doesn't understand file contents**, so diffing two versions compares the pointer files, not the data.
-- **DVC**: a stronger take on the idea; its strength is binding **data + model + code + pipeline DAG** together (`dvc add`, `dvc repro` to run the DAG, `dvc exp run` for experiments) to make an ML run **reproducible**.
+![Category 1 architecture: Git repo holds pointers (.dvc), remote cache holds bytes; version = a Git commit of the pointer files; granularity = file](./images/fig_arch-file_en.svg)
+
+- **Git LFS**: purely solves "don't blow up the Git repo with big files," handling storage only — it **doesn't understand file contents**, so diffing two versions compares the pointers, not the data.
+- **DVC**: a stronger take on the idea; its strength is binding **data + model + code + pipeline DAG** together (`dvc add`, `dvc repro`, `dvc exp run`) to make an ML run **reproducible**.
 
 **In the scenario**:
 
@@ -68,55 +70,52 @@ Hold these four actions, and each approach's genes show themselves immediately.
 
 - **Action B (parallel merge)**: no data-aware merge; you fall back to **Git's text merge of the pointer files**. Two people editing the same data file is one binary conflict.
 
-- **Action C (compute on a version)**: **can't**. To analyze a version you first `dvc checkout` the files locally, then feed pandas / Spark.
+- **Action C (cherry-pick / pull data)**: no row-level cherry-pick; pulling data means `dvc checkout` the whole file locally, then feed pandas / Spark.
 
-- **Action D (incident recovery)**: `git checkout <old commit>` + `dvc checkout`, swapping files back to the old version — at file granularity.
+- **Action D (incident recovery)**: `git checkout <old commit>` + `dvc checkout`, swapping files back — at file granularity.
 
-**Key difference from MatrixOne**: DVC versions **files**, and is **tightly coupled to the code repo**. It's handy for ML pipeline reproduction, but it has no concept of a "row," and can't run SQL on a version. **Pure reproduction pipelines → DVC; row-level semantics and compute-on-a-version → not its track at all.**
+**Key difference from MatrixOne**: DVC's git semantics are **borrowed** from Git and act on **files**; MatrixOne's are **kernel-native** and act on **rows**. For pure ML pipeline reproduction, DVC is handy; for row-level diff / merge, it isn't on this track at all.
 
 ---
 
 ## Category 2: git-for-data over object storage — lakeFS / Pachyderm
 
-**Approach**: over object storage (S3/OSS), provide git-style commit / branch / merge / revert, acting on **all objects in the whole repository**. It needs **a standing lakeFS server + a metadata KV** (PostgreSQL / DynamoDB in production); the data bytes stay in your object store, lakeFS owns only the metadata.
+**Approach**: a layer over object storage (S3/OSS) providing git-style commit / branch / merge / revert, acting on **all objects in the whole repository**. It needs **a standing lakeFS server + a metadata KV** (PostgreSQL / DynamoDB in production); the data bytes stay in your object store, lakeFS owns only the metadata; to actually compute, you still need an external engine.
 
-**lakeFS** is this category's flagship, and the product most often compared with MatrixOne. We've run head-to-head tests, and the picture is clear.
+![Category 2 architecture: object storage at the bottom, lakeFS server + metadata KV managing branches/commits, external engines on top reading a branch; granularity = object](./images/fig_arch-object_en.svg)
+
+**lakeFS** is this category's flagship, and the product most often compared with MatrixOne. Its git semantics are actually quite complete (branch / commit / merge / revert) — **the one shortfall is granularity.**
 
 **In the scenario** (using the 100GB multimodal set):
 
-- **Action A (see the change)**: the same batch changed 310 annotation rows, and `lakectl diff lakefs://repo/main lakefs://repo/feature` reports "**6 objects changed**" — its native diff granularity is the **object (whole file)**, it can't show which 310 rows. For row-level, you layer **Iceberg + Spark** on top (lakeFS now ships a `refs_data_diff` Spark SQL function that returns row-level adds/deletes — but **the compute runs in Spark, not in lakeFS**).
+- **Action A (see the change)**: the same batch changed 310 annotation rows, and `lakectl diff lakefs://repo/main lakefs://repo/feature` reports "**6 objects changed**" — its diff granularity is the **object (whole file)**, it can't show which 310 rows. For row-level, layer Iceberg + Spark on top (lakeFS now ships a `refs_data_diff` Spark SQL function — but **computed in Spark, not in lakeFS**).
 
-- **Action B (parallel merge)**: lakeFS merge is an **object-level three-way merge** — two branches touching **different** objects merge cleanly; but both touching the **same parquet file** is a conflict, and it **can't fuse the two batches of rows inside the file** — only `source-wins` / `dest-wins`.
+- **Action B (parallel merge)**: lakeFS merge is an **object-level three-way merge** — different objects merge cleanly; both branches touching the **same parquet file** is a conflict, and it **can't fuse the two batches of rows inside the file** — only `source-wins` / `dest-wins`.
 
-- **Action C (compute on a version)**: **lakeFS doesn't compute.** To compute metrics, build features, or join dimension tables on a branch, you read the objects out, parse them, and feed an external engine (Spark / Trino / DuckDB).
+- **Action C (cherry-pick / pull data)**: it can cherry-pick, but the unit is still the **object**; pulling data means reading objects out into an external engine (Spark / Trino / DuckDB).
 
 - **Action D (incident recovery)**: `lakectl branch revert` to a historical commit — at object granularity, whole-repo consistent.
 
-**Where it's strong**: **scope is the whole repository** — one commit / branch / merge naturally covers **all files**, making multi-file, cross-format atomic consistency effortless; this is where lakeFS beats MatrixOne. Content-level versioning of massive **unstructured bytes** (images / video / audio / weights) is its home turf.
+**Where it's strong**: **scope is the whole repository** — one commit / branch / merge naturally covers **all files**, making multi-file, cross-format atomic consistency effortless; content-level versioning of massive **unstructured bytes** (images / video / audio / weights) is its home turf.
 
-**Key difference from MatrixOne**: lakeFS manages **objects**, MatrixOne manages **rows**. The former is "Git for the data lake," the latter is "Git grown inside the database." The two are complementary — **lakeFS owns the bytes, MatrixOne owns the catalog and labels** — and a later article in this series is dedicated to how they combine.
+**Key difference from MatrixOne**: lakeFS's git is complete but stops at the **object** granularity; MatrixOne brings the same git semantics down to the **row**. The former is "Git for the data lake," the latter "Git grown inside the database" — **lakeFS owns the bytes, MatrixOne owns the catalog and labels** — complementary, and a later article covers how they combine.
 
-> Same layer: **Pachyderm** — a data-driven pipeline that auto-triggers on data change, plus lineage; same file / commit granularity, no row-level diff, no SQL on a version.
+> Same layer: **Pachyderm** — a data-driven pipeline that auto-triggers on data change, plus lineage; same file / commit granularity.
 
 ---
 
 ## Category 3: table format + git branches — Iceberg / Delta + Nessie
 
-**Approach**: open table formats like Iceberg / Delta Lake / Hudi represent a table as a chain of **immutable snapshots** (each write = a new snapshot), with built-in time travel:
+**Approach**: open table formats like Iceberg / Delta Lake / Hudi represent a table as a chain of **immutable snapshots** (each write = a new snapshot), with built-in time travel; layer a catalog like **Nessie** (or Unity Catalog) on top and tables gain git-style branches / tags / merge — and a single commit can span **multiple tables**. Querying is delegated entirely to external engines.
+
+![Category 3 architecture: data files + table-format snapshot chain + Nessie catalog (branch/tag/merge), external engines Spark/Trino/Flink on top; granularity = table snapshot](./images/fig_arch-tableformat_en.svg)
 
 ```sql
 -- Iceberg: read history by snapshot id or timestamp
 SELECT * FROM db.t FOR SYSTEM_VERSION AS OF 10963874102873;
 SELECT * FROM db.t FOR SYSTEM_TIME AS OF '2026-06-10 01:21:00';
--- Delta
-SELECT * FROM t VERSION AS OF 123;
-```
-
-Layer a catalog like **Nessie** (or Unity Catalog) on top and tables gain git-style branches / tags / merge — and a single commit can span **multiple tables**:
-
-```sql
+-- Nessie: cross-table branch & merge
 CREATE BRANCH etl IN nessie;
--- edit several tables on the etl branch…
 MERGE BRANCH etl INTO main IN nessie;
 ```
 
@@ -124,86 +123,105 @@ MERGE BRANCH etl INTO main IN nessie;
 
 - **Action A (see the change)**: versioning is at the **snapshot level**. Which rows differ between two snapshots, the format doesn't directly tell you — an external engine has to diff the two snapshots.
 
-- **Action B (parallel merge)**: Nessie's merge is a **real merge**, but at **table-snapshot** granularity — a conflict means "the **same table** was changed on both branches" (optimistic concurrency, content-key conflict), **not** the row-level three-way merge of MatrixOne / Dolt. It doesn't adjudicate rows; it delegates that to the table format.
+- **Action B (parallel merge)**: Nessie's merge is a **real merge**, but at **table-snapshot** granularity — a conflict means "the **same table** was changed on both branches" (optimistic concurrency, content-key conflict), **not** a row-level three-way merge. It delegates rows to the table format.
 
-- **Action C (compute on a version)**: **neither the table format nor Nessie computes** — they store snapshots and pointers; all querying is done by external engines (Spark / Trino / Flink / Dremio). The upside: **many engines read the same data**.
+- **Action C (cherry-pick / pull data)**: Nessie supports commit-level cherry-pick (still table/snapshot level); pulling data is Spark / Trino / Flink / Dremio.
 
 - **Action D (incident recovery)**: `RESTORE TABLE t TO VERSION AS OF 123` (Delta) / roll back to a snapshot.
 
-**Key difference from MatrixOne**: this path's strength is **open ecosystem, multi-engine interoperability, lakehouse scale** — one dataset that Spark reads, Trino reads, Flink writes. The cost is **no kernel-level row merge** and **no built-in compute engine**. If your data already lives in an open lakehouse to be shared across engines, this path is the most natural; for row-level git semantics + built-in HTAP compute, it isn't.
+**Key difference from MatrixOne**: this path's strength is **open ecosystem, multi-engine interoperability, lakehouse scale** — one dataset that Spark reads, Trino reads, Flink writes. The cost is git semantics that stop at the **table-snapshot level** and **no built-in compute engine**. If your data already lives in an open lakehouse to be shared across engines, this is the most natural path; for row-level git, it isn't.
 
 ---
 
-## Category 4: versioned SQL databases — Dolt
+## Category 4: in-database version control — Dolt, Snowflake / Neon, MatrixOne
 
-**Approach**: make the **git workflow itself** into a MySQL-compatible database (with a Postgres-compatible Doltgres too). A Merkle / prolly-tree storage layer makes **cell-level** diff a natural byproduct. This is the approach **most similar** to MatrixOne.
+**Approach**: don't add a layer outside the database — let the **database kernel itself** manage versions, understanding the semantics of every row and storing changes as immutable increments. **MatrixOne belongs here**, alongside Dolt and Snowflake / Neon. But even within "a database doing version control," their git completeness differs widely.
 
-**How "git" it is**:
+![Category 4 architecture: version control inside the database kernel; Dolt (single-node, Merkle tree, cell-level git) / Snowflake·Neon (cloud-storage CoW, clone-branch, no row-level merge) / MatrixOne (distributed, row-level snapshot/branch/diff/merge/PICK/PITR) side by side](./images/fig_arch-database_en.svg)
+
+### Dolt: the git workflow made into a database
+
+A Merkle / prolly-tree storage layer makes **cell-level** diff/merge a natural byproduct, and it brings a developer's full git over:
 
 ```sql
--- row / cell-level diff (system tables)
-SELECT * FROM dolt_diff_orders
-WHERE to_commit = HASHOF('HEAD') AND from_commit = HASHOF('HEAD^');
--- time travel
-SELECT * FROM orders AS OF 'HEAD~20';
--- three-way merge + conflict table
-CALL DOLT_MERGE('feature');                       -- conflicts land in dolt_conflicts_orders (base/our/their columns)
-CALL DOLT_CONFLICTS_RESOLVE('orders', '--ours');
+SELECT * FROM dolt_diff_orders WHERE to_commit = HASHOF('HEAD') AND from_commit = HASHOF('HEAD^');
+CALL DOLT_MERGE('feature');            -- cell-level three-way merge, conflicts in dolt_conflicts_orders
+SELECT * FROM orders AS OF 'HEAD~20';  -- time travel
 ```
 
-Plus per-cell `dolt blame`, a full commit graph, remote `dolt clone / push / pull`, and the hosted DoltHub — "**git-semantics-first**," matching the full feel of a developer using git.
+Plus per-cell `dolt blame`, remote `clone / push / pull`, the hosted DoltHub — the **"deepest" git** of all: even the distributed collaboration workflow is there. The cost: OLTP-leaning, single-node, weak analytically.
 
-**In the scenario**: it nails Actions A / B / D (row-level diff, cell-level three-way merge, reset to a historical commit); Action C too — it *is* a SQL engine, `AS OF` queries any version directly.
+### Snowflake / BigQuery / Neon: zero-copy clone + time travel
 
-**Differences from MatrixOne — the pair most worth getting right**:
+```sql
+CREATE TABLE t_clone CLONE t;             -- zero-copy clone (seconds)
+SELECT * FROM t AT(OFFSET => -300);       -- how it looked 5 minutes ago
+UNDROP TABLE t;                           -- rescue a drop
+```
 
-- **Dolt's git is deeper**: a distributed git workflow (remotes / push-pull / DoltHub / per-cell blame / a full commit DAG) is its **core pitch**; MatrixOne has none of that, using a snapshot / data-branch model.
+They can "branch" and "go back in time," which feels great, but their **git semantics only do the first half**:
 
-- **MatrixOne's engine is stronger**: Dolt **leans OLTP, is single-node, weak analytically** (its own benchmarks land around 1–2× MySQL latency), and its vector search is **beta as of 2.0**; MatrixOne is a **distributed, HTAP, production-vector, cloud-native** engine, strong on "row-level versioning × large-scale analytical compute × one dataset serving both transactions and analytics."
+- **Snowflake**: zero-copy clone + time travel (1 day default; Standard caps at 1 day, Enterprise reaches 90, plus a 7-day Fail-safe). But **no merge** — clones drift apart, nothing to merge back; to diff, write `MINUS` / `EXCEPT` yourself.
+- **Neon** (serverless Postgres, acquired by Databricks in 2025): copy-on-write database branches, scale-to-zero, a natural fit for branch-per-PR. But **no merge at all** — the only parent↔child sync is **reset (one-way overwrite)**, and its "diff" **compares schema only, not data rows**.
 
-In a line: **Dolt is "git made into a database"; MatrixOne is "an HTAP database that grew git" — one starts from version control, the other from the database engine.**
+### MatrixOne: the full set of row-level git semantics
+
+MatrixOne runs on a distributed, MySQL-compatible engine, and implements the git primitives **at the row level**, across **table → database → tenant → cluster** granularities:
+
+```sql
+CREATE SNAPSHOT s FOR TABLE db t;                         -- snapshot / tag
+DATA BRANCH CREATE feature FROM main;                     -- branch
+DATA BRANCH DIFF orders AGAINST orders {SNAPSHOT='s'} OUTPUT SUMMARY;  -- row-level diff
+DATA BRANCH MERGE feature INTO main WHEN CONFLICT FAIL;   -- row-level three-way merge + conflict policy
+DATA BRANCH PICK <change> ...;                            -- cherry-pick
+RESTORE TABLE db.t {SNAPSHOT = s};                        -- restore
+CREATE PITR p FOR DATABASE db RANGE 1 'd';                -- point-in-time recovery
+```
+
+**The watershed within this category**: **only Dolt and MatrixOne have true row/cell-level git**; Snowflake / Neon have just "clone + time travel," missing merge-with-conflict. And between Dolt and MatrixOne — **Dolt's git is "deeper"** (distributed push/pull/DoltHub/per-cell blame), **MatrixOne's git is "broader"** (row-level merge with conflict policy + `PICK` + `PITR`, one set of semantics across table-to-cluster granularities).
+
+> As for "can you run SQL/vector on a version" — every database in this category can, so it isn't a differentiator *within* the category; this article's focus is git-semantic completeness.
 
 ---
 
-## Category 5: cloud-warehouse zero-copy clone / branch — Snowflake / BigQuery / Neon
+## The git-primitive completeness matrix: same word "git," but how much git?
 
-**Approach**: mature cloud databases offer **zero-copy clone** and **time travel**, letting you "branch" and "go back in time," but usually **without row-level git semantics** (no DIFF / MERGE / PICK with conflict policy).
+Flatten the four categories and check them off, git primitive by git primitive — this table is the heart of the article:
 
-**Snowflake**:
+| Tool | snapshot / time-travel | branch | diff (granularity) | merge (+ conflict) | cherry-pick | restore / PITR | distributed git workflow |
+|---|---|---|---|---|---|---|---|
+| DVC / Git LFS | via Git | via Git (pointers) | file-level | pointer text merge | ✗ | `git checkout` | ✓ (Git remote, pointers) |
+| lakeFS | ✓ | ✓ | **object-level** | ✓ object-level (source/dest) | ✓ (object) | revert | partial |
+| Iceberg/Delta + Nessie | ✓ | ✓ | snapshot-level (via engine) | ✓ **table-snapshot level** | ✓ (commit-level) | RESTORE | ✗ |
+| Snowflake / BigQuery | ✓ | clone (not a true branch) | ✗ (write EXCEPT) | ✗ | ✗ | UNDROP / clone | ✗ |
+| Neon | ✓ (PITR) | ✓ (CoW) | ✗ (schema only) | ✗ (reset only) | ✗ | PITR / reset | ✗ |
+| **Dolt** | ✓ | ✓ | **cell-level** | ✓ **cell 3-way + conflict** | ✓ | reset | ✓ (push/pull/DoltHub) |
+| **MatrixOne** | ✓ | ✓ | **row-level** | ✓ **row 3-way + FAIL/SKIP/ACCEPT** | ✓ (`PICK`) | ✓ RESTORE + PITR | ✗ |
 
-```sql
-CREATE TABLE t_clone CLONE t;                     -- zero-copy clone (metadata-level, seconds)
-SELECT * FROM t AT(OFFSET => -300);               -- how it looked 5 minutes ago
-SELECT * FROM t BEFORE(STATEMENT => '01b2...');   -- before a given statement
-UNDROP TABLE t;                                   -- rescue a drop
-```
+Three takeaways:
 
-Time Travel defaults to **1 day**; **Standard Edition caps at 1 day, only Enterprise reaches 90**, after which a 7-day Fail-safe (Support-only recovery) follows. But there's **no merge primitive** — cloned tables drift independently, with **no way back or way to merge back**; to diff two versions you write `MINUS` / `EXCEPT` yourself.
-
-**Neon** (serverless Postgres, acquired by Databricks in 2025): the headline is **copy-on-write database branches** — each branch an **independent, autoscaling, scale-to-zero** Postgres endpoint, a natural fit for **branch-per-PR** CI. But note: Neon has **no merge primitive at all** — the only parent↔child sync is **reset (a one-way parent→child overwrite that discards the child's changes)** — and its "schema diff" **compares schema only, not data rows**. So Neon is **branch + reset / PITR**, not git-style merge.
-
-**BigQuery**: snapshot tables + time travel, likewise no row-level merge.
-
-**Key difference from MatrixOne**: they all have "zero-copy clone + go back in time," which feels great, but they're **missing git's second half** — row-level `DIFF`, `MERGE` with conflict policy, `PICK`. MatrixOne goes further on row-level git semantics; conversely, **Neon goes further on the serverless form factor (per-branch endpoint, scale-to-zero)** — a form MatrixOne doesn't have yet.
+1. **Only Dolt and MatrixOne take git down to the row/cell level.** The rest stop at coarse granularities — file (DVC), object (lakeFS), snapshot (Iceberg) — or are simply missing merge (Snowflake / Neon).
+2. **Snowflake / Neon's "version control" is really only the first half** — clone and go back in time, but no merge-with-conflict, so not complete git.
+3. **Dolt is deep on workflow, MatrixOne is broad on primitives**: Dolt adds distributed push/pull/blame; MatrixOne adds conflict policy + cherry-pick + PITR + multi-granularity. The two are the most git-complete pair on this track.
 
 ---
 
 ## Pinning the differences down: same task, how each one answers
 
-Every approach has now walked the scenario; here are the four sharpest contrasts side by side — same action, where the answers diverge.
+Beyond the matrix, two sharpest concrete actions.
 
 ### Action A: "310 rows changed — tell me which 310"
 
 | System | Its answer |
 |---|---|
 | DVC / Git LFS | "some **file** changed" — no rows |
-| lakeFS | "**6 objects** changed"; row-level needs Iceberg + Spark (`refs_data_diff`, computed in Spark) |
+| lakeFS | "**6 objects** changed"; row-level needs Iceberg + Spark |
 | Iceberg/Delta + Nessie | a **new snapshot id**; row-level diff needs an external engine to diff two snapshots |
-| Snowflake / Neon | **no native row diff**; write `MINUS` / `EXCEPT` yourself (Neon's diff is schema-only) |
-| Dolt | `SELECT * FROM dolt_diff_orders …` → **row / cell level**, from_ / to_ laid bare |
-| **MatrixOne** | `DATA BRANCH DIFF … OUTPUT SUMMARY` → **UPDATED 310**, milliseconds, scanning only the increment |
+| Snowflake / Neon | **no native row diff**; write `MINUS` / `EXCEPT` yourself (Neon compares schema only) |
+| Dolt | `SELECT * FROM dolt_diff_orders …` → **row / cell level** |
+| **MatrixOne** | `DATA BRANCH DIFF … OUTPUT SUMMARY` → **UPDATED 310**, scanning only the increment |
 
-This row says it best: **only Dolt and MatrixOne treat the "row" as a first-class citizen** — the rest see a file, or a snapshot, or make you write SQL to cover the gap. The same edit, seen at wildly different resolutions:
+The same edit, seen at wildly different resolutions:
 
 ![The same edit (310 rows) seen at completely different granularities: file-level / object-level / snapshot-level, down to row·cell level](./images/fig_diff-granularity_en.svg)
 
@@ -215,40 +233,27 @@ This row says it best: **only Dolt and MatrixOne treat the "row" as a first-clas
 | Dolt | **cell-level** three-way merge, conflicts in `dolt_conflicts_*`, resolved in SQL |
 | lakeFS | **object-level** merge; same file on both sides = conflict, only source / dest wins |
 | Nessie | **table-snapshot-level** merge; same table on both sides = conflict |
-| Snowflake | **no merge**: clones drift apart, nothing to merge back |
-| Neon | **no merge**: only reset (one-way parent→child overwrite) |
+| Snowflake / Neon | **no merge** (Snowflake clones drift; Neon only resets) |
 | DVC | Git's text merge of the **pointer files** |
 
 Granularity decides whether you can work in parallel without fighting: **editing different rows of the same table is a clean merge in MatrixOne / Dolt, but potentially a conflict in lakeFS / Nessie** — because to them that's "the same file / same table touched on both sides."
-
-### Action C: "on a historical version, directly run analytics / pull training data"
-
-- **Built-in engine, computes directly**: MatrixOne (HTAP SQL + vector), Dolt (OLTP SQL, `AS OF`), Snowflake / Neon (SQL, but the "version" is a clone / branch, not row-level semantics).
-
-- **Doesn't compute, needs an external engine**: lakeFS, DVC, Git LFS, Pachyderm (read the objects out, feed Spark / Trino); Iceberg / Delta also need Spark / Trino / Flink.
-
-This is the **watershed** between the "database approaches" and the "file / object approaches": for the former, "a version" is a table you can immediately `SELECT`, `JOIN`, and vector-search; for the latter, "a version" is a pile of bytes you still have to parse.
-
-### Action D: "dropped a table — recover in seconds"
-
-Nearly every approach has some "go back in time": MatrixOne uses snapshot + PITR (`RESTORE`), Snowflake uses Time Travel + `UNDROP`, Neon uses PITR (branch from a historical LSN), Dolt resets to a historical commit, lakeFS reverts to a historical commit, Iceberg / Delta `RESTORE TO VERSION`. **Recovery is table stakes on this track**; what really separates the field is Actions A / B / C above.
 
 ---
 
 ## One overview table
 
-| Category | Representatives | What it versions | At which layer | Granularity | Compute on a version | Row-level merge + conflict |
-|---|---|---|---|---|---|---|
-| Git-native files | DVC / Git LFS | file bytes | beside the code repo | file | ✗ | ✗ |
-| git over object store | lakeFS / Pachyderm | objects | over object storage | object (whole file) | ✗ (needs external engine) | ✗ (object-level) |
-| table format + git | Iceberg/Delta + Nessie | table snapshots | table format + catalog | snapshot | ✗ (needs external engine) | ✗ (table-snapshot level) |
-| versioned SQL DB | Dolt | data rows | database kernel | row / cell | ✓ (SQL, OLTP-leaning; vector beta) | ✓ (cell-level) |
-| cloud-warehouse clone / branch | Snowflake / Neon | table/database | database | table/database | ✓ | ✗ (no merge) |
-| **in-database git (HTAP)** | **MatrixOne** | data rows + object refs | database kernel | **row / cell** | ✓ (HTAP SQL + vector) | ✓ (row-level, with conflict policy) |
+| Category | Representatives | At which layer | Granularity | git-semantic completeness |
+|---|---|---|---|---|
+| Git-native files | DVC / Git LFS | beside the code repo | file | borrowed from Git, acts on pointers |
+| git over object store | lakeFS / Pachyderm | over object storage | object | complete, but stops at object level |
+| table format + git | Iceberg/Delta + Nessie | table format + catalog | snapshot | complete, but stops at table-snapshot |
+| in-database | Dolt | database kernel | row / cell | **most complete at row level** (+ distributed workflow) |
+| in-database | Snowflake / Neon | database | table / db | only clone + time travel, no merge |
+| **in-database** | **MatrixOne** | database kernel | **row / cell** | **most complete at row level** (+ conflict policy / PICK / PITR / multi-granularity) |
 
-The same landscape, as a positioning map — finer granularity to the right, richer compute toward the top. MatrixOne ends up alone in the top-right corner:
+The same landscape, as a positioning map — finer granularity to the right, more complete git semantics toward the top. **The top-right corner (row-level + complete git) holds Dolt and MatrixOne** — exactly the "version control inside the database kernel" category:
 
-![Positioning map: data-versioning approaches plotted on granularity × compute-on-a-version axes — MatrixOne sits alone in the top-right corner](./images/fig_landscape-map_en.svg)
+![Positioning map: data-versioning approaches plotted on granularity × git-semantic-completeness axes — the top-right corner holds Dolt and MatrixOne](./images/fig_landscape-map_en.svg)
 
 ---
 
@@ -256,21 +261,21 @@ The same landscape, as a positioning map — finer granularity to the right, ric
 
 Condense the map into one position:
 
-> **MatrixOne's git4data ≈ "Dolt's row-level git semantics + Snowflake's zero-copy/time-travel + Neon's database branching + built-in vector/HTAP/SQL compute," all inside one open-source, MySQL-compatible cloud database.**
+> **MatrixOne ≈ "Dolt's row-level git completeness + a warehouse's zero-copy clone/time-travel + Neon's database branching," with row-level merge-with-conflict, cherry-pick, and PITR all filled in, across table-to-cluster granularities, inside one open-source, MySQL-compatible database.**
 
-Its unique value is genuinely fusing **row-level git semantics** with **a live HTAP engine you can run SQL + vector compute on**. Against the four actions: **A see the change** (row-level DIFF), **B parallel collaboration** (row-level three-way merge + conflict policy), **C compute on a version** (HTAP SQL + vector), **D incident recovery** (snapshot + PITR) — it's one of the few that does **all four in a single engine.**
+Against the four actions: **A see the change** (row-level DIFF), **B parallel collaboration** (row-level three-way merge + conflict policy), **C cherry-pick / pull data** (`PICK` + direct SQL), **D incident recovery** (snapshot + PITR) — it's one of the few that does all four **at the row level, in a single engine.**
 
 But "comprehensive" also means being clear about what it **isn't**:
 
-- **It doesn't replace DVC**: no native coupling with Git/code/pipelines, none of the "data+model+code" triad reproduction of `dvc repro/exp` — for pure ML pipeline versioning, DVC is still the handier tool.
+- **It doesn't replace DVC**: none of the "data+model+code" triad reproduction of `dvc repro/exp` — for pure ML pipeline versioning, DVC is still handier.
 
 - **It doesn't replace lakeFS**: massive byte-level unstructured versioning and cross-format whole-repo atomic commits are lakeFS's turf; MatrixOne versions only the file *reference*. → **best used together**.
 
-- **It isn't Dolt**: no distributed git workflow (remotes / push-pull / DoltHub / per-cell blame) — Dolt's git is "deeper."
+- **Its git isn't as "deep" as Dolt's**: no distributed git workflow (remotes / push-pull / DoltHub / per-cell blame).
 
 - **It isn't an open lakehouse format** (Iceberg/Delta): not built for multi-engine interoperability or PB-scale lakehouse ecosystems.
 
-- **It isn't a serverless warehouse** (Snowflake/Neon): it trails on scale, ecosystem breadth, and the per-branch scale-to-zero form factor.
+- **It isn't a serverless warehouse** (Snowflake/Neon): it trails on the per-branch scale-to-zero form factor.
 
 Stating the boundaries isn't weakness — this is exactly the spot on this track **most prone to confusion**, and only by spelling it out can a reader know when to use MatrixOne, when to use someone else, and when to combine them.
 
@@ -278,18 +283,18 @@ Stating the boundaries isn't weakness — this is exactly the spot on this track
 
 ## Picking one, in a sentence
 
-- Want **row-level versioning + SQL/vector directly on a version + one dataset serving both transactions and analytics** → **MatrixOne** (this series' subject).
-- Want **byte-level versioning of massive raw files (images/video/weights)** → **lakeFS** (and combine with MatrixOne: lakeFS owns the bytes, MatrixOne owns the catalog and labels).
+- Want **complete, row-level, conflict-aware git, inside a MySQL-compatible database** → **MatrixOne** (this series' subject).
+- Want a **full distributed git workflow (push/pull/DoltHub/blame)** → **Dolt**.
+- Want **byte-level versioning of massive raw files (images/video/weights)** → **lakeFS** (and combine with MatrixOne).
 - Want **pure ML reproduction, versioning data + model + code together** → **DVC**.
 - Data already in an **open lakehouse**, shared across engines → **Iceberg/Delta + Nessie**.
-- Want a **full distributed git workflow (push/pull/DoltHub)** → **Dolt**.
-- Want **serverless, branch-per-PR, scale-to-zero** → **Neon**.
+- Want **serverless, branch-per-PR, scale-to-zero** (no row-level merge needed) → **Neon**.
 
 ---
 
 ## Closing
 
-The map is drawn. From this article on, the series leaves theory and enters practice — and you set out with a clear coordinate system: knowing what we mean by "git4data," where it stands on the track, and where its edges are.
+The map is drawn. From this article on, the series leaves theory and enters practice — and you set out with a clear coordinate system: knowing what we mean by "git4data," where it stands on the track (row-level + complete git, sharing the top-right corner with Dolt), and where its edges are.
 
 Next is the first practical stop, and git4data's most unglamorous, most frequent use: **incident rescue** — from a fat-fingered UPDATE to a dropped table, how to bring data back in seconds with snapshots, DIFF, and PITR.
 
