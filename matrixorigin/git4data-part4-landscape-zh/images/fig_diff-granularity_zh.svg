@@ -1,0 +1,70 @@
+<svg viewBox="0 0 1200 640" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system,'Segoe UI',Roboto,'PingFang SC','Microsoft YaHei',Arial,sans-serif">
+  <defs>
+    <pattern id="g" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M40 0H0V40" fill="none" stroke="#161B22" stroke-width="1"/>
+    </pattern>
+    <marker id="arr" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto">
+      <path d="M0 0L7 3L0 6Z" fill="#6E7681"/>
+    </marker>
+    <style>
+      .mono{font-family:ui-monospace,'SF Mono','JetBrains Mono',Menlo,Consolas,monospace;}
+      .h{fill:#E6EDF3;} .m{fill:#9DA7B3;} .dim{fill:#6E7681;}
+    </style>
+  </defs>
+
+  <rect width="1200" height="640" fill="#0D1117"/>
+  <rect width="1200" height="640" fill="url(#g)"/>
+
+  <text x="70" y="58" class="h" font-size="29" font-weight="700">同一次改动，各家"看见"的粒度天差地别</text>
+  <text x="72" y="88" class="mono dim" font-size="15">输入相同：310 行被改 &#8594; 输出的分辨率从"文件"一路细到"行·单元格"</text>
+
+  <!-- input card -->
+  <rect x="70" y="170" width="300" height="300" rx="10" fill="#10182B" stroke="#1F6FEB" stroke-width="1.5"/>
+  <text x="90" y="206" class="h" font-size="19" font-weight="700">一次改动</text>
+  <text x="90" y="230" class="dim" font-size="13">orders 表，同一批写入</text>
+  <line x1="90" y1="246" x2="350" y2="246" stroke="#21262D" stroke-width="1"/>
+  <text x="90" y="280" class="m mono" font-size="14">id 88231  amount 100 &#8594; 110</text>
+  <text x="90" y="312" class="m mono" font-size="14">id 88232  amount  98 &#8594; 108</text>
+  <text x="90" y="344" class="m mono" font-size="14">id 88233  amount 120 &#8594; 132</text>
+  <text x="90" y="376" class="dim mono" font-size="14">      &#8942;</text>
+  <text x="90" y="430" class="h mono" font-size="16" font-weight="700">共 310 行被改</text>
+
+  <!-- vertical "more precise" hint -->
+  <text x="436" y="320" class="dim" font-size="12.5" text-anchor="middle" transform="rotate(-90 436 320)">分辨率越往下越高 &#8594;</text>
+
+  <!-- connectors from input to each card -->
+  <g stroke="#30363D" stroke-width="1.4" fill="none">
+    <path d="M370 300 C 430 300, 460 175, 520 175" marker-end="url(#arr)"/>
+    <path d="M370 312 C 430 312, 460 285, 520 285" marker-end="url(#arr)"/>
+    <path d="M370 324 C 430 324, 460 395, 520 395" marker-end="url(#arr)"/>
+    <path d="M370 336 C 430 336, 460 505, 520 505" marker-end="url(#arr)"/>
+  </g>
+
+  <!-- card 1: file level -->
+  <rect x="520" y="135" width="610" height="90" rx="8" fill="#161B22" stroke="#30363D" stroke-width="1.4"/>
+  <text x="544" y="170" class="h" font-size="17" font-weight="700">文件级</text>
+  <text x="544" y="196" class="dim" font-size="13">DVC · Git LFS</text>
+  <text x="1106" y="187" class="m mono" font-size="16" text-anchor="end">train.parquet &#26377;改动</text>
+
+  <!-- card 2: object level -->
+  <rect x="520" y="245" width="610" height="90" rx="8" fill="#161B22" stroke="#30363D" stroke-width="1.4"/>
+  <text x="544" y="280" class="h" font-size="17" font-weight="700">对象级</text>
+  <text x="544" y="306" class="dim" font-size="13">lakeFS</text>
+  <text x="1106" y="297" class="m mono" font-size="16" text-anchor="end">6 个对象变了</text>
+
+  <!-- card 3: snapshot level -->
+  <rect x="520" y="355" width="610" height="90" rx="8" fill="#161B22" stroke="#8957E5" stroke-width="1.4"/>
+  <text x="544" y="390" class="h" font-size="17" font-weight="700">快照级</text>
+  <text x="544" y="416" class="dim" font-size="13">Iceberg · Delta + Nessie</text>
+  <text x="1106" y="407" class="m mono" font-size="16" text-anchor="end">snapshot #1043 &#8594; #1044</text>
+
+  <!-- card 4: row/cell level (highlight) -->
+  <rect x="520" y="465" width="610" height="100" rx="8" fill="#10233F" stroke="#1F6FEB" stroke-width="2"/>
+  <text x="544" y="500" class="h" font-size="17" font-weight="700">行 · 单元格级</text>
+  <text x="544" y="526" class="dim" font-size="13">Dolt · MatrixOne git4data</text>
+  <text x="1106" y="500" class="h mono" font-size="15" text-anchor="end">id 88231  amount 100 &#8594; 110</text>
+  <text x="1106" y="524" class="h mono" font-size="15" text-anchor="end">id 88232  amount  98 &#8594; 108  &#8230;</text>
+  <text x="1106" y="550" class="mono" fill="#79C0FF" font-size="16" font-weight="700" text-anchor="end">UPDATED 310</text>
+
+  <text x="544" y="600" class="dim" font-size="13.5">只有最后一档把"行"当一等公民——其余只能看到文件 / 对象 / 快照。</text>
+</svg>
