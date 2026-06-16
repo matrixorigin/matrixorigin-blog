@@ -44,11 +44,11 @@ Of these, **#2 (which layer) decides which category a tool belongs to**, while *
 
 To make the differences visible, fix a concrete scenario and make every approach answer the same four actions:
 
-> You maintain a data asset — picture a **50-million-row user-feature table** (or a **100GB multimodal training set of millions of files**, whichever fits below). The team repeatedly does four things:
+> You maintain a data asset — picture a **50-million-row user-feature table** (or a **100GB multimodal training set of millions of files**, whichever fits the category below). The team repeatedly does four things:
 >
 > - **Action A | See the change**: after editing a batch of data, know precisely **which rows** changed, and to what (git diff).
 > - **Action B | Parallel collaboration**: several people each open a branch, edit in parallel, merge back to mainline, with conflicts adjudicated (git branch + merge).
-> - **Action C | Cherry-pick / pull data**: lift one change onto another branch (cherry-pick), or pull a batch of data directly on some version.
+> - **Action C | Cherry-pick / pull data**: lift one change onto another branch (cherry-pick), or pull a batch of data directly from a specific version.
 > - **Action D | Incident recovery**: a dropped table or a botched bulk edit — bring it back in seconds (git reset / restore).
 
 Hold these four actions, and the details of each approach come into focus.
@@ -106,7 +106,7 @@ Hold these four actions, and the details of each approach come into focus.
 
 ## Category 3: open table format + git branches — Iceberg / Delta + Nessie
 
-**Approach**: open table formats like Iceberg / Delta Lake / Hudi represent a table as a chain of **immutable snapshots** (each write = a new snapshot), with built-in time travel; layer a catalog like **Nessie** (or Unity Catalog) on top and tables gain git-style branches / tags / merge — and a single commit can span **multiple tables**. Querying is delegated entirely to external engines.
+**Approach**: open table formats like Iceberg / Delta Lake / Hudi represent a table as a chain of **immutable snapshots** (each write = a new snapshot), with built-in time travel; layer a catalog like **Nessie** on top and tables gain git-style branches / tags / merge — and a single commit can span **multiple tables**. Querying is delegated entirely to external engines.
 
 ![Category 3 architecture: data files + table-format snapshot chain + Nessie catalog (branch/tag/merge), external engines Spark/Trino/Flink on top; granularity = table snapshot](./images/fig_arch-tableformat_en.svg)
 
@@ -133,9 +133,9 @@ MERGE BRANCH etl INTO main IN nessie;
 
 ---
 
-## Category 4: in-database version control — Dolt, Snowflake, Neon, MatrixOne
+## Category 4: in-database version control — Dolt, Snowflake, Neon, and MatrixOne
 
-**Approach**: don't add a layer outside the database — let the **database kernel itself** manage versions, understanding the semantics of every row and storing changes as immutable increments. **MatrixOne belongs here**, alongside Dolt and Snowflake, Neon. But even within "a database doing version control," their git completeness differs widely.
+**Approach**: don't add a layer outside the database — let the **database kernel itself** manage versions, understanding the semantics of every row and storing changes as immutable increments. **MatrixOne belongs here**, alongside Dolt, Snowflake, and Neon. But even within "a database doing version control", their git completeness differs widely.
 
 ![Category 4 architecture: version control inside the database kernel; Dolt (single-node, Merkle tree, cell-level git) / Snowflake·Neon (cloud-storage CoW, clone-branch, no row-level merge) / MatrixOne (distributed, row-level snapshot/branch/diff/merge/PICK/PITR) side by side](./images/fig_arch-database_en.svg)
 
@@ -149,7 +149,7 @@ CALL DOLT_MERGE('feature');            -- cell-level three-way merge, conflicts 
 SELECT * FROM orders AS OF 'HEAD~20';  -- time travel
 ```
 
-Plus per-cell `dolt blame`, remote `clone / push / pull`, the hosted DoltHub — the **"deepest" git** of all: even the distributed collaboration workflow is there. But Dolt is a single-node database with no OLAP support, so its applicable scenarios are relatively limited.
+Plus row-level `dolt blame` / history, remote `clone / push / pull`, and the hosted DoltHub — the **"deepest" git** of all: even the distributed collaboration workflow is there. But Dolt is a single-node database with no OLAP support, so its applicable scenarios are relatively limited.
 
 ### Snowflake / BigQuery / Neon: zero-copy clone + time travel
 
@@ -166,21 +166,21 @@ They can "branch" and "go back in time," which feels great, but their **git sema
 
 ### MatrixOne: the full set of row-level git semantics
 
-MatrixOne runs on a distributed, MySQL-compatible engine, and implements the git primitives **at the row level**, across **table → database → tenant → cluster** granularities:
+MatrixOne runs on a distributed, MySQL-compatible engine and implements these git primitives **at the row level**. `SNAPSHOT` and `PITR` span **table / database / account / cluster** scopes; `DATA BRANCH CREATE` works at table or database scope, while `DIFF` / `MERGE` / `PICK` are table-to-table operations:
 
 ```sql
-CREATE SNAPSHOT s FOR TABLE db t;                         -- snapshot / tag
-DATA BRANCH CREATE feature FROM main;                     -- branch
-DATA BRANCH DIFF orders AGAINST orders {SNAPSHOT='s'} OUTPUT SUMMARY;  -- row-level diff
-DATA BRANCH MERGE feature INTO main WHEN CONFLICT FAIL;   -- row-level three-way merge + conflict policy
-DATA BRANCH PICK <change> ...;                            -- cherry-pick
-RESTORE TABLE db.t {SNAPSHOT = s};                        -- restore
-CREATE PITR p FOR DATABASE db RANGE 1 'd';                -- point-in-time recovery
+CREATE SNAPSHOT s FOR TABLE db orders;                                   -- snapshot / tag
+DATA BRANCH CREATE TABLE db.orders_feature FROM db.orders{SNAPSHOT='s'};  -- branch (a new table)
+DATA BRANCH DIFF db.orders_feature AGAINST db.orders{SNAPSHOT='s'} OUTPUT SUMMARY;     -- row-level diff
+DATA BRANCH MERGE db.orders_feature INTO db.orders WHEN CONFLICT FAIL;    -- row-level three-way merge + conflict policy
+DATA BRANCH PICK db.orders_feature INTO db.orders KEYS (101, 102) WHEN CONFLICT FAIL;  -- cherry-pick (needs a primary key)
+RESTORE TABLE db.orders {SNAPSHOT='s'};                                   -- restore
+CREATE PITR p FOR DATABASE db RANGE 1 'd';                                -- point-in-time recovery
 ```
 
 **In the scenario** (within one category, how the three styles each answer):
 
-- **Action A (see the change)**: Dolt and MatrixOne give you a **row / cell-level** changelist; Snowflake / Neon have no native row-level diff (write `EXCEPT` yourself; Neon compares schema only).
+- **Action A (see the change)**: Dolt and MatrixOne give you a **per-row** changelist (Dolt down to the cell); Snowflake / Neon have no native row-level diff (write `EXCEPT` yourself; Neon compares schema only).
 
 - **Action B (parallel merge)**: Dolt at cell level, MatrixOne at row level — both **three-way merge with conflict adjudication**; Snowflake has no merge (clones drift), Neon only one-way reset.
 
@@ -188,7 +188,7 @@ CREATE PITR p FOR DATABASE db RANGE 1 'd';                -- point-in-time recov
 
 - **Action D (incident recovery)**: all can go back in time — Dolt `reset` to a historical commit, Snowflake time travel + `UNDROP`, Neon PITR, MatrixOne `RESTORE` + PITR.
 
-**The differences within this category**: **only Dolt and MatrixOne have true row/cell-level git**; Snowflake / Neon have just "clone + time travel," missing merge-with-conflict. And between Dolt and MatrixOne — **Dolt's git is "deeper"** (distributed push/pull/DoltHub/per-cell blame), **MatrixOne's git is "broader"** (row-level merge with conflict policy + `PICK` + `PITR`, one set of semantics across table-to-cluster granularities).
+**The differences within this category**: **only Dolt and MatrixOne bring git down to the row level**; Snowflake / Neon have just "clone + time travel," missing merge-with-conflict. And between the two — **Dolt has cell-level diff/conflict** and a deeper distributed workflow (clone / push / pull / DoltHub, row-level blame); **MatrixOne has row-level diff / merge / `PICK` with conflict policy**, and its `SNAPSHOT` / `PITR` additionally span table → cluster.
 
 > As for "can you run SQL on a version" — every database in this category can, so it isn't a differentiator *within* the category; this article's focus is git-semantic completeness.
 
@@ -229,7 +229,7 @@ The same edit, seen at wildly different resolutions — the visual version of th
 | table format + git | Iceberg/Delta + Nessie | table format + catalog | snapshot | complete, but stops at table-snapshot |
 | in-database | Dolt | database kernel | row / cell | **most complete at row level** (+ distributed workflow) |
 | in-database | Snowflake / Neon | database | table / db | only clone + time travel, no merge |
-| **in-database** | **MatrixOne** | database kernel | **row / cell** | **most complete at row level** (+ conflict policy / PICK / PITR / multi-granularity) |
+| **in-database** | **MatrixOne** | database kernel | **row** | **most complete at row level** (+ conflict policy / PICK / PITR; snapshot/PITR span table→cluster) |
 
 The same landscape, as a positioning map — finer granularity to the right, more complete git semantics toward the top. **The top-right corner (row-level + complete git) holds Dolt and MatrixOne** — exactly the "version control inside the database kernel" category:
 
@@ -241,9 +241,9 @@ The same landscape, as a positioning map — finer granularity to the right, mor
 
 Condense the map into one position:
 
-> **MatrixOne ≈ "Dolt's row-level git completeness + a warehouse's zero-copy clone/time-travel + Neon's database branching," with row-level merge-with-conflict, cherry-pick, and PITR all filled in, across table-to-cluster granularities, inside one open-source, MySQL-compatible cloud-native HTAP database.**
+> **MatrixOne ≈ "Dolt's row-level git completeness + a warehouse's zero-copy clone/time-travel + Neon's database branching," with row-level merge-with-conflict, cherry-pick, and PITR all filled in (snapshot/PITR spanning table to cluster), inside one open-source, MySQL-compatible cloud-native HTAP database.**
 
-Against the four actions: **A see the change** (row-level DIFF), **B parallel collaboration** (row-level three-way merge + conflict policy), **C cherry-pick / pull data** (`PICK` + direct SQL), **D incident recovery** (snapshot + PITR) — it's one of the few that does all four **at the row level, in a single engine.**
+Against the four actions: **A see the change** (row-level DIFF), **B parallel collaboration** (row-level three-way merge + conflict policy), **C cherry-pick / pull data** (`PICK` + direct SQL), **D incident recovery** (snapshot + PITR) — MatrixOne is one of a few systems that supports all four **both at the row level and in a single engine.**
 
 But on the other hand, it's worth being just as clear about what it **isn't**:
 

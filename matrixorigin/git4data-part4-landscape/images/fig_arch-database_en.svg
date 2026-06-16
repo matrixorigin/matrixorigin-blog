@@ -43,7 +43,7 @@
   <g font-size="12.5" fill="#C9D7E6"><text x="820" y="232">· row-level snapshot / branch</text>
     <text x="820" y="260">· row-level diff / merge + conflict</text>
     <text x="820" y="288">· PICK · RESTORE · PITR</text></g>
-  <text x="820" y="356" fill="#79C0FF" font-size="12.5">multi-granularity:</text>
+  <text x="820" y="356" fill="#79C0FF" font-size="12.5">snapshot / PITR span:</text>
   <text x="820" y="376" fill="#79C0FF" font-size="12.5">table &#8594; db &#8594; tenant &#8594; cluster</text>
 
   <rect x="60" y="416" width="1080" height="46" rx="8" fill="#10182B" stroke="#1F6FEB" stroke-width="1.2"/>
