@@ -1,0 +1,51 @@
+<svg viewBox="0 0 1200 480" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system,'Segoe UI',Roboto,'PingFang SC','Microsoft YaHei',Arial,sans-serif">
+  <defs>
+    <pattern id="g" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0V40" fill="none" stroke="#161B22" stroke-width="1"/></pattern>
+    <style>.mono{font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace;} .h{fill:#E6EDF3;} .m{fill:#9DA7B3;} .dim{fill:#6E7681;}</style>
+  </defs>
+  <rect width="1200" height="480" fill="#0D1117"/><rect width="1200" height="480" fill="url(#g)"/>
+  <text x="70" y="52" class="h" font-size="24" font-weight="700">种类四：数据库内建的版本控制</text>
+  <text x="72" y="78" class="dim" font-size="14">版本控制长在数据库内核里——引擎既懂每一行，又能把改动存成不可变增量</text>
+
+  <!-- Col 1: Dolt -->
+  <rect x="60" y="100" width="340" height="296" rx="10" fill="#161B22" stroke="#30363D" stroke-width="1.4"/>
+  <rect x="60" y="100" width="340" height="44" rx="10" fill="#1C2330"/>
+  <text x="80" y="129" class="h" font-size="17" font-weight="700">Dolt</text>
+  <text x="372" y="127" class="dim" font-size="12" text-anchor="end">git 最深</text>
+  <g class="m" font-size="13.5"><text x="80" y="176">· 单机 · MySQL 兼容</text>
+    <text x="80" y="206">· Merkle / prolly 树存储</text>
+    <text x="80" y="236">· 单元格级 diff / merge</text>
+    <text x="80" y="266">· blame · push · pull</text>
+    <text x="80" y="296">· DoltHub（托管远端）</text></g>
+  <text x="80" y="356" class="dim" font-size="12.5">代价：偏 OLTP · 单机 ·</text>
+  <text x="80" y="376" class="dim" font-size="12.5">分析能力弱</text>
+
+  <!-- Col 2: Snowflake / Neon -->
+  <rect x="430" y="100" width="340" height="296" rx="10" fill="#161B22" stroke="#30363D" stroke-width="1.4"/>
+  <rect x="430" y="100" width="340" height="44" rx="10" fill="#1C2330"/>
+  <text x="450" y="129" class="h" font-size="17" font-weight="700">Snowflake / Neon</text>
+  <text x="742" y="127" class="dim" font-size="12" text-anchor="end">只做前半段</text>
+  <g class="m" font-size="13.5"><text x="450" y="176">· 云存储 · 写时复制</text>
+    <text x="450" y="206">· 零拷贝克隆 / 库分支</text>
+    <text x="450" y="236">· 时间旅行 / PITR</text></g>
+  <g font-size="13.5" fill="#F0883E"><text x="450" y="266">· ✗ 无行级 merge</text>
+    <text x="450" y="296">· ✗ 无行级 diff</text></g>
+  <text x="450" y="356" class="dim" font-size="12.5">能克隆、能回到过去，</text>
+  <text x="450" y="376" class="dim" font-size="12.5">但合不回来</text>
+
+  <!-- Col 3: MatrixOne (highlight) -->
+  <rect x="800" y="100" width="340" height="296" rx="10" fill="#10233F" stroke="#1F6FEB" stroke-width="2"/>
+  <rect x="800" y="100" width="340" height="44" rx="10" fill="#163056"/>
+  <text x="820" y="129" class="h" font-size="17" font-weight="700">MatrixOne</text>
+  <text x="1120" y="127" font-size="12" fill="#79C0FF" text-anchor="end">行级 git 最全</text>
+  <g class="m" font-size="13"><text x="820" y="174">· CN · TN · LogService · S3</text>
+    <text x="820" y="202">· 分布式 · MySQL 兼容</text></g>
+  <g font-size="13" fill="#C9D7E6"><text x="820" y="232">· 行级 snapshot / branch</text>
+    <text x="820" y="260">· 行级 diff / merge + 冲突</text>
+    <text x="820" y="288">· PICK · RESTORE · PITR</text></g>
+  <text x="820" y="356" fill="#79C0FF" font-size="12.5">快照 / PITR 覆盖：</text>
+  <text x="820" y="376" fill="#79C0FF" font-size="12.5">表 → 库 → 租户 → 集群</text>
+
+  <rect x="60" y="416" width="1080" height="46" rx="8" fill="#10182B" stroke="#1F6FEB" stroke-width="1.2"/>
+  <text x="600" y="444" class="m" font-size="14" text-anchor="middle">共同点：版本控制就在数据库内核里——<tspan class="h" font-weight="700">一个版本，就是一张能直接 SELECT / JOIN 的表</tspan></text>
+</svg>
