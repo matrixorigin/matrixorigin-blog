@@ -1,16 +1,16 @@
 ---
 title: "Old Wine, New Bottle: Databricks Coins Yet Another Word for HTAP"
 author: MatrixOrigin
-description: At its Summit, Databricks announced it had "cracked a 40-year-old database problem" and gave it a shiny new name — LTAP. A database lifer would like to point out that this bottle is called HTAP, it was opened a decade ago, and the hard road it describes is one MatrixOne has been walking for five years.
+description: At its Summit, Databricks announced it had "cracked a 40-year-old database problem" and gave it a shiny new name — LTAP. A database lifer would like to point out that this bottle is called HTAP, and it was opened a decade ago. LTAP is just one more repackaging.
 tags:
   - Engineering
 keywords:
   - Databricks
   - LTAP
   - HTAP
-  - MatrixOne
   - Lakebase
   - Iceberg
+  - Neon
 publishTime: "2026-06-18T17:00:00+08:00"
 date: 2026-06-18
 lang: en
@@ -21,11 +21,11 @@ translations:
 
 # Old Wine, New Bottle: Databricks Coins Yet Another Word for HTAP
 
-By Dr. Zuyu Zhang — a databaseologist with a decade experience (personal opinions only)
+By Dr. Zhang Zuyu — a database lifer who has been watching HTAP for ten years (personal opinions only)
 
-At this week's Data + AI Summit, Databricks CEO Ali Ghodsi stood on stage wearing the face of a man who has just achieved enlightenment, and announced he had cracked a database problem that stumped the industry for 40 years: merging the two copies of data — one transactional, one analytical — that every company on earth keeps apart. And then, as tradition demands, he gave it a brand-new name: **LTAP**, Lake Transactional/Analytical Processing.
+At last week's Data + AI Summit, Databricks CEO Ali Ghodsi stood on stage wearing the face of a man who has just achieved enlightenment, and announced he had cracked a database problem that stumped the industry for 40 years: merging the two copies of data — one transactional, one analytical — that every company on earth keeps apart. And then, as tradition demands, he gave it a brand-new name: **LTAP**, Lake Transactional/Analytical Processing.
 
-![Summit 2026 Keynote: LTAP concept](./images/databricks_ltap.jpg)
+![Summit 2026 Keynote: the LTAP concept](./images/databricks_ltap.jpg)
 
 I stared at those four letters for a while and nearly lost it.
 
@@ -47,33 +47,19 @@ Why missing for so long? Because **TP is the hardest bone of the three to chew.*
 
 So how did Databricks get its "database"? **It bought one.** Lakebase is built on Neon, a serverless-Postgres company it acquired last year. Take a standalone Postgres instance, park it next to the lakehouse, let the two share a storage layer — that's the LTAP it's describing: "an OLAP engine that reads one copy, and an OLTP engine that updates the records."
 
-![Summit 2026 Keynote: LTAP introduction](./images/databricks_ltap_unified.jpg)
+![Summit 2026 Keynote: introducing LTAP](./images/databricks_ltap_unified.jpg)
 
 Translation: **it's still two engines, just sharing one warehouse.** That beats the old mess of CDC jobs plus downstream replicas plus one data engineer going bald holding it all together. But "sharing storage" and "actually living in one architecture" are two very different things. Run two engines side by side and sooner or later somebody writes a document called "Query Routing Guidelines v4" — and that document is always out of date, and somebody is always getting paged at 2 a.m. because a query went to the wrong engine.
 
-## 2. MatrixOne walked this same tightrope backwards — and has been on it for five years
-
-Why does this hit a nerve? Because the tightrope Databricks is only now climbing onto is exactly the one MatrixOne has been walking for five years — except we started from the hard end.
-
-Everyone else went lake first, warehouse next, and bought a database last. We started by putting TP and AP into one architecture. One copy of data, natively writable and readable, transactional and analytical at the same time — no bolted-on Postgres, no format translation, no perpetually-stale routing doc. That wasn't a feature we chased later; it was the first sentence in the first design doc.
-
-![MatrixOne HTAP database](./images/matrixone_htap.png)
-
-(While we're here: that Lakebase "Git-style branching and snapshots" Databricks announced as big news this week — branch your production data, run experiments, roll back — is called Git for Data. We shipped it five years ago, and it's literally baked into the name MatrixOne. Another old bottle.)
-
-## 3. What actually matured is the substrate — and we placed that bet five years ago
+## 2. What actually matured is the substrate
 
 So why does LTAP suddenly work *now*, in 2026?
 
-One reason: **the open, unified storage substrate — Iceberg and friends — finally grew up.** One copy of open-format data sitting on object storage can feed both TP and AP, with no separate copies. The consensus the industry only just reached — compute/storage separation, a single copy, open formats, one dataset serving mixed workloads — is precisely the bet MatrixOne placed five years ago.
+One reason: **the open, unified storage substrate — Iceberg and friends — finally grew up.** One copy of open-format data sitting on object storage can feed both TP and AP, with no separate copies. Compute/storage separation, a single copy, open formats, one dataset serving mixed workloads — the consensus the industry only just reached — is what makes LTAP possible at all.
 
-Back when we designed it this way, Iceberg wasn't this solid and the industry was still arguing over what "lakehouse" even meant. We bet on one thing: the future of the database is exactly one copy of data, many workloads, living on object storage. This week, Databricks put a new word on that conclusion and announced it all over again.
+And the idea itself isn't new. People sketched this design years ago; back then Iceberg wasn't this solid and the industry was still arguing over what "lakehouse" even meant — the pieces simply weren't in place. Now they've clicked together one by one, so it works. What Databricks did was put a fresh word on a conclusion that had finally matured, and announce it all over again.
 
-Welcome — sincerely. The drinks have just been warming for five years.
-
-![MatrixOne with single copy of data](./images/matrixone_htap_single_data_copy.png)
-
-## 4. In the age of agents, the instance underneath has to be transactional
+## 3. In the age of agents, the instance underneath has to be transactional
 
 Last, why now — because this is the real trigger: agents.
 
@@ -83,11 +69,9 @@ Agents aren't people. A person clicks a dashboard, runs a query, leaves. An agen
 
 What it needs is to read accurate business state in real time, at high concurrency and low latency. The only thing that survives that is **a genuinely transactional instance** — one that reads while it writes, guarantees consistency, and returns the right answer at the exact instant state changes. A read-only analytics engine bolted to the side of a lake can't.
 
-![Data Access Pattern in Agent Era](./images/agent_era.png)
+![Data access pattern in the age of agents](./images/agent_era.png)
 
-Which is exactly why everyone is suddenly piling onto TP: Databricks bought Neon for Lakebase, Snowflake bought Crunchy for Postgres — all doing the same transactional homework. Same logic everywhere: if an agent is going to actually do work, read-only analytical data isn't enough; it needs a state layer it can read and write in real time.
-
-The only difference: **everyone else assembled that layer from parts. Ours grew that way.** OLTP has always lived inside MatrixOne.
+Which is exactly why everyone is suddenly piling onto TP: Databricks bought Neon for Lakebase, Snowflake bought Crunchy for Postgres — all doing the same transactional homework. And they're doing it the same way too — **almost all of them simply "bought a Postgres."** That alone tells you how hard it is to grow a genuinely transactional kernel from scratch.
 
 ## One last thing
 
@@ -95,8 +79,8 @@ Back to that new word.
 
 LTAP isn't wrong. The direction is dead right. Enterprises don't want stale analytics taped onto their operational systems, don't want long, brittle pipelines, and definitely don't want an agent making calls off a copy of the business that's an hour behind. What they want is one copy of data that can be written, read, analyzed, and served to agents in real time.
 
-No argument there. Just don't confuse "we bolted a Postgres onto the lakehouse" with "we welded TP and AP into one kernel from day one." Open table formats are useful. Shared storage is useful. Postgres compatibility is useful. But none of those three, on its own, conjures a real HTAP database.
+No argument there. Just don't confuse "we bolted a Postgres onto the lakehouse" with "TP and AP welded into one kernel from day one." Open table formats are useful. Shared storage is useful. Postgres compatibility is useful. But none of those three, on its own, conjures a real HTAP database.
 
-Databricks coined another good word. The thing that word points at, MatrixOne has been quietly building for five years.
+Databricks coined another good word. But no matter how good the word, it's no substitute for actually walking the hardest road — TP — all the way to the end.
 
-Old wine, new bottle. It's good wine. We just opened this one a long time ago.
+Old wine, new bottle. It's good wine. Just don't forget — this bottle was opened a decade ago, and back then it was called HTAP.
