@@ -57,6 +57,8 @@ Why does this hit a nerve? Because the tightrope Databricks is only now climbing
 
 Everyone else went lake first, warehouse next, and bought a database last. We started by putting TP and AP into one architecture. One copy of data, natively writable and readable, transactional and analytical at the same time — no bolted-on Postgres, no format translation, no perpetually-stale routing doc. That wasn't a feature we chased later; it was the first sentence in the first design doc.
 
+![MatrixOne HTAP database](./images/matrixone_htap.png)
+
 (While we're here: that Lakebase "Git-style branching and snapshots" Databricks announced as big news this week — branch your production data, run experiments, roll back — is called Git for Data. We shipped it five years ago, and it's literally baked into the name MatrixOne. Another old bottle.)
 
 ## 3. What actually matured is the substrate — and we placed that bet five years ago
@@ -65,9 +67,11 @@ So why does LTAP suddenly work *now*, in 2026?
 
 One reason: **the open, unified storage substrate — Iceberg and friends — finally grew up.** One copy of open-format data sitting on object storage can feed both TP and AP, with no separate copies. The consensus the industry only just reached — compute/storage separation, a single copy, open formats, one dataset serving mixed workloads — is precisely the bet MatrixOne placed five years ago.
 
-Back when we designed it this way, Iceberg wasn't this solid and the industry was still arguing over what "lakehouse" even meant. We bet on one thing: the future of the database is one copy of data, many workloads, living on object storage. This week, Databricks put a new word on that conclusion and announced it all over again.
+Back when we designed it this way, Iceberg wasn't this solid and the industry was still arguing over what "lakehouse" even meant. We bet on one thing: the future of the database is exactly one copy of data, many workloads, living on object storage. This week, Databricks put a new word on that conclusion and announced it all over again.
 
 Welcome — sincerely. The drinks have just been warming for five years.
+
+![MatrixOne with single copy of data](./images/matrixone_htap_single_data_copy.png)
 
 ## 4. In the age of agents, the instance underneath has to be transactional
 
@@ -78,6 +82,8 @@ Ghodsi tossed out a stat himself: roughly 80% of the databases on their platform
 Agents aren't people. A person clicks a dashboard, runs a query, leaves. An agent never sleeps: it fans out, asks follow-ups, retrieves history while the business is still writing new records underneath it, and a single agent can spin up a swarm of agents and throw thousands of concurrent requests at you in a blink. For that workload, handing it a "fresher lake" is nowhere near enough.
 
 What it needs is to read accurate business state in real time, at high concurrency and low latency. The only thing that survives that is **a genuinely transactional instance** — one that reads while it writes, guarantees consistency, and returns the right answer at the exact instant state changes. A read-only analytics engine bolted to the side of a lake can't.
+
+![Data Access Pattern in Agent Era](./images/agent_era.png)
 
 Which is exactly why everyone is suddenly piling onto TP: Databricks bought Neon for Lakebase, Snowflake bought Crunchy for Postgres — all doing the same transactional homework. Same logic everywhere: if an agent is going to actually do work, read-only analytical data isn't enough; it needs a state layer it can read and write in real time.
 
