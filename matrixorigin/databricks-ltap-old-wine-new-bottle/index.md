@@ -21,9 +21,11 @@ translations:
 
 # Old Wine, New Bottle: Databricks Coins Yet Another Word for HTAP
 
-By MatrixOrigin — a database lifer who has been watching HTAP for ten years (personal opinions only)
+By Dr. Zuyu Zhang — a databaseologist with a decade experience (personal opinions only)
 
-At last week's Data + AI Summit, Databricks CEO Ali Ghodsi stood on stage wearing the face of a man who has just achieved enlightenment, and announced he had cracked a database problem that stumped the industry for 40 years: merging the two copies of data — one transactional, one analytical — that every company on earth keeps apart. And then, as tradition demands, he gave it a brand-new name: **LTAP**, Lake Transactional/Analytical Processing.
+At this week's Data + AI Summit, Databricks CEO Ali Ghodsi stood on stage wearing the face of a man who has just achieved enlightenment, and announced he had cracked a database problem that stumped the industry for 40 years: merging the two copies of data — one transactional, one analytical — that every company on earth keeps apart. And then, as tradition demands, he gave it a brand-new name: **LTAP**, Lake Transactional/Analytical Processing.
+
+![Summit 2026 Keynote: LTAP concept](./images/databricks_ltap.jpg)
 
 I stared at those four letters for a while and nearly lost it.
 
@@ -44,6 +46,8 @@ But it was always missing the last piece: the database — the transactional TP 
 Why missing for so long? Because **TP is the hardest bone of the three to chew.** A lake stores, a warehouse computes; if either runs a little slow or a little off, worst case your report is half a day late. TP gets no such mercy — it demands strict transactional consistency, millisecond point reads and writes, and thousands of concurrent sessions hammering it at once without miscounting a single cent. You don't conjure that by smearing a layer of SQL compatibility onto the side of a lake.
 
 So how did Databricks get its "database"? **It bought one.** Lakebase is built on Neon, a serverless-Postgres company it acquired last year. Take a standalone Postgres instance, park it next to the lakehouse, let the two share a storage layer — that's the LTAP it's describing: "an OLAP engine that reads one copy, and an OLTP engine that updates the records."
+
+![Summit 2026 Keynote: LTAP introduction](./images/databricks_ltap_unified.jpg)
 
 Translation: **it's still two engines, just sharing one warehouse.** That beats the old mess of CDC jobs plus downstream replicas plus one data engineer going bald holding it all together. But "sharing storage" and "actually living in one architecture" are two very different things. Run two engines side by side and sooner or later somebody writes a document called "Query Routing Guidelines v4" — and that document is always out of date, and somebody is always getting paged at 2 a.m. because a query went to the wrong engine.
 

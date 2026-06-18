@@ -1,5 +1,5 @@
 ---
-title: 旧瓶装新酒：造词大师 Databricks 又来强行造新概念了
+title: 旧瓶装新酒：造词大师 Databricks 又来强推新概念了
 author: MatrixOrigin
 description: Databricks 在 Summit 上宣布"破解了一个 40 年的数据库难题"，给它起了个新词叫 LTAP。一个做了十来年数据库的人想说一句：这瓶酒叫 HTAP，十年前就开了——而这条最难的路，MatrixOne 已经走了五年。
 tags:
@@ -21,15 +21,17 @@ translations:
 
 # 旧瓶装新酒：造词大师 Databricks 又来强行造新概念了
 
-文 / 矩阵起源（一个看了十年 HTAP 的数据库老兵，文章皆为个人观点）
+文 / 张祖羽（一个做了十年数据库的老兵，文章皆为个人观点）
 
-上周 Databricks 的 Data + AI Summit，Ali Ghodsi 站台上，一脸"我悟了"的表情，宣布自己破解了一个困扰行业 40 年的数据库难题——把事务和分析这两份老死不相往来的数据，合成一份。然后，照例，给它起了个新名字：**LTAP**，Lake Transactional/Analytical Processing。
+这周 Databricks 的 Data + AI Summit，Ali Ghodsi 站台上，一脸"我悟了"的表情，宣布自己破解了一个困扰行业 40 年的数据库难题——把事务和分析这两类传统数据库系统，合成一份。然后，照例，给它起了个新名字：**LTAP**，Lake Transactional/Analytical Processing。
+
+![Summit 2026 现场：LTAP 概念](./images/databricks_ltap.jpg)
 
 我盯着这四个字母看了半天，差点没绷住。
 
 倒不是这事儿不对——它当然对。我是说，**这瓶酒，我们这行早就开过了，它叫 HTAP。** Gartner 2014 年就把这词儿造出来了，混合事务/分析处理。Ghodsi 把那个 H（Hybrid）摘下来，换上一个 L（Lake），齐活儿，一个"全新范式"就这么诞生了。
 
-要论造词，Databricks 是这行里的祖师爷，这点我是真服。lakehouse 是它造出来又 popularize 的；Data Intelligence Platform 也是它的话术；这回轮到 LTAP。**这家公司最强的从来不是数据库内核，是市场部的命名能力。** 每隔一阵子，它就能把一个老概念擦干净、贴个新标签、配一场 keynote，然后让全行业跟着它的词儿走。
+要论造词，Databricks 是这行里的祖师爷，这点我是真服。Lakehouse 是它造出来又 popularize 的；Data Intelligence Platform 也是它的话术；这回轮到 LTAP。**这家公司最强的从来不是数据库内核，是市场部的命名能力。** 每隔一阵子，它就能替换老概念、贴上新标签、搭配一场 keynote，然后让全行业跟着它的词儿走。
 
 （不得不说，这招是真好使。你看，连我都忍不住要写篇文章来跟它聊聊。）
 
@@ -45,7 +47,9 @@ Databricks 这一路，说穿了就是从"湖"往"库"爬。
 
 所以 Databricks 的"库"是咋来的？**买的。** Lakebase 的底座，是去年收的 Neon，一家做 serverless Postgres 的公司。把一个独立的 Postgres 实例，塞到湖仓旁边，让它俩合用一层存储——这就是它口中的 LTAP："一个 OLAP 引擎读一份数据，一个 OLTP 引擎更新它"。
 
-说白了，**还是两个引擎，只不过让它们共用一个仓库。** 这比过去那种 CDC 任务 + 下游副本 + 一个累到秃头的数据工程师勉强焊在一起的烂摊子，确实强。但"共享个存储"和"真长在一套架构里"，是两码事。两个引擎并着跑，迟早会冒出一份叫《查询路由规范 v4》的文档，而那玩意儿永远是过期的，永远有人半夜被叫起来——因为某条 query 又走错了引擎。
+![Summit 2026 现场：LTAP 介绍](./images/databricks_ltap_unified.jpg)
+
+说白了，**还是两个引擎，只不过让它们共用一个仓库。** 这比过去那种 CDC 任务 + 下游副本 + 一个累到秃头的数据工程师勉强焊在一起的烂摊子，确实强。但"共享个存储"和"真长在一套架构里"，是两码事。两个引擎并着跑，迟早会冒出一份叫《数据查询路由规范 v4》的文档，而那玩意儿永远是过期的，永远有人半夜被叫起来——因为某条 query 漏掉了最新的数据。
 
 ## 二、这条独木桥，MatrixOne 是反着走的，而且走了五年
 
@@ -75,7 +79,7 @@ Agent 不像人。人点一下 dashboard、查一下、走了。Agent 是 24 小
 
 它要的是：在高并发、低延迟下，实时拿到准确的业务状态。能扛住这个的，**只能是一个真正事务性的实例**——能边写边读、能保证一致、能在状态变化的那一瞬给出对的答案。一个挂在湖边的只读分析引擎，给不了。
 
-这也是为啥你看大伙儿最近不约而同往 TP 上扑：Databricks 收 Neon 做 Lakebase，Snowflake 收 Crunchy 做 Postgres，全在补 transactional 这一课。道理一模一样：Agent 要真下场干活，光有"只读"的分析数据不够，它得有一个能实时读写的状态底座。
+这也是为啥你看大伙儿最近不约而同往 TP 上扑：Databricks 收 Neon 做 Lakebase，已经有 Unistore 的 Snowflake 收 Crunchy 做 Postgres，全在补 transactional 这一课。道理一模一样：Agent 要真下场干活，光有"只读"的分析数据不够，它得有一个能实时读写的状态底座。
 
 区别只在于——这块底座，**别人是临时拼出来的，我们是原生长出来的。** OLTP 能力，本来就长在 MatrixOne 身上。
 
