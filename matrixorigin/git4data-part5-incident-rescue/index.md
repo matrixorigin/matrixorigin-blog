@@ -40,11 +40,11 @@ Eighty percent of a rescue is decided **before** the accident. git4data makes "d
 CREATE DATABASE rescue_demo;
 USE rescue_demo;
 
--- A 1-day continuous protection window for the whole database. Configure once.
+-- A rolling 1-day protection window for the whole database. Configure once.
 CREATE PITR ops_pitr FOR DATABASE rescue_demo RANGE 1 'd';
 ```
 
-Once configured, PITR works quietly in the background, and **it protects the entire window after its creation** — any second inside that window is recoverable, whether or not you ever took a manual snapshot. The window length (`RANGE 1 'd'`) is your RPO: set it to 1 day, 7 days, whatever your business can tolerate looking back. **The point is that it has to exist before the incident** — creating it afterward is too late.
+Once configured, PITR works quietly in the background, maintaining a **rolling recovery window of the most recent stretch** — any second inside it is recoverable, whether or not you ever took a manual snapshot. The window length (`RANGE 1 'd'`) is your RPO and lookback depth: set it to 1 day, 7 days, whatever your business can tolerate. The catch is that this window **keeps rolling forward**: moments older than the window length slide out of protection and are no longer guaranteed recoverable. So PITR is your **short-term continuous backstop** — and it **has to exist before the incident**; creating it afterward is too late.
 
 **Second: before any risky bulk operation, casually take a snapshot.**
 
@@ -62,9 +62,14 @@ FROM generate_series(1, 1000000) g;          -- 1,000,000 rows, seconds
 
 Part 2 measured it: snapshotting a 1M-row (even 100M-row) table takes **5–8 milliseconds** — it only records a moment and protects that moment's objects (Part 3 explained why). Which means snapshots carry **zero psychological cost**: take one before every change, the way you hit Ctrl+S while writing a document.
 
-Remember the division of labor: **a snapshot is a precise save point you place by hand — good for surgical repair; PITR is a safety net woven automatically in the background — it catches the moments you didn't save, and even a dropped table.** The four scenarios below lean on this pair again and again.
+Remember the division of labor — these are **two independent capabilities, each covering a different timescale**:
 
-![Two safety nets: snapshots are precise save points you place by hand on the timeline; PITR is a continuous protection window covering everything after its creation](./images/fig_safety-nets_en.svg)
+> - **PITR is the automatic, forward-rolling "continuous net."** Any second in the recent window is recoverable (even moments you never saved, even a dropped table), but it only protects **inside the window** — older moments roll off as the window advances.
+> - **A snapshot is a named save point you place by hand, and once taken it persists.** It **doesn't expire** (until you drop it), which makes it the right tool to pin a "known-good state" (before a release, a quarterly close, a training-data cut) — so even weeks later, after the PITR window has long rolled past that moment, you can still DIFF against it, surgically repair from it, or restore it.
+
+The four scenarios below lean on this pair again and again.
+
+![Two safety nets: a snapshot is a durable, named save point you place by hand; PITR is a forward-rolling short-term window that only protects the most recent stretch](./images/fig_safety-nets_en.svg)
 
 ---
 
@@ -230,8 +235,6 @@ SELECT COUNT(*) FROM orders;       -- 1000000, schema and data back, intact
 
 Measured: **a dropped 1M-row table, restored whole-database from PITR, not a row missing.** In the traditional playbook this is a "major incident, all hands, spin up a backup instance" event; here it's one SQL statement and a few seconds. `TRUNCATE`, a dropped whole database — same.
 
-> ⚠ **A timing trap (we hit it in testing)**: a PITR has a valid-from boundary (roughly its creation time). If you restore to a second-precision timestamp **right after** creating the PITR, you may get `input timestamp ... is less than the pitr valid time`. Wait 1–2 seconds, or check `SHOW PITR` for its start. Which, again, is why **PITR should be standing configuration, not something you create after the incident.**
-
 ---
 
 ## Getting recovery right: one decision tree
@@ -270,8 +273,51 @@ The honest notes you want before you try this in production:
 
 - **Creation is near-free; long-term retention is not.** Snapshots and PITR are milliseconds to create and take almost no space — but **the historical objects pinned by a snapshot or PITR are not reclaimed by background GC**; they hold storage until the snapshot/PITR is dropped. So: `DROP SNAPSHOT` your short-lived "before-change" snapshots once done; size the PITR window to your RPO, don't blindly stretch it to 30 days.
 - **PITR recovery is whole-database and overwriting.** It's best for structural disasters (DROP/TRUNCATE/whole-database pollution). To "repair only some rows while keeping the rest of the new writes," use a snapshot + surgical repair, not PITR.
-- **The timing boundary.** PITR only protects the window after its creation; your restore timestamp must fall inside the valid range shown by `SHOW PITR`.
+- **The timing boundary.** PITR only protects the recent rolling window — older moments have rolled off and need a snapshot; your restore timestamp must fall inside the valid range shown by `SHOW PITR`.
 - **DIFF first, act second.** This is the habit to take away: the recovery actions (rollback / surgical repair / PITR) are all cheap; **the expensive part is the judgment**, and DIFF is the step that grounds that judgment in fact rather than guesswork.
+
+---
+
+## The baseline: how would a traditional MySQL stack rescue the same incidents?
+
+In MatrixOne the four scenarios above are mostly "one or two SQL statements, seconds." It's worth looking back at what the same incidents take on a traditional MySQL stack — which is exactly where most teams live today.
+
+MySQL has no first-class "snapshot" or "built-in PITR." Its point-in-time recovery is the classic **full backup + binlog replay**, and one run looks roughly like this:
+
+1. **Find a spare machine and restore a full backup first.** From the latest `mysqldump` or a physical backup (XtraBackup), load the whole database into a **brand-new recovery instance** — you can't recover in place on production. For a large database that load alone is tens of minutes to hours.
+2. **Hand-locate the bad statement's position in the binlog.** Use `mysqlbinlog` to scan the binary logs and find which position or GTID that `UPDATE` / `DROP` landed on:
+   ```bash
+   mysqlbinlog --start-datetime="2026-06-25 02:00:00" binlog.000123 | grep -n "UPDATE orders"
+   ```
+3. **Replay up to the moment before the incident.** Re-execute the binlog between "after the backup point" and "before the bad statement" — event by event, so hours of log take hours to replay:
+   ```bash
+   mysqlbinlog --stop-position=448291 binlog.000123 | mysql -h recovery_host
+   ```
+4. **Then move the data back to production.** The recovery instance now holds the pre-incident state; you still have to **export, compare, and merge** the data you need back into the production database that's still taking orders.
+
+The real pain is a handful of problems baked into this flow:
+
+- **It needs a spare instance plus a full extra copy of disk.** Rescuing a 500-row fat-finger still means reviving the entire database first.
+- **The granularity is the whole database / instance.** Want to roll just the `orders` table back to a moment? You can't — you restore everything and pick from it.
+- **The prerequisites are hard, and you often discover they weren't met only after the incident.** `log_bin` must have been on all along, the binlog must not have been purged early by `binlog_expire_logs_seconds`, and the format had better be ROW — miss any one and PITR is simply off the table.
+- **The stop-position is manual and easy to get wrong.** Scan one transaction too many or too few and you either don't fully roll back or you clobber good data.
+- **The worst part: you can't keep the legitimate writes that came after.** Standard PITR stops before the bad statement, so the real orders that landed afterward **vanish with it**; to keep them you have to **skip exactly that one bad transaction and replay all the rest** (hand `--exclude-gtids` / GTID surgery) — one slip and you're inconsistent. This is precisely what Scenario 1's "surgical repair" does in a single SQL, and on MySQL it's a nightmare.
+- **There's no cheap "see the damage."** MySQL gives you no `DIFF`; to learn how many rows changed and which ones, you first restore the pre-incident state to a side instance, then write SQL to compare row by row.
+
+> Managed flavors (RDS / Aurora) turn "find the backup, configure binlog" into a console button, which genuinely helps — but **the essence is unchanged**: it still restores to a **new instance** (not in place), still at **whole-database granularity**, still takes tens of minutes, and you still have to **reconcile and move the data back** yourself afterward — and you pay for a whole extra instance for the privilege.
+
+The contrast in one table:
+
+| | Traditional MySQL PITR | MatrixOne git4data |
+|---|---|---|
+| Restore granularity | whole database / instance | table / database / account / cluster, your pick |
+| Extra instance | required (full extra disk) | none, in place |
+| Time | backup load + event-by-event binlog replay, **hours** | **seconds** |
+| See the damage | restore to a side instance, compare by hand | one `DATA BRANCH DIFF` |
+| Keep post-incident writes | hand-skip GTIDs, error-prone | surgical repair / `MERGE`, separated for free |
+| Prerequisites | binlog on early, not purged, right format | one `CREATE SNAPSHOT` / `CREATE PITR` beforehand |
+
+The bottom line: MySQL treats point-in-time recovery as a **major-incident engineering project**; git4data collapses it into **one everyday SQL statement**. That gap is the most tangible operational difference that "version-controlling data like code" actually buys you.
 
 ---
 
