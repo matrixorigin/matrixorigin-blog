@@ -1,5 +1,5 @@
 ---
-title: "MatrixOne Git4Data Deep Dive (Part 7) · Data Operations in Practice — Write-Audit-Publish: A Release Gate for Your Data Pipeline"
+title: "MatrixOne Git4Data Deep Dive (Part 7) · Data Operations in Practice — Write-Audit-Publish: A Release Gate for Your ETL Pipeline"
 author: MatrixOrigin
 mail: contact@matrixorigin.io
 description: "Git4Data Part 7, closing the data-operations practice arc: Write-Audit-Publish (WAP). New data lands on a staging branch, passes a set of SQL audit assertions, then publishes with one atomic MERGE — a bad batch is stopped at the gate and production never sees it. With real scenarios, the full three-step walkthrough, and a detailed comparison against load-then-check / blue-green rename / staging+INSERT / transactions / DQ tools. All SQL verified on MatrixOne 4.0.0-rc3."
@@ -16,7 +16,7 @@ translations:
   zh: git4data-part7-write-audit-publish-zh
 ---
 
-# MatrixOne Git4Data Deep Dive (Part 7) · Data Operations in Practice — Write-Audit-Publish: A Release Gate for Your Data Pipeline
+# MatrixOne Git4Data Deep Dive (Part 7) · Data Operations in Practice — Write-Audit-Publish: A Release Gate for Your ETL Pipeline
 
 Data pipelines have a perennial problem: **you don't control upstream data quality, but you own the fallout.**
 

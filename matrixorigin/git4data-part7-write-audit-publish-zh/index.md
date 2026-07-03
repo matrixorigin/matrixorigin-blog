@@ -1,5 +1,5 @@
 ---
-title: "MatrixOne Git4Data 技术详解（七）·数据运维实践篇：Write-Audit-Publish——给数据流水线装一道发布门禁"
+title: "MatrixOne Git4Data 技术详解（七）·数据运维实践篇：Write-Audit-Publish——给 ETL 流水线装一道发布门禁"
 author: MatrixOrigin
 description: "Git4Data 系列（七），数据运维实践篇收官：Write-Audit-Publish（WAP）。新数据先落 staging 分支、跑一组 SQL 审计门禁、再一次原子 MERGE 发布——脏批次在门口就被拦下，生产表全程零感知。含真实场景、三步落地、以及和直接灌/蓝绿改名/staging+INSERT/事务/DQ 工具等方案的详细对比。全部 SQL 在 MatrixOne 4.0.0-rc3 上实测。"
 tags: ["技术干货"]
@@ -15,7 +15,7 @@ translations:
   en: git4data-part7-write-audit-publish
 ---
 
-# MatrixOne Git4Data 技术详解（七）·数据运维实践篇：Write-Audit-Publish——给数据流水线装一道发布门禁
+# MatrixOne Git4Data 技术详解（七）·数据运维实践篇：Write-Audit-Publish——给 ETL 流水线装一道发布门禁
 
 数据流水线有一个老大难问题：**上游来的数据，质量不归你管，但出了事算你的。**
 
