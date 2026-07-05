@@ -179,7 +179,7 @@ Production went from 100k to 105k, and not one dirty row ever appeared in it.
 
 ## How the alternatives do it — by system, and where each differs
 
-"Isn't this just checking before you load?" The naive baseline — **load straight into production, check afterward** — is the most common and the most painful: by the time the check finds the problem, the dirty data is already in production and read downstream ("publish, then pray"). WAP exists to avoid exactly that. But *how* you build a real WAP depends on the system you're on. Three families:
+"Isn't this just checking before you load?" The naive baseline — **load straight into production, check afterward** — is the most common and the most painful: by the time the check finds the problem, the dirty data is already in production and read downstream ("publish, then pray"). WAP exists to avoid exactly that. But *how* you build a real WAP depends on the system you're on. Two families:
 
 ### 1) Git-style, on the lake: Iceberg branches, lakeFS (where WAP is done natively)
 
@@ -196,17 +196,12 @@ These two and MatrixOne are **essentially the same path — all of them fully im
 
 The theme: these systems all **work around not having branches**, approximating atomic publish by **swapping** a whole table or partition. The price: you can only swap in blocks (no row-level incremental upsert), multi-table is hard to make atomic, and the swap either locks the table or rebuilds a pile of attached objects.
 
-### 3) Data-quality tools: dbt tests / Great Expectations / Soda
-
-These are the **check-definition layer, not a storage gate.** They're great at expressing checks, but the default timing is often "test *after* the data has landed in the target" (`dbt build` builds into the target, then tests) — the gate and the storage are separate, and in that gap dirty data may already have been read. To become a true gate they still need family 1 or 2 underneath. They aren't competitors to MatrixOne but **complements**: define the checks with them, and make the gate that actually blocks with MatrixOne's branch + atomic MERGE (its git4data capability).
-
 | Approach | Isolation | Publish | Incremental append | Multi-table atomic | Needs external engine | Serves online reads |
 |---|---|---|---|---|---|---|
 | Iceberg branches | zero-copy branch | fast-forward (metadata, atomic) | yes | weak (per-table) | yes (Spark/Trino) | no (lake, AP) |
 | lakeFS | repo branch | merge (atomic, + hook gate) | yes | **strong (repo-level)** | yes | no (file layer) |
 | Snowflake | zero-copy clone | SWAP (whole-table, atomic) | **whole-table** | weak | no (built-in) | no (standard tables; Hybrid excepted) |
 | PG / MySQL | staging table / partition | ATTACH / EXCHANGE / RENAME | by partition | weak | no | yes (but locks / rebuilds) |
-| dbt / GE / Soda | — (defines checks only) | depends on substrate | — | — | depends | — |
 | **MatrixOne (git4data capability)** | **zero-copy branch** | **atomic MERGE (row-level delta)** | **native** | **db-snapshot backstop** | **no (SQL, same engine)** | **yes (HTAP, serves directly)** |
 
 In one line: this git-style gate used to live either **on the lake** (Iceberg / lakeFS — but that's not a database that serves reads, and needs an engine stack) or was **faked with whole-table swaps** on a warehouse / DB (Snowflake SWAP, PG partition exchange — coarse-grained, multi-table hard). MatrixOne is the uncommon case that puts it **inside a live HTAP database, with a row-level incremental atomic MERGE as the publish** — and the audit is just SQL in that same database, no second stack to stand up.
