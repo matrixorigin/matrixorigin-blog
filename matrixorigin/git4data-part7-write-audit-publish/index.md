@@ -179,7 +179,7 @@ Production went from 100k to 105k, and not one dirty row ever appeared in it.
 
 ## How the alternatives do it — by system, and where each differs
 
-"Isn't this just checking before you load?" The naive baseline — **load straight into production, check afterward** — is the most common and the most painful: by the time the check finds the problem, the dirty data is already in production and read downstream ("publish, then pray"). WAP exists to avoid exactly that. But *how* you build a real WAP depends on the system you're on. (WAP as a pattern was coined and popularized by Netflix in 2017 — predating Iceberg branches and lakeFS, which later made it a native capability.) Three families:
+"Isn't this just checking before you load?" The naive baseline — **load straight into production, check afterward** — is the most common and the most painful: by the time the check finds the problem, the dirty data is already in production and read downstream ("publish, then pray"). WAP exists to avoid exactly that. But *how* you build a real WAP depends on the system you're on. Three families:
 
 ### 1) Git-style, on the lake: Iceberg branches, lakeFS (where WAP is done natively)
 
