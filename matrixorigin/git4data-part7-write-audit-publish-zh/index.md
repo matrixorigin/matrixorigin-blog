@@ -177,19 +177,19 @@ SELECT COUNT(*) FROM events WHERE user_id IS NULL OR amount < 0 OR amount > 1000
 
 ## 别的方案怎么做？带上数据库选型，逐个对比
 
-"不就是灌数前先检查一下嘛？" 最朴素的做法——**直接灌进生产、事后再查**——也最常见、最痛：等检查发现问题，脏数据早已在生产表里、被下游读走了（这就是"先发布，再祈祷"）。WAP 就是为了避免这一幕。但**真要落地 WAP，做法取决于你手上是什么系统**。分三类看：
+"不就是灌数前先检查一下嘛？" 最朴素的做法——**直接灌进生产、事后再查**——也最常见、最痛：等检查发现问题，脏数据早已在生产表里、被下游读走了（这就是"先发布，再祈祷"）。WAP 就是为了避免这一幕。但**真要落地 WAP，做法取决于你手上是什么系统**。（WAP 这套模式最早由 Netflix 于 2017 年提出、推广，比 Iceberg 分支和 lakeFS 都早；后来它们把它做成了原生能力。）分三类看：
 
-### 一、湖上的 git 式方案：Iceberg 分支、lakeFS（WAP 的发源地，真能做）
+### 一、湖上的 git 式方案：Iceberg 分支、lakeFS（WAP 在这里被做成了原生能力）
 
-- **Apache Iceberg（分支）**：写进一条 audit 分支（`spark.wap.branch`）、在分支上跑质量检查、通过就 `fast_forward` 到 `main`。分支零拷贝、fast-forward 是纯元数据操作且原子——**思路和 MatrixOne 的做法几乎一样**，因为 WAP 本就发源于此。差异在**落点**：Iceberg 是**对象存储上的表格式**，自己不执行查询，得靠 Spark / Trino / Flink 这类外部引擎来读写、跑审计；它面向**分析（AP）**，"生产表"是湖上给分析读的数据集，**不是一个还在对外服务点查 / 事务的库**。要跑 WAP，得配 engine（Spark 的 WAP 模式）、catalog 和一整套 lake 栈。
-- **lakeFS**：给整个数据湖做 git——branch 整个 repo、写到分支、用 **pre-merge hooks（`actions.yaml`）** 当审计门禁、通过才 merge 到 `main`。merge 是 repo 级原子，**天然多表 / 多文件一致**。差异：lakeFS 版本化的是**对象存储里的文件 / 路径**，不是数据库表；它挡在 S3 前面，你仍要用外部引擎（Spark / Trino / DuckDB）在版本化路径上查数；审计逻辑跑在 webhook / Airflow 里（另一套编排）。
+- **Apache Iceberg（分支）**：写进一条 audit 分支（`spark.wap.branch`）、在分支上跑质量检查、通过就把 `main` **fast-forward 到 audit 分支**（`fast_forward('t','main','audit')`，让主分支追上）。分支零拷贝、fast-forward 是纯元数据操作且原子——**思路和 MatrixOne 的做法几乎一样**。差异在**落点**：Iceberg 是**对象存储上的表格式**，自己不执行查询，得靠 Spark / Trino / Flink 这类外部引擎来读写、跑审计；它面向**分析（AP）**，"生产表"是湖上给分析读的数据集，**不是一个还在对外服务点查 / 事务的库**。要跑 WAP，得配 engine（Spark 的 WAP 模式）、catalog 和一整套 lake 栈。
+- **lakeFS**：给整个数据湖做 git——branch 整个 repo、写到分支、用 **pre-merge hooks（`_lakefs_actions/` 下的 action 文件）** 当审计门禁、通过才 merge 到 `main`。merge 是 repo 级原子，**天然多表 / 多文件一致**。差异：lakeFS 版本化的是**对象存储里的文件 / 路径**，不是数据库表；它挡在 S3 前面，你仍要用外部引擎（Spark / Trino / DuckDB）在版本化路径上查数；审计逻辑跑在 webhook / Airflow 里（另一套编排）。
 
 这两者**确实把 WAP 做对了**，**MatrixOne 和它们走的是同一条路**（git4data 不是独立产品，而是 MatrixOne 内建的这套 git 式能力）。区别在**落点**：它们保护的是**湖 / 数仓里给分析读的数据集**，需要"存储格式 + 外部引擎 + catalog / hooks"一整套栈；而 MatrixOne 把**同一套 git 式 WAP 直接做进它自己这个还在对外服务的 HTAP 数据库**——审计是同库里的普通 SQL，发布是库内的原子 MERGE，读的人就是这个库的消费者。
 
 ### 二、传统数仓 / 数据库上"凑"WAP（没有 git 分支，只能靠交换）
 
-- **Snowflake**：零拷贝 `CLONE` 出 staging、灌 + 审计，再 `ALTER TABLE prod SWAP WITH staging`（两条 RENAME 在一个事务里、原子、连权限一起换）。clone 零拷贝这点很像分支。差异：**SWAP 是整表替换、且是单表**——要"只追加今天 5000 行"，你得 clone→insert→swap 一整张表，每次都在**换掉全表**；多表要原子得自己拼；且 Snowflake 是数仓（AP），不服务在线点查。
-- **PostgreSQL / MySQL**：没有分支。可行的近似是**分区交换**——把新批次灌进一张单独的表、校验，再 `ALTER TABLE … ATTACH PARTITION`（PG）/ `EXCHANGE PARTITION`（MySQL）挂上去；或者 staging 表 + `RENAME` 交换、外面用事务包住。差异：分区交换只适用于**按分区键（如日期）追加**、挂载要拿锁、还要过 CHECK 约束扫描；RENAME 交换有前面说的多表不原子、句柄 / 索引 / 权限重建问题；事务包住则长事务持锁、拖垮在线表。
+- **Snowflake**：零拷贝 `CLONE` 出 staging、灌 + 审计，再 `ALTER TABLE prod SWAP WITH staging`（两条 RENAME 在一个事务里、原子；注意权限不随数据走，staging 表要 `COPY GRANTS` 才继承 prod 的授权）。clone 零拷贝这点很像分支。差异：**SWAP 换掉的是整张表、不是增量发布**（想只追加，直接 `INSERT` / `MERGE` 也行，但那就绕过了“先隔离再发布”这道门、回到方案 A）；多表要原子得自己拼；且标准表面向分析（AP），要低延迟点查 / OLTP 得另用 Hybrid Tables（Unistore）。
+- **PostgreSQL / MySQL**：没有分支。可行的近似是**分区交换**——把新批次灌进一张单独的表、校验，再 `ALTER TABLE … ATTACH PARTITION`（PG）/ `EXCHANGE PARTITION`（MySQL）挂上去；或者 staging 表 + `RENAME` 交换、外面用事务包住。差异：分区交换是把一张**已填好数据的表挂载成一个分区**（RANGE / LIST / HASH 都行，数据要符合该分区约束），是**分区粒度的挂载 / 替换、不是行级追加或更新**，挂载要拿锁、还要过 CHECK 约束扫描；RENAME 交换有前面说的多表不原子、句柄 / 索引 / 权限重建问题；事务包住则长事务持锁、拖垮在线表。
 - **BigQuery**：没有分支。staging 表 + 事务里 `MERGE` / `CREATE OR REPLACE TABLE` / 分区覆写，或表快照 + 覆盖。形态同上：要么整表 / 整分区替换，要么大 MERGE 有中间态和成本。
 
 这类系统**都在"绕过没有分支"这件事**——用整表 / 整分区的**交换**来近似原子发布。代价是：只能整块换（不适合行级增量 upsert）、多表难原子、换的过程要么锁表、要么重建一堆附属对象。
@@ -202,7 +202,7 @@ SELECT COUNT(*) FROM events WHERE user_id IS NULL OR amount < 0 OR amount > 1000
 |---|---|---|---|---|---|---|
 | Iceberg 分支 | 零拷贝分支 | fast-forward（元数据，原子） | 支持 | 弱（表级） | 是（Spark/Trino） | 否（湖上 AP） |
 | lakeFS | repo 分支 | merge（原子，带 hooks 门禁） | 支持 | **强（repo 级）** | 是 | 否（文件层） |
-| Snowflake | 零拷贝 clone | SWAP（整表交换，原子） | **整表换** | 弱 | 否（自带） | 否（数仓 AP） |
+| Snowflake | 零拷贝 clone | SWAP（整表交换，原子） | **整表换** | 弱 | 否（自带） | 否（标准表，Hybrid 例外） |
 | PG / MySQL | staging 表 / 分区 | ATTACH / EXCHANGE / RENAME | 按分区 | 弱 | 否 | 是（但要锁 / 重建） |
 | dbt / GE / Soda | —（只定义检查） | 依赖底层 | — | — | 取决于底层 | — |
 | **MatrixOne（git4data 能力）** | **零拷贝分支** | **原子 MERGE（行级增量）** | **原生** | **库级快照兜底** | **否（同引擎 SQL）** | **是（HTAP，直接服务）** |
