@@ -184,7 +184,7 @@ SELECT COUNT(*) FROM events WHERE user_id IS NULL OR amount < 0 OR amount > 1000
 - **Apache Iceberg（分支）**：写进一条 audit 分支（`spark.wap.branch`）、在分支上跑质量检查、通过就把 `main` **fast-forward 到 audit 分支**（`fast_forward('t','main','audit')`，让主分支追上）。分支零拷贝、fast-forward 是纯元数据操作且原子——**思路和 MatrixOne 的做法几乎一样**。差异在**落点**：Iceberg 是**对象存储上的表格式**，自己不执行查询，得靠 Spark / Trino / Flink 这类外部引擎来读写、跑审计；它面向**分析（AP）**，"生产表"是湖上给分析读的数据集，**不是一个还在对外服务点查 / 事务的库**。要跑 WAP，得配 engine（Spark 的 WAP 模式）、catalog 和一整套 lake 栈。
 - **lakeFS**：给整个数据湖做 git——branch 整个 repo、写到分支、用 **pre-merge hooks（`_lakefs_actions/` 下的 action 文件）** 当审计门禁、通过才 merge 到 `main`。merge 是 repo 级原子，**天然多表 / 多文件一致**。差异：lakeFS 版本化的是**对象存储里的文件 / 路径**，不是数据库表；它挡在 S3 前面，你仍要用外部引擎（Spark / Trino / DuckDB）在版本化路径上查数；审计逻辑跑在 webhook / Airflow 里（另一套编排）。
 
-这两者**确实把 WAP 做对了**，**MatrixOne 和它们走的是同一条路**（git4data 不是独立产品，而是 MatrixOne 内建的这套 git 式能力）。区别在**落点**：它们保护的是**湖 / 数仓里给分析读的数据集**，需要"存储格式 + 外部引擎 + catalog / hooks"一整套栈；而 MatrixOne 把**同一套 git 式 WAP 直接做进它自己这个还在对外服务的 HTAP 数据库**——审计是同库里的普通 SQL，发布是库内的原子 MERGE，读的人就是这个库的消费者。
+这两者**确实把 WAP 做对了**，**MatrixOne 和它们走的是同一条路**。区别在**落点**：它们保护的是**湖 / 数仓里给分析读的数据集**，需要"存储格式 + 外部引擎 + catalog / hooks"一整套栈；而 MatrixOne 把**同一套 git 式 WAP 直接做进它自己这个还在对外服务的 HTAP 数据库**——审计是同库里的普通 SQL，发布是库内的原子 MERGE，读的人就是这个库的消费者。
 
 ### 二、传统数仓 / 数据库上"凑"WAP（没有 git 分支，只能靠交换）
 
@@ -207,7 +207,7 @@ SELECT COUNT(*) FROM events WHERE user_id IS NULL OR amount < 0 OR amount > 1000
 | dbt / GE / Soda | —（只定义检查） | 依赖底层 | — | — | 取决于底层 | — |
 | **MatrixOne（git4data 能力）** | **零拷贝分支** | **原子 MERGE（行级增量）** | **原生** | **库级快照兜底** | **否（同引擎 SQL）** | **是（HTAP，直接服务）** |
 
-一句话总结：WAP 这套 git 式门禁，过去要么在**湖上**做（Iceberg / lakeFS——但那不是能对外服务的库，还得配一套引擎栈），要么在**数仓 / 库**上用"整表交换"硬凑（Snowflake SWAP、PG 分区交换——粒度粗、多表难原子）。MatrixOne 是少见的把它做进**一个还在对外服务的 HTAP 数据库、且发布是行级增量原子 MERGE** 的方案（git4data 就是它内建的这套能力）——审计就是同一个库里的 SQL，不用再搭一套。
+一句话总结：WAP 这套 git 式门禁，过去要么在**湖上**做（Iceberg / lakeFS——但那不是能对外服务的库，还得配一套引擎栈），要么在**数仓 / 库**上用"整表交换"硬凑（Snowflake SWAP、PG 分区交换——粒度粗、多表难原子）。MatrixOne 是少见的把它做进**一个还在对外服务的 HTAP 数据库、且发布是行级增量原子 MERGE** 的方案——审计就是同一个库里的 SQL，不用再搭一套。
 
 ![两种世界：直接灌、事后查——脏数据先进生产、被下游读到，再手忙脚乱清理；WAP——脏数据卡在门口，生产永远只读到干净数据](./images/fig_where-bad-data-lands_zh.svg)
 
