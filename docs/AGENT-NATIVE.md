@@ -27,7 +27,8 @@ Use these files in order:
 7. `docs/AGENT-WORKFLOWS.md`: repeatable task checklists.
 8. `docs/agent-templates/`: reusable issue, PR, review, and verification
    output shapes.
-9. `docs/DESIGN.md`: system design background and longer-term blog architecture
+9. `skills/`: task-focused instructions for repeated Agent workflows.
+10. `docs/DESIGN.md`: system design background and longer-term blog architecture
    notes.
 
 ## Repository Boundaries
@@ -43,10 +44,9 @@ Use these files in order:
 
 - Put stable Agent rules in `AGENTS.md`.
 - Put tool-specific entry notes in `CLAUDE.md`.
-- Put task checklists in future workflow documents such as
-  `docs/AGENT-WORKFLOWS.md`.
+- Put task checklists in `docs/AGENT-WORKFLOWS.md`.
 - Put reusable output shapes in `docs/agent-templates/`.
-- Put high-frequency Agent procedures in future skills under `skills/`.
+- Put high-frequency Agent procedures in `skills/`.
 - Do not duplicate the full README or schema in Agent prompt files; link to the
   source of truth instead.
 

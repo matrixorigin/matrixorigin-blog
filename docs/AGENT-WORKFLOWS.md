@@ -7,6 +7,9 @@ executable schema in `schema/frontmatter.ts`.
 Use these workflows to keep content edits surgical, verifiable, and scoped to
 the correct publishing surface.
 
+For repeated tasks, prefer the matching skill under `skills/` before relying on
+this checklist alone.
+
 ## Before Any Change
 
 1. Identify the target project directory:
@@ -20,6 +23,8 @@ the correct publishing surface.
 ## New Article
 
 Use this when creating a new blog post.
+
+Matching skill: `skills/matrixorigin-blog-new-article/SKILL.md`.
 
 1. Confirm the target project directory and intended slug.
 2. Create `<project>/<slug>/index.md`.
@@ -45,6 +50,8 @@ PR notes should include:
 
 Use this when changing an existing post's text, metadata, or local assets.
 
+Matching skill: `skills/matrixorigin-blog-content-edit/SKILL.md`.
+
 1. Locate the exact article directory before editing.
 2. Read the current frontmatter and preserve unrelated fields.
 3. Edit only the requested article content or assets.
@@ -62,6 +69,8 @@ assets unless the user explicitly asked for that task.
 
 Use this when a user says a post was added or edited but does not appear on the
 target website.
+
+Matching skill: `skills/matrixorigin-blog-publish-debug/SKILL.md`.
 
 Check in this order:
 
@@ -88,6 +97,8 @@ Report separately:
 ## Image Or Video Not Visible
 
 Use this when article media is missing or broken.
+
+Matching skill: `skills/matrixorigin-blog-publish-debug/SKILL.md`.
 
 1. Confirm the media file exists under the article directory.
 2. Confirm Markdown uses a supported local path, usually `./images/<file>` or
@@ -122,6 +133,8 @@ validation behavior.
 
 Use this when explaining what happens after content changes are pushed.
 
+Matching skill: `skills/matrixorigin-blog-publish-debug/SKILL.md`.
+
 1. Start with the simple role map:
    - This repository stores Markdown content.
    - A dispatch workflow notifies the downstream site repository.
@@ -138,6 +151,8 @@ Use this when explaining what happens after content changes are pushed.
 ## PR Preparation
 
 Use this before opening a pull request.
+
+Matching skill: `skills/matrixorigin-blog-review-pr/SKILL.md`.
 
 1. Run the smallest relevant verification:
    - Documentation-only: `git diff --check`.
@@ -159,6 +174,8 @@ Use `docs/agent-templates/pr-body.md` for the final PR body shape.
 ## Review Checklist
 
 Use this when reviewing a blog-content PR.
+
+Matching skill: `skills/matrixorigin-blog-review-pr/SKILL.md`.
 
 - Does the PR touch only the intended project directory or docs?
 - Does every changed article still start with frontmatter at the first byte?
