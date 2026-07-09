@@ -154,6 +154,8 @@ Use this before opening a pull request.
 5. If a command fails because of a known pre-existing issue, include the exact
    failing file and reason.
 
+Use `docs/agent-templates/pr-body.md` for the final PR body shape.
+
 ## Review Checklist
 
 Use this when reviewing a blog-content PR.
@@ -166,3 +168,5 @@ Use this when reviewing a blog-content PR.
 - Does a `status` or `date` change intentionally affect visibility or ordering?
 - Did the author run the appropriate verification, or explain why it fails?
 - Are downstream deploy claims separated from content validation claims?
+
+Use `docs/agent-templates/review-output.md` for the final review response shape.
