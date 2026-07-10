@@ -20,7 +20,7 @@ matrixorigin/     ← Main company blog → matrixorigin.cn/blog & matrixorigin.
 ## Tooling
 
 - **Frontmatter schema** — all articles validated against [`schema/frontmatter.ts`](./schema/frontmatter.ts) (Zod). Backward-compatible with existing Memoria articles.
-- **Local validation** — `pnpm validate` (runs in CI for content, schema, and script changes).
+- **Local validation** — `pnpm validate` (runs in CI for content, schema, scripts, and tooling config changes).
 - **Migration** — `pnpm migrate:dry ../mo-website-redesign` to preview pulling historical articles into `matrixorigin/`.
 
 See [`docs/DESIGN.md`](./docs/DESIGN.md) for the broader blog system design
@@ -95,7 +95,7 @@ Your Markdown content starts here...
 | Field | Required | Description |
 |-------|----------|-------------|
 | `title` | **Yes** | English title (max 200 chars) |
-| `date` | **Yes** | ISO date `YYYY-MM-DD` or full ISO timestamp — used for chronological sorting |
+| `date` | **Yes** | Publication date used for chronological sorting. Recommended format: `YYYY-MM-DD` or a full ISO timestamp; current validation keeps broader string compatibility. |
 | `description` | **Yes** | English summary shown on article list and SEO metadata (10-500 chars) |
 | `status` | No | `draft` = not visible · `published` = live on website · `archived` = retained but not actively published. Defaults to `published` if omitted. |
 | `title_zh` | No | Chinese title (shown when user switches to 中文) |
@@ -218,7 +218,7 @@ memoria/
 - **Video size**: Keep local videos under 50 MB. For larger videos, use an external platform (YouTube / Bilibili) and embed via `<iframe>`.
 - **Preview locally**: Use any Markdown editor (VS Code, Typora, Obsidian) to preview before publishing. Front matter is displayed as a table in most editors.
 - **Slug naming**: Use descriptive, URL-friendly slugs: `memoria-v2-release`, `cursor-memory-tutorial`, `mcp-quick-start`.
-- **Date matters**: Articles are sorted by `date` (newest first). Make sure the date reflects the intended publication order.
+- **Date matters**: Articles are sorted by `date` (newest first). Use `YYYY-MM-DD` for day-level ordering, or a full ISO timestamp when same-day ordering needs to be explicit.
 
 ---
 
