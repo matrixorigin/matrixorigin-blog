@@ -2,7 +2,8 @@
 
 This repository is the **shared content source** for blog posts across MatrixOrigin projects.
 
-Each project has its own top-level directory. Each project's backend only watches its own directory and ignores the rest.
+Each project has its own top-level directory. Publishing automation is scoped by
+that top-level directory.
 
 ```
 memoria/          ← Memoria articles → synced to thememoria.ai/blog.html
@@ -19,27 +20,42 @@ matrixorigin/     ← Main company blog → matrixorigin.cn/blog & matrixorigin.
 ## Tooling
 
 - **Frontmatter schema** — all articles validated against [`schema/frontmatter.ts`](./schema/frontmatter.ts) (Zod). Backward-compatible with existing Memoria articles.
-- **Local validation** — `pnpm validate` (runs in CI on every PR).
+- **Local validation** — `pnpm validate` (runs in CI for content, schema, scripts, and tooling config changes).
 - **Migration** — `pnpm migrate:dry ../mo-website-redesign` to preview pulling historical articles into `matrixorigin/`.
 
-See [`docs/DESIGN.md`](./docs/DESIGN.md) for the full blog system design (SSG, SEO, syndication, feedback).
+See [`docs/DESIGN.md`](./docs/DESIGN.md) for the broader blog system design
+background. For current publishing automation, check `.github/workflows/`.
 
 ---
 
-## Memoria Blog
+## Publishing targets
 
-Articles in `memoria/` are automatically published to [thememoria.ai/blog.html](https://thememoria.ai/blog.html).
+- `matrixorigin/` content is dispatched to
+  [`matrixorigin/mo-website-redesign`](https://github.com/matrixorigin/mo-website-redesign)
+  when pushed to `main`, then rendered by the website build.
+- `memoria/` content is dispatched to
+  [`matrixorigin/memoria-website`](https://github.com/matrixorigin/memoria-website)
+  when a published Memoria article changes on `main`.
 
-The Memoria backend watches this directory via GitHub Webhook and a periodic poller (every 5 minutes as fallback). Push a change → article updates within seconds.
+Validation and downstream deployment are separate steps: `pnpm validate` proves
+the content shape is valid, but it does not prove the downstream website deploy
+has completed.
 
 ---
 
-## How to publish a new Memoria article
+## How to publish a new article
 
-### 1. Create a directory under `memoria/`
+### 1. Choose the project directory
+
+Use the target project's top-level directory:
+
+- `matrixorigin/` for MatrixOrigin company blog articles.
+- `memoria/` for Memoria product blog articles.
+
+### 2. Create an article directory
 
 ```
-memoria/
+<project>/
   your-article-slug/       ← directory name becomes the URL slug
     index.md               ← article content (required)
     images/                ← optional: images referenced in the article
@@ -55,7 +71,7 @@ memoria/
 - ✅ `introducing-memoria`, `release-v2-0`, `how-to-use-mcp`
 - ❌ `Introducing_Memoria` (uppercase + underscore), `-draft` (leading hyphen), `my article` (space)
 
-### 2. Write `index.md` with front matter
+### 3. Write `index.md` with front matter
 
 Every `index.md` must start with a YAML front matter block:
 
@@ -78,18 +94,22 @@ Your Markdown content starts here...
 
 | Field | Required | Description |
 |-------|----------|-------------|
-| `title` | **Yes** | English title (max 500 chars) |
-| `date` | **Yes** | ISO date `YYYY-MM-DD` — used for chronological sorting |
-| `status` | **Yes** | `draft` = not visible · `published` = live on website |
+| `title` | **Yes** | English title (max 200 chars) |
+| `date` | **Yes** | Publication date used for chronological sorting. Recommended format: `YYYY-MM-DD` or a full ISO timestamp; current validation keeps broader string compatibility. |
+| `description` | **Yes** | English summary shown on article list and SEO metadata (10-500 chars) |
+| `status` | No | `draft` = not visible · `published` = live on website · `archived` = retained but not actively published. Defaults to `published` if omitted. |
 | `title_zh` | No | Chinese title (shown when user switches to 中文) |
 | `tag` | No | English tag label, e.g. `Announcement`, `Tutorial`, `Case Study` |
 | `tag_zh` | No | Chinese tag label |
-| `description` | No | English summary shown on article list (~150 chars) |
-| `description_zh` | No | Chinese summary |
+| `description_zh` | No | Chinese summary (10-500 chars) |
+| `lang` | No | Body language, either `en` or `zh` |
+| `cover` | No | Cover image path |
+| `translations` | No | Counterpart slugs, e.g. `{ zh: "slug-zh", en: "slug" }` |
 
-> **Important:** `status` is case-sensitive. `published` works; `Published` or `PUBLISHED` will be treated as `draft`.
+> **Important:** `status` is case-sensitive. `published` works; `Published` or
+> `PUBLISHED` fails validation.
 
-### 3. Add images (optional)
+### 4. Add images (optional)
 
 Place images in the `images/` subdirectory and reference them with a relative path:
 
@@ -99,14 +119,13 @@ Place images in the `images/` subdirectory and reference them with a relative pa
 
 Supported formats: **PNG, JPEG, GIF, WebP, SVG**
 
-When the article is published, the backend automatically:
-1. Downloads the image from this repository
-2. Uploads it to Aliyun OSS for fast CDN delivery
-3. Replaces `./images/<filename>` with the permanent OSS URL in the stored content
+When the article is published, the downstream site pipeline processes local
+assets for its own runtime. Keep image references local and portable in this
+repository.
 
 > **Note:** Always use the `./images/` prefix (with `./`). Paths like `images/cover.png` (without `./`) are not recognized.
 
-### 4. Add videos (optional)
+### 5. Add videos (optional)
 
 Place video files in the `videos/` subdirectory and reference them using Markdown image syntax:
 
@@ -116,7 +135,8 @@ Place video files in the `videos/` subdirectory and reference them using Markdow
 
 Supported formats: **MP4, WebM, MOV, OGG**
 
-The backend uploads the video to OSS (same as images), and the frontend automatically renders it as an HTML5 `<video controls>` player instead of an `<img>` tag.
+The downstream site must support the referenced video format and rendering
+behavior. Validate the target site when adding or changing local videos.
 
 **For large videos (> 50 MB), prefer embedding from an external platform:**
 
@@ -132,17 +152,19 @@ The backend uploads the video to OSS (same as images), and the frontend automati
   frameborder="0" allowfullscreen></iframe>
 ```
 
-### 5. Publish
+### 6. Validate and publish
 
-Change `status: "draft"` to `status: "published"` and push:
+Change `status: "draft"` to `status: "published"`, validate, and push:
 
 ```bash
+pnpm validate
 git add .
 git commit -m "publish: your-article-slug"
 git push
 ```
 
-The website updates within a few seconds via GitHub Webhook.
+After merge or push to `main`, the corresponding dispatch workflow triggers the
+downstream website pipeline for the changed project directory.
 
 To **unpublish**, change `status` back to `"draft"` and push.
 
@@ -150,16 +172,19 @@ To **unpublish**, change `status` back to `"draft"` and push.
 
 ## Editing an existing article
 
-Edit `index.md` and push. The backend detects the file SHA change and re-syncs automatically. Only modified articles are re-processed; unchanged ones are skipped.
+Edit `index.md`, run `pnpm validate`, and push. After the change reaches
+`main`, the relevant downstream workflow is responsible for reprocessing the
+article.
 
 ---
 
 ## Deleting an article
 
-Remove the entire article directory and push. On the next sync, the backend marks the article as deleted and it disappears from the website.
+Remove the entire article directory and push. On the next downstream sync, the
+site should remove the article from the published listing.
 
 ```bash
-git rm -r memoria/your-article-slug/
+git rm -r <project>/your-article-slug/
 git commit -m "remove: your-article-slug"
 git push
 ```
@@ -189,11 +214,11 @@ memoria/
 
 - **Bilingual content**: Write both English and Chinese fields in the front matter. The website has a language toggle; the article body is single-language.
 - **Markdown support**: Full CommonMark + GFM — tables, code blocks with syntax highlighting, blockquotes, task lists, etc.
-- **Image size**: Keep individual images under 10 MB. The backend handles files of any size (GitHub's 1 MB inline limit is bypassed via `download_url`).
+- **Image size**: Keep individual images under 10 MB unless a target site has a documented reason to allow larger files.
 - **Video size**: Keep local videos under 50 MB. For larger videos, use an external platform (YouTube / Bilibili) and embed via `<iframe>`.
 - **Preview locally**: Use any Markdown editor (VS Code, Typora, Obsidian) to preview before publishing. Front matter is displayed as a table in most editors.
 - **Slug naming**: Use descriptive, URL-friendly slugs: `memoria-v2-release`, `cursor-memory-tutorial`, `mcp-quick-start`.
-- **Date matters**: Articles are sorted by `date` (newest first). Make sure the date reflects the intended publication order.
+- **Date matters**: Articles are sorted by `date` (newest first). Use `YYYY-MM-DD` for day-level ordering, or a full ISO timestamp when same-day ordering needs to be explicit.
 
 ---
 
@@ -202,7 +227,8 @@ memoria/
 **Q: I pushed but the article didn't appear on the website.**
 - Check that `status` is exactly `"published"` (lowercase)
 - Check that the directory slug is valid (lowercase, no spaces, no underscores)
-- Wait up to 5 minutes for the periodic poller to run
+- Check that `pnpm validate` passes
+- Check the relevant downstream dispatch workflow for the project directory
 
 **Q: My image isn't showing.**
 - Make sure the file is in the `images/` subdirectory (not in the root of the article directory)
