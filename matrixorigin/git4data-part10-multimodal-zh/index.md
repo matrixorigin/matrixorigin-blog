@@ -256,6 +256,60 @@ WHERE m.split_name = 'train';
 
 ---
 
+## 把它真跑一遍：lakeFS + MatrixOne 端到端实践
+
+前面都是分开讲。这一节把两个世界真的接起来跑一遍——配套仓库里有可直接执行的 [`run_practice.sh`](https://github.com/matrixorigin/git4data-tutorial/blob/main/10-multimodal-lakefs/run_practice.sh)，下面是它的骨架与实测输出（commit 值每次运行不同，这里给的是一次示例；计数是确定的）。
+
+**先起两个服务**，各一个容器：
+
+```bash
+# 字节侧：lakeFS（本地存储 + 预置管理员凭证）
+docker run -d --name lakefs -p 8000:8000 \
+  -e LAKEFS_INSTALLATION_ACCESS_KEY_ID=... -e LAKEFS_INSTALLATION_SECRET_ACCESS_KEY=... \
+  -e LAKEFS_DATABASE_TYPE=local -e LAKEFS_BLOCKSTORE_TYPE=local \
+  -e LAKEFS_AUTH_ENCRYPT_SECRET_KEY=... treeverse/lakefs:latest run
+# 元数据侧：MatrixOne
+docker run -d --name matrixone -p 6001:6001 matrixorigin/matrixone:4.1.0
+```
+
+**① 字节进 lakeFS**：建仓库、开 ingest 分支、上传对象、提交、合并到 main，拿到一个真实的 commit（就是“字节版本”）：
+
+```bash
+curl -u $KEY:$SECRET -X POST $L/repositories/media/branches/ingest/commits -d '{"message":"ingest 2026w30"}'
+curl -u $KEY:$SECRET -X POST $L/repositories/media/refs/ingest/merge/main   -d '{"message":"publish 2026w30"}'
+#   -> main commit（字节版本）= ba1693908b37…
+```
+
+**② 元数据进 MatrixOne**：每行指向 lakeFS 的对象路径 + 刚拿到的那个 commit，然后在元数据上去重、去污染、对齐、策展、打快照，并把 commit 记进注册表：
+
+```sql
+-- samples 每行：object_uri='lakefs://media/main/img/000003.jpg', object_commit='ba1693908b37…',
+--               content_hash, phash, caption, label, license
+--   实测 exact_dup 1 / near_dup 1 / contaminated 1 / unaligned 1；策展后 train 4 / valid 1 / test 1
+CREATE SNAPSHOT mm_dataset_v1 FOR DATABASE mm_practice;
+INSERT INTO dataset_registry
+SELECT 'mm_v1', 'mm_dataset_v1', 'media', 'ba1693908b37…', COUNT(*) FROM dataset_membership;
+```
+
+**③ 复现——两个 ID 一起用**：从元数据快照里读出一条训练样本的指针和 commit，再回 lakeFS 按那个 commit 把**真正的字节**取回来：
+
+```sql
+SELECT s.object_uri, s.object_commit
+FROM samples {SNAPSHOT='mm_dataset_v1'} s
+JOIN dataset_membership {SNAPSHOT='mm_dataset_v1'} m ON s.sample_id = m.sample_id
+WHERE m.split_name = 'train' ORDER BY s.sample_id LIMIT 1;
+--   -> lakefs://media/main/img/000003.jpg  @  ba1693908b37…
+```
+
+```bash
+curl -u $KEY:$SECRET "$L/repositories/media/refs/ba1693908b37…/objects?path=img/000003.jpg"
+#   -> "img-3-bytes"   ← 元数据快照 × lakeFS commit，把确切的字节复现了出来
+```
+
+一个元数据快照 + 一个 lakeFS commit，就把“当时训练用的到底是哪些样本、哪一版字节”完整钉死了——这就是两个版本世界组合起来的全部意义。
+
+---
+
 ## 落地时容易踩的坑
 
 - **两个版本会漂移**。最常见的错误是只 pin 了元数据、没记 lakeFS commit——结果元数据复现出来了，字节却对不上（对象可能已被覆盖或删除）。铁律：**元数据快照里一定要记住对应的 lakeFS commit。**

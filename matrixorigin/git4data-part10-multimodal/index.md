@@ -257,6 +257,60 @@ This is more realistic than "hoping one tool manages both bytes and metadata wel
 
 ---
 
+## Run it for real: an end-to-end lakeFS + MatrixOne practice
+
+Everything above was described side by side. This section actually wires the two worlds together and runs them — the companion repo has a directly runnable [`run_practice.sh`](https://github.com/matrixorigin/git4data-tutorial/blob/main/10-multimodal-lakefs/run_practice.sh); below is its skeleton and measured output (commit values differ per run; the one shown is an example — the counts are deterministic).
+
+**Start the two services**, one container each:
+
+```bash
+# byte side: lakeFS (local storage + pre-seeded admin credentials)
+docker run -d --name lakefs -p 8000:8000 \
+  -e LAKEFS_INSTALLATION_ACCESS_KEY_ID=... -e LAKEFS_INSTALLATION_SECRET_ACCESS_KEY=... \
+  -e LAKEFS_DATABASE_TYPE=local -e LAKEFS_BLOCKSTORE_TYPE=local \
+  -e LAKEFS_AUTH_ENCRYPT_SECRET_KEY=... treeverse/lakefs:latest run
+# metadata side: MatrixOne
+docker run -d --name matrixone -p 6001:6001 matrixorigin/matrixone:4.1.0
+```
+
+**① Bytes into lakeFS**: create the repo, open an ingest branch, upload objects, commit, merge to main, and get a real commit (the "byte version"):
+
+```bash
+curl -u $KEY:$SECRET -X POST $L/repositories/media/branches/ingest/commits -d '{"message":"ingest 2026w30"}'
+curl -u $KEY:$SECRET -X POST $L/repositories/media/refs/ingest/merge/main   -d '{"message":"publish 2026w30"}'
+#   -> main commit (the byte version) = ba1693908b37…
+```
+
+**② Metadata into MatrixOne**: each row points at a lakeFS object path + the commit just obtained; then dedup, decontaminate, align, curate on the metadata, snapshot it, and record the commit in a registry:
+
+```sql
+-- each samples row: object_uri='lakefs://media/main/img/000003.jpg', object_commit='ba1693908b37…',
+--                   content_hash, phash, caption, label, license
+--   measured exact_dup 1 / near_dup 1 / contaminated 1 / unaligned 1; after curation train 4 / valid 1 / test 1
+CREATE SNAPSHOT mm_dataset_v1 FOR DATABASE mm_practice;
+INSERT INTO dataset_registry
+SELECT 'mm_v1', 'mm_dataset_v1', 'media', 'ba1693908b37…', COUNT(*) FROM dataset_membership;
+```
+
+**③ Reproduce — use both IDs together**: read a train sample's pointer and commit from the metadata snapshot, then go back to lakeFS and fetch the **actual bytes** at that commit:
+
+```sql
+SELECT s.object_uri, s.object_commit
+FROM samples {SNAPSHOT='mm_dataset_v1'} s
+JOIN dataset_membership {SNAPSHOT='mm_dataset_v1'} m ON s.sample_id = m.sample_id
+WHERE m.split_name = 'train' ORDER BY s.sample_id LIMIT 1;
+--   -> lakefs://media/main/img/000003.jpg  @  ba1693908b37…
+```
+
+```bash
+curl -u $KEY:$SECRET "$L/repositories/media/refs/ba1693908b37…/objects?path=img/000003.jpg"
+#   -> "img-3-bytes"   <- metadata snapshot × lakeFS commit reproduced the exact bytes
+```
+
+One metadata snapshot plus one lakeFS commit nail down exactly "which samples, which version of the bytes this training used" — which is the whole point of composing the two version worlds.
+
+---
+
 ## Pitfalls to watch for
 
 - **The two versions drift.** The commonest mistake is pinning only the metadata and not recording the lakeFS commit — the metadata reproduces, but the bytes don't match (an object may have been overwritten or deleted). The iron rule: **the metadata snapshot must remember its corresponding lakeFS commit.**
