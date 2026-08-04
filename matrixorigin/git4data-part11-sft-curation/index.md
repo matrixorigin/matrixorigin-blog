@@ -2,7 +2,7 @@
 title: "MatrixOne Git4Data Deep Dive (Part 11) · Large Models — SFT Data Curation: Auditable and Reproducible"
 author: MatrixOrigin
 mail: contact@matrixorigin.io
-description: "Git4Data Part 11: SFT has the least data and the highest value per record, so every curation decision imprints on model behavior. Using one chat model's SFT pool, this runs a full curation pass on a zero-copy branch — exact dedup, near-dup, quality gate, safety, benchmark decontamination, multi-turn integrity — each cut counted and recorded by DATA BRANCH DIFF, then registered and snapshotted for an atomic release; plus how the industry's other approaches compare. SQL verified on MatrixOne 4.1.0."
+description: "Git4Data Part 11: SFT has the least data and the highest value per record, so every curation decision imprints on model behavior. Using one chat model's SFT pool, this runs a full curation pass on a zero-copy branch — exact dedup, near-dup, quality gate, safety, benchmark decontamination, multi-turn integrity — each cut counted and recorded by DATA BRANCH DIFF, then registered and snapshotted for an atomic release; plus how other approaches compare. SQL verified on MatrixOne 4.1.0."
 tags: ["Technical Insights"]
 keywords: ["Git4Data", "MatrixOne", "Large Language Model", "SFT", "Data Curation", "Decontamination", "Data Versioning", "MLOps"]
 publishTime: "2026-07-23T17:00:00+08:00"
