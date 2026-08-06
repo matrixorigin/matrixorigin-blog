@@ -7,8 +7,8 @@ keywords: ["Git4Data", "MatrixOne", "数据版本控制", "lakeFS", "Dolt", "Sno
 publishTime: "2026-06-15T17:00:00+08:00"
 date: '2026-06-15'
 image:
-  "1": "/content/zh/shared/tech.png"
-  "235": "/content/zh/shared/tech.png"
+  "1": "/images/blog-covers/technical.png"
+  "235": "/images/blog-covers/technical.png"
 lang: zh
 status: published
 translations:

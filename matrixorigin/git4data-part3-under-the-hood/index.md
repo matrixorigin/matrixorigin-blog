@@ -8,8 +8,8 @@ keywords: ["Git4Data", "MatrixOne", "Data Version Control", "Storage Engine", "S
 publishTime: "2026-06-09T17:00:00+08:00"
 date: '2026-06-09'
 image:
-  "1": "/content/zh/shared/technical.png"
-  "235": "/content/zh/shared/technical.png"
+  "1": "/images/blog-covers/technical.png"
+  "235": "/images/blog-covers/technical.png"
 lang: en
 status: published
 translations:
