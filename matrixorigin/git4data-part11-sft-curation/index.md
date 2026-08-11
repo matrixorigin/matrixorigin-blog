@@ -2,7 +2,7 @@
 title: "MatrixOne Git4Data Deep Dive (Part 11) · Large Models — SFT Data Curation: Auditable and Reproducible"
 author: MatrixOrigin
 mail: contact@matrixorigin.io
-description: "Git4Data Part 11: SFT has the least data and the highest value per record, so every curation decision imprints on model behavior. Using one chat model's SFT pool, this runs a full curation pass on a zero-copy branch — exact dedup, near-dup, quality gate, safety, benchmark decontamination, multi-turn integrity — each filter counted and recorded by DATA BRANCH DIFF, then registered and snapshotted for an atomic release; plus how other approaches compare. SQL verified on MatrixOne 4.1.0."
+description: "Git4Data Part 11: SFT data is orders of magnitude smaller than pretraining data, so every curation decision imprints on model behavior. Using one chat model's SFT pool, this runs a full curation pass on a zero-copy branch — exact dedup, near-dup, quality gate, safety, benchmark decontamination, multi-turn integrity — counting before each filter, with DATA BRANCH DIFF reporting the net change, then register-swap-snapshot to release. SQL verified on MatrixOne 4.1.0."
 tags: ["Technical Insights"]
 keywords: ["Git4Data", "MatrixOne", "Large Language Model", "SFT", "Data Curation", "Decontamination", "Data Versioning", "MLOps"]
 publishTime: "2026-07-23T17:00:00+08:00"
@@ -22,11 +22,11 @@ Across the first ten parts we took MatrixOne's Git4Data capability from concept 
 
 This part enters **large models** — specifically the step that leans hardest on human judgment: **SFT (Supervised Fine-Tuning) data curation**.
 
-First, where it sits. A large model usually goes through three stages: **pretraining** (learning language and world knowledge from a vast corpus), **SFT** (teaching it to answer the way people expect, using high-quality "instruction → response" samples), and **preference alignment** (RLHF / DPO and friends, choosing the better of several decent answers). SFT is the hinge between them, and it's the stage with **the least data and the highest value per record** — pretraining runs to trillions of tokens; SFT is often just tens to hundreds of thousands of records.
+First, where it sits. A large model usually goes through three stages: **pretraining** (learning language and world knowledge from a vast corpus), **SFT** (teaching it to answer the way people expect, using high-quality "instruction → response" samples), and **preference alignment** (RLHF / DPO and friends, choosing the better of several decent answers). SFT is the hinge between them, and its data volume is **orders of magnitude smaller than pretraining's**: pretraining runs to trillions of tokens, while in publicly documented practice OpenAI's InstructGPT used roughly 13k human demonstrations, and LIMA reached usable alignment with just 1,000 curated samples (see References). That isn't a constant that holds across models — real SFT sets range from a few thousand to well over a million records.
 
 Precisely because it's small, **every record's quality and every curation decision imprints directly on model behavior.** And those decisions are almost all human calls: do we keep this batch of synthetic data? a vendor's quality dropped — do we pull their data? what's the right code-to-chat ratio? is the quality bar 0.35 or 0.50?
 
-> This part first walks the whole SFT data chain and where the Git4Data capability helps at each stage, then runs one complete curation pass end to end: what the pool looks like, which filters to apply, how each one leaves an audit record, how to publish it as a reproducible version, and where the industry's other approaches get stuck. All SQL is verified on MatrixOne `4.1.0`; the runnable version lives in [matrixorigin/git4data-tutorial](https://github.com/matrixorigin/git4data-tutorial) under `11-sft-curation/`.
+> This part first walks the whole SFT data chain and where the Git4Data capability helps at each stage, then runs one complete curation pass end to end: what the pool looks like, which filters to apply, how each one leaves an audit record, how to publish it as a reproducible version, and where the industry's other approaches get stuck. All SQL is verified on **MatrixOne `4.1.0`**; the runnable version is [`11-sft-curation/sft_curation_demo.sql` in git4data-tutorial](https://github.com/matrixorigin/git4data-tutorial/blob/354b9cff424cafb50d0b58128e78cc36970fe211/11-sft-curation/sft_curation_demo.sql), pinned to a specific commit so the numbers here keep matching it.
 
 ---
 
@@ -64,7 +64,7 @@ Let's be clear about the boundary: ③ scoring belongs to the scoring model, ⑤
 |---|---|---|
 | ② Pool | new batch, quality unknown, mustn't poison the pool | new data lands on a **branch**, `MERGE` only on pass; the pool never moves |
 | ③ Score | the scoring model changes versions, so scores shift | scores enter a **snapshot** with the data — "which version of scores this used" stays queryable |
-| ④ Curate | what was deleted, why, and can it be undone — all unclear | filter on a **branch**; one `DATA BRANCH DIFF` gives the full audit record |
+| ④ Curate | what was deleted, why, and can it be undone — all unclear | filter on a **branch**, counting before each step; `DATA BRANCH DIFF` reports the pass's net change |
 | ⑤ Mix | the mix is a decision that leaves no trace | compute the mix in SQL before release; freeze the rule in a **registry** with the version |
 | ⑥ Release | the pool training reads keeps changing | a database-scope **`CREATE SNAPSHOT`** freezes the version for bit-for-bit reproduction |
 | ⑧ Iterate | data differences between two model versions can't be attributed | **`DIFF`** two snapshots — down to exactly which rows, removed by which filter |
@@ -103,7 +103,7 @@ fix some responses            = UPDATE some rows
 
 **Every filter is a row-level change** — exactly what the Git4Data capability is best at. So the thesis up front:
 
-> **SFT curation shouldn't be a script that runs and vanishes. It should be a controlled change: done on a branch, audited by a DIFF, published atomically as a version.**
+> **SFT curation shouldn't be a script that runs and vanishes. It should be a controlled change: done on a branch, audited by a DIFF, published in a fixed order and frozen as a version.**
 
 ---
 
@@ -268,7 +268,7 @@ After six filters: **73,000 → 59,671 rows, measured.**
 
 ---
 
-## The audit record: one DIFF says exactly what this pass removed
+## The audit record: DIFF gives the net change, the process records the reasons
 
 With the pass complete, the important move — **record what it did**:
 
@@ -279,24 +279,30 @@ DATA BRANCH DIFF sft_curated AGAINST sft_records OUTPUT SUMMARY;
 
 `13329` isn't an estimate; it's the sum of the six filters: `4000 + 3000 + 5184 + 101 + 744 + 300 = 13329`. **The pool never moved a row, and this pass's entire impact compresses into one summary line.**
 
-More useful than the total: you can expand the difference **down to rows** at any time — which ones went, how much a given domain lost, whether one source got hit unusually hard — all of it ordinary SQL:
+One thing needs stating precisely: **`OUTPUT SUMMARY` returns the branch's net change against the pool (INSERTED / DELETED / UPDATED), not a per-row reason for each deletion.** There is no "this row was cut by the safety filter" column in the table, and DIFF cannot invent one. **Grouping by reason comes from the process itself** — each filter runs `COUNT` before `DELETE`, so those six numbers are the six reasons, and they add up exactly to the DIFF total. If you need stronger traceability, there are two routes: **take a DIFF after each filter**, so every step carries its own net-change number; or, before deleting, write the matched primary keys along with `(step, reason)` into a curation log table. The registry's `curate_rule` records the **rule**, not a per-row verdict.
+
+So three things are certain here: the pool never moved a row; this pass's net impact is a definite, queryable number; and both the rule and the number get frozen with the version.
+
+The data is already in tables, so you can keep asking questions before release — starting with this version's mix:
 
 ```sql
 -- before publishing, look at the mix: domain and source ratios are themselves curation decisions
 SELECT domain, COUNT(*) AS n,
        ROUND(100.0 * COUNT(*) / (SELECT COUNT(*) FROM sft_curated), 1) AS pct
 FROM sft_curated GROUP BY domain ORDER BY domain;
---   measured chat 19346 (32.2%) / code 13247 (22.0%) / math 13764 (22.9%) / safety 13764 (22.9%)
+--   measured chat 18896 (31.7%) / code 13247 (22.2%) / math 13764 (23.1%) / safety 13764 (23.1%)
 
 SELECT source, COUNT(*) AS n FROM sft_curated GROUP BY source ORDER BY source;
---   measured human_written 24041 / synthetic_gpt 18040 / vendor_a 18040
+--   measured human_written 23591 / synthetic_gpt 18040 / vendor_a 18040
 ```
 
-These two queries surface something easy to overlook: **the mix is part of curation too.** Chat at 32% and code at only 22% — does that match this run's goal? Synthetic data at nearly a third — is that too high? There's no universal answer, but these judgments must be seen **before release**, not guessed at after training produces a strange model.
+Both groups total **59,671**, matching the row count left after the DIFF above — **doing that reconciliation before release catches most "the numbers in the doc aren't the numbers in the version" problems.**
+
+These queries also surface something easy to overlook: **the mix is part of curation too.** Chat at 31.7% and code at only 22.2% — does that match this run's goal? Synthetic data (`synthetic_gpt`) at nearly a third — is that too high? There's no universal answer, but these judgments must be seen **before release**, not guessed at after training produces a strange model.
 
 ---
 
-## Release: atomic merge, register before snapshot
+## Release: register, then swap, then snapshot
 
 Only after the audit passes do we publish. Two details are worth stressing.
 
@@ -319,7 +325,7 @@ FROM sft_curated;
 
 Note the `curate_rule` column: **it makes "the rules this version was filtered by" part of the data.** Three months later, when someone asks what v1's quality bar was, it's one SELECT — not an archaeology trip through the script repo's git log.
 
-**Second, publishing is atomic.** Replace the pool with the curated branch, then snapshot to freeze the whole version:
+**Second, the swap and the freeze are a fixed sequence of statements, not one transaction.** Replace the pool with the curated branch, then snapshot to freeze the whole version:
 
 ```sql
 DROP TABLE sft_records;
@@ -330,6 +336,10 @@ CREATE SNAPSHOT sft_v1 FOR DATABASE sft_pool;
 SELECT n_records FROM dataset_registry {SNAPSHOT='sft_v1'} WHERE dataset_version = 'sft_v1';
 --   measured 59671
 ```
+
+To be honest about it: **there is no atomicity across these three statements.** On 4.1.0 they commit independently, and if any one fails the earlier ones do not roll back — a successful `DROP` followed by a failed `RENAME` leaves the pool temporarily absent. So the right way to run this step is: **snapshot the current pool first as a rollback point**, then execute in the order above, confirming each statement before moving on, and `RESTORE` to the previous version if something fails.
+
+Put differently, what this flow guarantees is not "one command that either fully succeeds or fully doesn't." It's that **the release order is deterministic, each step's result is verifiable, and every version has a rollback anchor**. What actually gets frozen and reproduced bit for bit is the result of that final `CREATE SNAPSHOT` — until it succeeds, the version isn't published.
 
 ---
 
@@ -366,13 +376,13 @@ Making SFT curation "auditable, reproducible, reversible" has a few common paths
 
 **Approach 2: scripts plus keeping every intermediate artifact.** Disciplined teams do this: `step1_dedup.jsonl`, `step2_quality.jsonl`… It is traceable, at the cost of **a full copy per step** (N× storage), and comparing two versions means writing more scripts — you can't just JOIN or aggregate.
 
-**Approach 3: HuggingFace Datasets versioned on the Hub.** The dataset gets versions and revisions, with a strong ecosystem. But the granularity is the **dataset version**: it can tell you v3 isn't v2, not that "these 300 rows went because their conversations were left incomplete"; the filtering logic still lives in external scripts.
+**Approach 3: HuggingFace Datasets versioned on the Hub.** The dataset gets revisions (every Hub repo is a git repo, so any commit is retrievable), with a strong ecosystem. But **in this workflow** the traceable granularity is the dataset revision: it can tell you v3 isn't v2; saying "these 300 rows went because their conversations were left incomplete" is something you have to record yourself in the script. The filtering logic still lives in external scripts too.
 
 **Approach 4: data-version tools like DVC / lakeFS.** They pin JSONL files to versions you can return to, which is solid. But what they see is **files**: the diff is file- or object-level, while SFT curation's semantics are entirely row-level; and with the data in files, computing "the domain mix" means reading it back first.
 
 **Approach 5: curation in a data warehouse (Spark / BigQuery, …).** Filtering in SQL matches this article's approach and is common at larger teams. The difference is **version semantics**: keeping each version in Spark usually means writing to a new date-suffixed table, or leaning on Delta/Iceberg table versions; row-level branch / diff / merge isn't native, so "try a curation pass on a branch and throw it away if it's bad" has to be assembled by hand.
 
-Put in one table:
+Put in one table. **First, the table's scope**: it compares the **default path of each workflow listed above**, not the full capability of the products involved — treat each vendor's own documentation as authoritative (see References). Most of the "no" cells can be filled in with extra engineering; the cost is that you build and maintain it yourself.
 
 | Approach | Row-level audit record (which rows) | Where the filtering lives | Version reproducible | Cost of a failed attempt | Extra copies |
 |---|---|---|---|---|---|
@@ -383,7 +393,7 @@ Put in one table:
 | Warehouse SQL (Spark, …) | no (table-version level) | **SQL** ✅ | yes | new table | one table per version |
 | **MatrixOne (Git4Data capability)** | **yes (`DATA BRANCH DIFF`)** | **SQL** ✅ | **yes (snapshot)** | **zero-copy branch, just drop it** | **none** |
 
-In one line: the other approaches either lock the filtering logic in scripts and leave you a file (the script family), or version the data without row-level semantics (file-version tools), or let you filter in SQL without native branching and row-level diff (warehouses). What's different about MatrixOne is that **all three hold on one table at once**: curation written in SQL, tried on a zero-copy branch, each filter recorded by `DATA BRANCH DIFF`, then published atomically and snapshotted.
+In one line: **among the paths listed here**, they either lock the filtering logic in scripts and leave you a file (the script family), or version the data without row-level semantics (file-version tools), or let you filter in SQL without native branching and row-level diff (warehouses). What's different about MatrixOne is that **all three hold on one table at once**: curation written in SQL, tried on a zero-copy branch, net change reported by `DATA BRANCH DIFF`, then published in a fixed order and frozen with a snapshot.
 
 ---
 
@@ -399,12 +409,26 @@ In one line: the other approaches either lock the filtering logic in scripts and
 
 - **Curation rules should travel with the version.** Writing the thresholds and rules into the registry (this article's `curate_rule` column) is far more reliable than a comment in some script.
 
+- **Release is not a single atomic command.** `DROP` / `RENAME` / `CREATE SNAPSHOT` each commit independently; keeping the release controlled relies on "snapshot a rollback point first, verify every step."
+
+---
+
+## References
+
+- OpenAI, [Aligning language models to follow instructions (InstructGPT)](https://openai.com/index/instruction-following/) ｜ paper: [arXiv:2203.02155](https://arxiv.org/abs/2203.02155) — SFT demonstration-set size and the RLHF chain
+- Zhou et al., [LIMA: Less Is More for Alignment](https://arxiv.org/abs/2305.11206) — alignment from 1,000 curated samples
+- HuggingFace, [Repositories getting started (revision / commit semantics)](https://huggingface.co/docs/hub/en/repositories-getting-started)
+- [DVC quickstart (file / directory versioning)](https://dvc.org/doc/start)
+- lakeFS, [Branching quickstart (zero-copy branches over object storage)](https://docs.lakefs.io/latest/quickstart/branch/)
+- Apache Spark, [Spark SQL Programming Guide](https://spark.apache.org/docs/latest/sql-programming-guide.html)
+- Google Cloud, [BigQuery introduction](https://cloud.google.com/bigquery/docs/introduction)
+
 ---
 
 ## Closing
 
-SFT is the stage of large-model training with the least data and the highest value per record. That's exactly why every curation decision imprints directly on model behavior — and why this has long been the **least transparent** link in the chain: a pile of scripts runs, the pool shrinks a lot, and what went, why, and whether it can be undone rests on memory and discipline.
+SFT's data volume is orders of magnitude smaller than pretraining's, while each sample's effect on model behavior is far more direct. That's exactly why every curation decision imprints on model behavior — and why this has long been the **least transparent** link in the chain: a pile of scripts runs, the pool shrinks a lot, and what went, why, and whether it can be undone rests on memory and discipline.
 
-Replace that with "do it on a branch, audit it with a DIFF, publish atomically, freeze with a snapshot," and the link becomes as controllable as code review: **73,000 → 59,671, and where those 13,329 went is one SQL away**; raising the bar from 0.35 to 0.50 costs 21% of the data, and that price is on the table before training starts; and any historical version can be reconstructed bit for bit at any time.
+Replace that with "do it on a branch, count before each filter, let DIFF report the net change, publish in a fixed order, freeze with a snapshot," and the link becomes as controllable as code review: **73,000 → 59,671, and which filter each of those 13,329 belongs to reconciles in one SQL**; raising the bar from 0.35 to 0.50 costs 21% of the data, and that price is on the table before training starts; and any historical version can be reconstructed bit for bit at any time.
 
-> 📎 Runnable SQL: [github.com/matrixorigin/git4data-tutorial](https://github.com/matrixorigin/git4data-tutorial) ｜ Source & community: [github.com/matrixorigin/matrixone](https://github.com/matrixorigin/matrixone)
+> 📎 Runnable SQL (pinned to commit `354b9cf`): [github.com/matrixorigin/git4data-tutorial](https://github.com/matrixorigin/git4data-tutorial/blob/354b9cff424cafb50d0b58128e78cc36970fe211) ｜ Source & community: [github.com/matrixorigin/matrixone](https://github.com/matrixorigin/matrixone)

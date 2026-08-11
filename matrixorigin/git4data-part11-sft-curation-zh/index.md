@@ -1,7 +1,7 @@
 ---
 title: "MatrixOne Git4Data 技术详解（十一）·大模型篇：SFT 数据 curation——可审计、可复现的数据清洗"
 author: MatrixOrigin
-description: "Git4Data 系列（十一），大模型篇：SFT 是数据量最小、单条价值最高的一段，每一次取舍都印在模型行为上。本文用一个对话模型的 SFT 数据池，在零拷贝分支上完整走一遍 curation——精确去重、近重复、质量门、安全、评测去污染、多轮对话完整性六步过滤，每步先计数，DATA BRANCH DIFF 留下审计记录，先登记后快照原子发布；并对比业内其他做法。SQL 在 MatrixOne 4.1.0 上实测。"
+description: "Git4Data 系列（十一），大模型篇：SFT 的数据量比预训练小好几个数量级，每一次取舍都印在模型行为上。本文用一个对话模型的 SFT 数据池，在零拷贝分支上完整走一遍 curation——精确去重、近重复、质量门、安全、评测去污染、多轮对话完整性六步过滤，每步先计数，DATA BRANCH DIFF 给出这一轮的净变更，再按先登记、后替换、再快照的顺序发布；并对比业内其他做法。SQL 在 MatrixOne 4.1.0 上实测。"
 tags: ["技术干货"]
 keywords: ["Git4Data", "MatrixOne", "大模型", "SFT", "数据策展", "data curation", "去污染", "数据版本"]
 publishTime: "2026-07-23T17:00:00+08:00"
@@ -21,11 +21,11 @@ translations:
 
 这一篇进入**大模型**。具体说，是大模型训练里最讲究、也最依赖人工判断的一步：**SFT（Supervised Fine-Tuning，监督微调）的数据 curation**。
 
-先说清楚它在整条链路里的位置。一个大模型通常要经过三段：**预训练**（在海量文本上学语言和世界知识）、**SFT**（用高质量的「指令 → 回答」样本，教会它按人的期望回话）、**偏好对齐**（RLHF / DPO 等，让它在多个像样的回答里挑更好的那个）。SFT 是承上启下的一段，也是**数据量最小、单条价值最高**的一段——预训练动辄几万亿 token，SFT 常常只有几万到几十万条。
+先说清楚它在整条链路里的位置。一个大模型通常要经过三段：**预训练**（在海量文本上学语言和世界知识）、**SFT**（用高质量的「指令 → 回答」样本，教会它按人的期望回话）、**偏好对齐**（RLHF / DPO 等，让它在多个像样的回答里挑更好的那个）。SFT 是承上启下的一段，而且**数据量比预训练小好几个数量级**：预训练动辄几万亿 token，而在公开披露的实践里，OpenAI 的 InstructGPT 用的人工示范集约 1.3 万条，LIMA 更是只用 1,000 条精选样本就做出了可用的对齐效果（见文末参考资料）。当然这不是一个跨模型都成立的定值，不同团队的 SFT 集从几千到上百万条都有。
 
 正因为量小，**每一条的质量、每一次的取舍，都会直接印在模型行为上**。而这些取舍，几乎全是人在做决定：这批合成数据留不留？这个来源的数据质量掉了要不要下架？code 和 chat 的比例调成多少？质量分的门槛卡在 0.35 还是 0.50？
 
-> 这一篇先把 SFT 数据的完整链路过一遍、说清 Git4Data 这套能力在每个环节能帮上什么，再把一次完整的 curation 从头到尾做一遍：数据池长什么样、要用哪几步过滤、每一步怎么留下审计记录、最后怎么发布成一个可复现的版本，以及业内其他做法各自卡在哪。文中 SQL 全部在 MatrixOne `4.1.0` 上实测，可跑版本见 [matrixorigin/git4data-tutorial](https://github.com/matrixorigin/git4data-tutorial) 的 `11-sft-curation/`。
+> 这一篇先把 SFT 数据的完整链路过一遍、说清 Git4Data 这套能力在每个环节能帮上什么，再把一次完整的 curation 从头到尾做一遍：数据池长什么样、要用哪几步过滤、每一步怎么留下审计记录、最后怎么发布成一个可复现的版本，以及业内其他做法各自卡在哪。文中 SQL 全部在 **MatrixOne `4.1.0`** 上实测；可跑版本见 [git4data-tutorial 的 `11-sft-curation/sft_curation_demo.sql`](https://github.com/matrixorigin/git4data-tutorial/blob/354b9cff424cafb50d0b58128e78cc36970fe211/11-sft-curation/sft_curation_demo.sql)（已固定到具体 commit，避免后续改动导致数字对不上）。
 
 ---
 
@@ -63,7 +63,7 @@ translations:
 |---|---|---|
 | ② 入池 | 新批次质量未知，又不能污染主池 | 新数据先进**分支**，审计通过再 `MERGE`，主池全程不动 |
 | ③ 打分 | 打分模型换版本，分数会变 | 打分结果连同数据一起进**快照**，"这一版用的是哪一版分数"可查 |
-| ④ curation | 删了什么、为什么删、能不能撤，全说不清 | 在**分支**上过滤，一条 `DATA BRANCH DIFF` 给出完整审计记录 |
+| ④ curation | 删了什么、为什么删、能不能撤，全说不清 | 在**分支**上过滤，每步先计数，`DATA BRANCH DIFF` 给出这一轮的净变更 |
 | ⑤ 配比 | 配比是决策，却没有留痕 | 发布前用 SQL 直接统计配比；规则写进**注册表**随版本冻结 |
 | ⑥ 发布 | 训练读的池子一直在变 | 库级 **`CREATE SNAPSHOT`** 冻结版本，日后逐位复现 |
 | ⑧ 迭代 | 两版模型的数据差异归因不到行 | 两个快照做 **`DIFF`**，差异精确到具体哪些行、被哪一步删的 |
@@ -102,7 +102,7 @@ SFT 数据不一样。一条 SFT 样本长这样：
 
 **每一步过滤都是一次行级变更**——这正是 Git4Data 这套能力最擅长的东西。于是整篇文章的主张可以先摆出来：
 
-> **SFT curation 不该是一串跑完就没影的脚本，而应该是一次「在分支上做完、用 DIFF 留下审计记录、原子发布成一个版本」的受控变更。**
+> **SFT curation 不该是一串跑完就没影的脚本，而应该是一次「在分支上做完、用 DIFF 留下审计记录、按固定顺序发布成一个冻结版本」的受控变更。**
 
 ---
 
@@ -267,7 +267,7 @@ DELETE FROM sft_curated WHERE conv_id IN (
 
 ---
 
-## 审计记录：一条 DIFF 说清这一轮到底删了什么
+## 审计记录：净变更由 DIFF 出具，删除原因由流程留痕
 
 整轮 curation 做完，最重要的动作来了——**留下这一轮的审计记录**：
 
@@ -278,24 +278,30 @@ DATA BRANCH DIFF sft_curated AGAINST sft_records OUTPUT SUMMARY;
 
 `13329` 这个数字不是估算，它就是六步之和：`4000 + 3000 + 5184 + 101 + 744 + 300 = 13329`。**主池一行没动，而这一轮的全部影响被压缩成一行摘要。**
 
-比总数更有用的是，你随时可以把差异**展开到行**——想知道具体删了哪些、某个 domain 被删了多少、某个来源是不是被砍得特别狠，都是普通 SQL：
+这里要把话说准：**`OUTPUT SUMMARY` 给出的是这条分支相对主池的净变更（INSERTED / DELETED / UPDATED），不是逐行的删除原因**。表里并没有「这一行是被安全过滤删的」这种字段，DIFF 也不可能凭空知道。**按原因归类的能力来自流程本身**——每一步先 `COUNT` 再 `DELETE`，那六个数字就是六个原因的分账，加起来恰好等于 DIFF 的总数。如果需要更强的追溯，有两条路：**在每一步之后各留一次 DIFF**，让每个过滤步骤都有自己的净变更数字；或者在删除之前，先把命中行的主键连同 `(step, reason)` 写进一张 curation 日志表。注册表里的 `curate_rule` 记的是**规则**，不是逐行的判决书。
+
+所以这一节能确定的是三件事：主池一行没动；这一轮的净影响是一个可查的确定数字；规则和数字都会跟着版本一起冻住。
+
+数据本来就在表里，发布之前还可以随手追问细节——比如这一版的配比：
 
 ```sql
 -- 发布前先看一眼配比：领域和来源的比例，本身就是一次 curation 决策
 SELECT domain, COUNT(*) AS n,
        ROUND(100.0 * COUNT(*) / (SELECT COUNT(*) FROM sft_curated), 1) AS pct
 FROM sft_curated GROUP BY domain ORDER BY domain;
---   实测 chat 19346 (32.2%) / code 13247 (22.0%) / math 13764 (22.9%) / safety 13764 (22.9%)
+--   实测 chat 18896 (31.7%) / code 13247 (22.2%) / math 13764 (23.1%) / safety 13764 (23.1%)
 
 SELECT source, COUNT(*) AS n FROM sft_curated GROUP BY source ORDER BY source;
---   实测 human_written 24041 / synthetic_gpt 18040 / vendor_a 18040
+--   实测 human_written 23591 / synthetic_gpt 18040 / vendor_a 18040
 ```
 
-这两条查询点出了一个容易被忽略的事实：**配比也是 curation 的一部分**。chat 占到 32% 而 code 只有 22%，是不是符合这次训练的目标？合成数据占了三成，比例是否过高？这些判断没有标准答案，但它们必须在**发布之前**被看到——而不是训练完拿到一个奇怪的模型再回头猜。
+两组数字都合计 **59,671**，和上面 DIFF 之后剩下的行数对得上——**发布前顺手做一次这样的对账，能挡住绝大多数「表里数字和实际版本不是一回事」的问题**。
+
+这两条查询还点出了一个容易被忽略的事实：**配比也是 curation 的一部分**。chat 占到 31.7% 而 code 只有 22.2%，是不是符合这次训练的目标？合成数据（`synthetic_gpt`）占了三成，比例是否过高？这些判断没有标准答案，但它们必须在**发布之前**被看到——而不是训练完拿到一个奇怪的模型再回头猜。
 
 ---
 
-## 发布：原子合并 + 先登记后快照
+## 发布：先登记、再替换、后快照
 
 审计通过，才轮到发布。这里有两个细节值得强调。
 
@@ -318,17 +324,21 @@ FROM sft_curated;
 
 注意 `curate_rule` 这一列：**它把「这一版是按什么规则筛出来的」变成了数据的一部分**。三个月后有人问「v1 的质量分门槛是多少」，不用去翻脚本仓库的 git log，一条 SELECT 就够了。
 
-**第二，发布是原子的。** 用 curated 分支替换主池，然后打快照冻住整个版本：
+**第二，替换和冻结是一串有先后的语句，不是一个事务。** 用 curation 后的分支替换主池，再打快照冻住整个版本：
 
 ```sql
 DROP TABLE sft_records;
-ALTER TABLE sft_curated RENAME TO sft_records;   -- 用策展后的池子替换主池
+ALTER TABLE sft_curated RENAME TO sft_records;   -- 用 curation 后的池子替换主池
 CREATE SNAPSHOT sft_v1 FOR DATABASE sft_pool;
 
 -- 绑定现在在快照里了，不只是活库里
 SELECT n_records FROM dataset_registry {SNAPSHOT='sft_v1'} WHERE dataset_version = 'sft_v1';
 --   实测 59671
 ```
+
+这里要诚实说明一点：**这三条语句之间没有原子性**。在 4.1.0 上它们各自独立提交，中间任何一条失败，前面已经生效的不会自动回退——比如 `DROP` 成功而 `RENAME` 失败，主池就会暂时处于不存在的状态。所以发布这一步的正确做法是：**先对当前主池打一个快照作为回退点**，再按上面的顺序执行，每一步确认成功后再走下一步，失败时用 `RESTORE` 退回上一版。
+
+换句话说，这套流程给你的保证不是「一条命令要么全成要么全不成」，而是**发布顺序是确定的、每一步的结果是可验证的、任何一版都有可回退的锚点**。真正被冻住、能逐位复现的是最后那个 `CREATE SNAPSHOT` 的结果——在它成功之前，这一版都不算发布完成。
 
 ---
 
@@ -365,13 +375,13 @@ SELECT COUNT(*) AS v1_rows FROM sft_records {SNAPSHOT='sft_v1'};   -- 实测 596
 
 **做法二：脚本 + 把每一步的中间产物都存下来。** 有纪律的团队会这么做：`step1_dedup.jsonl`、`step2_quality.jsonl`……确实能回溯了，代价是**每一步一份全量副本**（N 倍存储），而且比对两个版本要写额外的脚本，不能直接 JOIN 或聚合。
 
-**做法三：HuggingFace Datasets + 版本化到 Hub。** 数据集有了版本和 revision，社区生态也好。但它的粒度是**数据集版本级**：能告诉你 v3 和 v2 不是同一份，但不能行级告诉你「哪 300 行因为多轮残缺被删了」；筛选逻辑仍在外部脚本里。
+**做法三：HuggingFace Datasets + 版本化到 Hub。** 数据集有了 revision（Hub 上每个仓库就是一个 git 仓库，可以按 commit 取到确定的一版），社区生态也好。但**在这条工作流里**，可回溯的粒度是数据集的 revision：它能告诉你 v3 和 v2 不是同一份，要说清「哪 300 行是因为多轮残缺被删的」，得靠你在脚本里自己另外记录；筛选逻辑也仍在外部脚本里。
 
 **做法四：DVC / lakeFS 等数据版本工具。** 能把 JSONL 文件钉成可回到的版本，这点很扎实。但它们看到的是**文件**：diff 是文件级或对象级的，而 SFT curation 的语义全是行级的；而且数据在文件里，做一次「按 domain 统计配比」还得先读回来。
 
 **做法五：数据仓库（Spark / BigQuery 等）里跑 curation。** 用 SQL 做筛选，这一步和本文思路是一致的，也是大团队常见的做法。差别在于**版本语义**：Spark 表要留住每一版通常靠「写到一张带日期后缀的新表」或 Delta/Iceberg 的表版本；行级的 branch / diff / merge 不是原生语义，「在分支上试一轮 curation，不行就丢掉」这件事要自己拼装。
 
-放进一张表里：
+放进一张表里。**先说清这张表的范围**：它比较的是上面列出的这几种**典型工作流的默认路径**，不是对相关产品全部能力的评价——各家的能力边界以官方文档为准（见文末参考资料），表里标「否」的格子，多数都能靠额外的工程手段补上，代价是你得自己拼装和维护。
 
 | 做法 | 行级审计记录（删了哪些） | 筛选逻辑在哪 | 版本可复现 | 试错成本 | 额外副本 |
 |---|---|---|---|---|---|
@@ -382,7 +392,7 @@ SELECT COUNT(*) AS v1_rows FROM sft_records {SNAPSHOT='sft_v1'};   -- 实测 596
 | 数仓 SQL（Spark 等） | 否（表版本级） | **SQL** ✅ | 是 | 建新表 | 每版一张表 |
 | **MatrixOne（Git4Data 能力）** | **是（`DATA BRANCH DIFF`）** | **SQL** ✅ | **是（快照）** | **零拷贝分支，丢弃即可** | **无** |
 
-一句话：其他做法要么把筛选逻辑锁在脚本里、结果只剩一个文件（脚本类），要么能版本化却看不到行级语义（文件版本工具），要么能用 SQL 筛却没有原生的分支 / 行级 diff（数仓）。MatrixOne 的不同在于**这三件事在同一张表上同时成立**：curation 用 SQL 写、在零拷贝分支上试、每一步的结果由 `DATA BRANCH DIFF` 出具审计记录、通过后原子发布并快照。
+一句话：**就本文列出的这几条路径而言**，要么把筛选逻辑锁在脚本里、结果只剩一个文件（脚本类），要么能版本化却看不到行级语义（文件版本工具），要么能用 SQL 筛却没有原生的分支 / 行级 diff（数仓）。MatrixOne 的不同在于**这三件事在同一张表上同时成立**：curation 用 SQL 写、在零拷贝分支上试、净变更由 `DATA BRANCH DIFF` 出具、通过后按固定顺序替换主池并打快照冻结。
 
 ---
 
@@ -398,12 +408,26 @@ SELECT COUNT(*) AS v1_rows FROM sft_records {SNAPSHOT='sft_v1'};   -- 实测 596
 
 - **curation 规则要跟着版本走。** 把门槛、规则写进注册表（本文的 `curate_rule` 列），比写在某个脚本的注释里可靠得多。
 
+- **发布这一步不是一条原子命令。** `DROP` / `RENAME` / `CREATE SNAPSHOT` 各自独立提交，要靠「先打回退快照 + 每步校验」来保证发布过程可控。
+
+---
+
+## 参考资料
+
+- OpenAI, [Aligning language models to follow instructions（InstructGPT）](https://openai.com/index/instruction-following/) ｜ 论文：[arXiv:2203.02155](https://arxiv.org/abs/2203.02155) —— SFT 示范集规模与 RLHF 链路
+- Zhou et al., [LIMA: Less Is More for Alignment](https://arxiv.org/abs/2305.11206) —— 1,000 条精选样本的对齐实验
+- HuggingFace, [Repositories getting started（revision / commit 语义）](https://huggingface.co/docs/hub/en/repositories-getting-started)
+- [DVC 快速上手（文件 / 目录级版本化）](https://dvc.org/doc/start)
+- lakeFS, [Branching quickstart（对象存储上的零拷贝分支）](https://docs.lakefs.io/latest/quickstart/branch/)
+- Apache Spark, [Spark SQL Programming Guide](https://spark.apache.org/docs/latest/sql-programming-guide.html)
+- Google Cloud, [BigQuery 介绍](https://cloud.google.com/bigquery/docs/introduction)
+
 ---
 
 ## 结语
 
-SFT 是大模型里数据量最小、但单条价值最高的一段。正因如此，curation 的每一次取舍都会直接印在模型行为上——而这些取舍，长期以来是整条链路上**最不透明**的一环：一串脚本跑完，池子小了一大截，至于删了什么、为什么删、能不能退回，全靠人的记忆和纪律。
+SFT 的数据量比预训练小好几个数量级，而每一条样本对模型行为的影响却直接得多。正因如此，curation 的每一次取舍都会印在模型行为上——而这些取舍，长期以来是整条链路上**最不透明**的一环：一串脚本跑完，池子小了一大截，至于删了什么、为什么删、能不能退回，全靠人的记忆和纪律。
 
-把它换成「分支上做、DIFF 留审计记录、原子发布、快照冻结」之后，这一环就变成了和代码评审一样可控的东西：**73,000 → 59,671，中间那 13,329 条的去向，一条 SQL 就能说清楚**；把门槛从 0.35 提到 0.50 要付出 21% 的数据量，这个代价在训练开始之前就摆在桌面上；而任何一个历史版本，随时可以逐位复原。
+把它换成「分支上做、每一步先计数、DIFF 出具净变更、按固定顺序发布、快照冻结」之后，这一环就变成了和代码评审一样可控的东西：**73,000 → 59,671，中间那 13,329 条分别属于哪一步，一条 SQL 就能对上账**；把门槛从 0.35 提到 0.50 要付出 21% 的数据量，这个代价在训练开始之前就摆在桌面上；而任何一个历史版本，随时可以逐位复原。
 
-> 📎 可运行 SQL：[github.com/matrixorigin/git4data-tutorial](https://github.com/matrixorigin/git4data-tutorial) ｜ 源码与社区：[github.com/matrixorigin/matrixone](https://github.com/matrixorigin/matrixone)
+> 📎 可运行 SQL（固定 commit `354b9cf`）：[github.com/matrixorigin/git4data-tutorial](https://github.com/matrixorigin/git4data-tutorial/blob/354b9cff424cafb50d0b58128e78cc36970fe211) ｜ 源码与社区：[github.com/matrixorigin/matrixone](https://github.com/matrixorigin/matrixone)
