@@ -4,8 +4,8 @@ author: MatrixOrigin
 description: "MatrixOrigin has been named a 2026 Shenzhen Potential Unicorn Enterprise, recognizing its technical innovation, growth potential, and market value in Data & AI."
 tags: ["News"]
 keywords: ["MatrixOrigin", "Potential Unicorn Enterprise", "MatrixOne Intelligence 5.0", "enterprise AI", "trusted AI agents"]
-date: "2026-08-11T18:30:00+08:00"
-publishTime: "2026-08-11T18:30:00+08:00"
+date: "2026-08-11T18:40:00+08:00"
+publishTime: "2026-08-11T18:40:00+08:00"
 image:
   "1": "/images/blog-covers/news.png"
   "235": "/images/blog-covers/news.png"
@@ -24,4 +24,4 @@ Following a review by the **Shenzhen Gazelle and Unicorn Enterprise Evaluation C
 The recognition moves MatrixOrigin up another tier in Shenzhen’s unicorn development pipeline, following its designation as a **“Seed Unicorn Enterprise”** in 2025. It reflects broad confidence in the company’s R&D capabilities, commercial prospects, and ability to sustain rapid growth.
 
 As AI reshapes enterprise technology, MatrixOrigin will continue to make innovation the engine of its growth, with a clear focus on building a **unified platform that takes enterprises from data to trusted AI agents**. Central to this strategy is the newly upgraded **MatrixOne Intelligence 5.0** (MOI 5.0), an enterprise-grade Data & AI platform that brings data, models, memory, and the trusted AI agent runtime onto a single foundation. It connects the entire journey—from governing raw data and building knowledge bases to developing trusted AI agents and running them in production. By eliminating the need to stitch together multiple systems, MOI 5.0 reduces complexity and gives enterprises greater control, helping them move AI agents beyond demos and into production at scale—the critical **“last mile”**—and turn AI into measurable business value.
-
+
