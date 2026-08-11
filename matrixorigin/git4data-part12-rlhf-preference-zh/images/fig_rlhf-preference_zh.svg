@@ -65,7 +65,7 @@
   <text x="64" y="386" fill="#E6EDF3" font-size="12.5" font-weight="700">分歧裁决（2:1 的 4,000 对）</text>
   <text x="64" y="408" fill="#79C0FF" font-size="11">Alice 分支改判 985　　Bob 分支改判 657</text>
   <text x="64" y="428" fill="#A371F7" font-size="11">MERGE alice → 再 MERGE bob WHEN CONFLICT SKIP</text>
-  <text x="64" y="447" fill="#6E7681" font-size="10.5">重叠处＝真冲突，显式暴露，不被悄悄覆盖</text>
+  <text x="64" y="447" fill="#6E7681" font-size="10.5">重叠行合并前先查出来存成清单，再按 SKIP 策略处理</text>
   <line x1="444" y1="338" x2="240" y2="360" stroke="#6E7681" stroke-width="1.5" marker-end="url(#arr)"/>
 
   <!-- publish + rm binding -->
@@ -80,6 +80,6 @@
   <text x="880" y="412" fill="#9DA7B3" font-size="11" font-weight="700">数据集版本 = 投票版本 × 推导规则</text>
   <text x="880" y="434" fill="#6E7681" font-size="11">所以投票必须和成品一起冻住。</text>
 
-  <text x="44" y="492" fill="#6E7681" font-size="11.5">谁的回答更好、门槛卡多少、环怎么处理，都由你决定；MatrixOne 的 Git4Data 能力保证的是：投票与成品同版本、每次改判可查、冲突显式、历史可复现。</text>
+  <text x="44" y="492" fill="#6E7681" font-size="11.5">谁的回答更好、门槛卡多少、环怎么处理，都由你决定；MatrixOne 的 Git4Data 能力保证的是：投票与成品同版本、每次改判可查、冲突按显式策略处理并留痕、历史可复现。</text>
   <text x="44" y="512" fill="#6E7681" font-size="11.5">全部数据实测于 MatrixOne 4.1.0，且使用确定性表达式（无 rand()），可逐次复现。</text>
 </svg>

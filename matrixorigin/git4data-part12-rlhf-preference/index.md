@@ -2,7 +2,7 @@
 title: "MatrixOne Git4Data Deep Dive (Part 12) · Large Models — RLHF Preference Data: Disagreement, Adjudication, Reproducibility"
 author: MatrixOrigin
 mail: contact@matrixorigin.io
-description: "Git4Data Part 12: preference data's unit is a pair, not a row, and it is computed from annotator votes rather than collected. From 63,000 votes this derives preference pairs, audits degenerate pairs, no-consensus, preference cycles and length bias on a branch, adjudicates disagreement with conflict merges, and binds the dataset to its reward model. Verified on MatrixOne 4.1.0."
+description: "Git4Data Part 12: preference data's unit is a pair, not a row, and it is computed from annotator votes rather than collected — the same data feeding both the RLHF and DPO routes. From 63,000 votes this derives preference pairs, audits degenerate pairs, no-consensus, preference cycles and length bias on a branch, materialises the conflict list before adjudicating on branches, and binds the dataset to its reward model. Verified on MatrixOne 4.1.0."
 tags: ["Technical Insights"]
 keywords: ["Git4Data", "MatrixOne", "Large Language Model", "RLHF", "DPO", "Preference Data", "Reward Model", "Data Versioning"]
 publishTime: "2026-07-24T17:00:00+08:00"
@@ -20,11 +20,18 @@ translations:
 
 In [Part 11](https://github.com/matrixorigin/matrixorigin-blog/blob/main/matrixorigin/git4data-part11-sft-curation/index.md) we ran a full SFT curation pass: six filters on a branch, each counted first, a DIFF as the audit record, registry before snapshot at release. This part moves one step further down the large-model training chain, into **preference alignment** — the **preference data** that RLHF / DPO depends on.
 
-As [Part 11](https://github.com/matrixorigin/matrixorigin-blog/blob/main/matrixorigin/git4data-part11-sft-curation/index.md) explained, SFT teaches a model to answer the way people expect. But SFT has a ceiling: it can learn "this is a good answer," not "**between these two decent answers, which one is better.**" And the latter is exactly what pushes a model from usable to good. That's what preference alignment is for: have humans (or models) compare candidate responses, train a **reward model** on those comparisons, and use it to steer the policy model.
+As [Part 11](https://github.com/matrixorigin/matrixorigin-blog/blob/main/matrixorigin/git4data-part11-sft-curation/index.md) explained, SFT teaches a model to answer the way people expect. But SFT has a ceiling: it can learn "this is a good answer," not "**between these two decent answers, which one is better.**" And the latter is exactly what pushes a model from usable to good. That's what preference alignment is for: have humans (or models) compare candidate responses, then use those comparisons to adjust the model.
+
+Two routes need separating up front — **they consume the same preference data, but their downstreams are entirely different**:
+
+- **RLHF**: train a **reward model** on the comparisons first, then use reinforcement learning (PPO and friends) to optimize the policy model against that reward model;
+- **DPO** ([Direct Preference Optimization](https://arxiv.org/abs/2305.18290)): **no reward model at all** — optimize the policy model directly on the preference pairs.
+
+This part is about **the preference data itself**, which both routes share. Wherever the text below says "reward model" or `rm_v1` (including the registry that binds a dataset to a model), it's describing the **RLHF** route; on DPO you bind a policy-model version instead, and the build / audit / adjudication / release flow is identical.
 
 So the shape of the training data changes once again — and this time more fundamentally than in any earlier part.
 
-> This part makes clear what's special about preference data, the ways it breaks (degenerate pairs, no consensus, preference cycles, length bias), how to adjudicate disagreement between annotators, and how a preference dataset gets bound to a reward model as a reproducible pair. All SQL is verified on MatrixOne `4.1.0`, and **everything is deterministic** (no `rand()`), so every number reproduces run to run; the runnable version lives in [matrixorigin/git4data-tutorial](https://github.com/matrixorigin/git4data-tutorial) under `12-rlhf-preference/`.
+> This part makes clear what's special about preference data, the ways it breaks (degenerate pairs, no consensus, preference cycles, length bias), how to adjudicate disagreement between annotators, and how a preference dataset gets bound to a reward model as a reproducible pair. All SQL is verified on **MatrixOne `4.1.0`**, and **everything is deterministic** (no `rand()`), so every number reproduces run to run; the runnable version is [`12-rlhf-preference/rlhf_preference_demo.sql` in git4data-tutorial](https://github.com/matrixorigin/git4data-tutorial/blob/354b9cff424cafb50d0b58128e78cc36970fe211/12-rlhf-preference/rlhf_preference_demo.sql), pinned to a specific commit so the numbers here keep matching it.
 
 ---
 
@@ -35,7 +42,7 @@ As in the last part, lay out the chain before drilling in. A batch of preference
 ```text
 ① generate ─▶ ② pair & assign ─▶ ③ annotate ─▶ ④ derive pairs ─▶ ⑤ audit & curate
                                                                         │
-                        ⑧ train RM → policy opt → evaluate ◀── ⑦ release ◀── ⑥ adjudicate
+                        ⑧ train & evaluate (RM+PPO / DPO) ◀── ⑦ release ◀── ⑥ adjudicate
                                         │
                                         └──── more labels / new rule / new bar ──▶ back to ③④⑤
 ```
@@ -54,26 +61,26 @@ As in the last part, lay out the chain before drilling in. A batch of preference
 
 **⑦ Release**: freeze a definite version and bind it to the reward model about to be trained.
 
-**⑧ Train RM → policy optimization → evaluate**: the reward model feeds PPO/DPO, and after evaluation you go back for more labels or a new rule — returning to ③④⑤. **And a symptom like "the policy model started padding its answers" usually takes three layers of backtracking to attribute.**
+**⑧ Train and evaluate**: on RLHF that's "train the reward model, then optimize the policy with PPO"; on DPO it's optimizing the policy directly on the preference pairs. After evaluation you go back for more labels or a new rule — returning to ③④⑤. **And a symptom like "the policy model started padding its answers" usually takes three layers of backtracking to attribute.**
 
 ### Which of these eight stages belong to data version control
 
-Same boundary first: ① belongs to the policy model, ② to the labeling platform, ⑧ to the RL training framework and evaluation — **the Git4Data capability touches none of those judgments.** It handles the middle: how votes become a dataset, how that dataset is audited and adjudicated, and how it freezes into a version traceable from the reward model.
+Same boundary first: ① belongs to the policy model, ② to the labeling platform, ⑧ to the RL / DPO training framework and evaluation — **the Git4Data capability touches none of those judgments.** It handles the middle: how votes become a dataset, how that dataset is audited and adjudicated, and how it freezes into a version traceable from the reward model.
 
 | Stage | The real problem | How MatrixOne's Git4Data capability helps |
 |---|---|---|
 | ③ Annotate | store only the verdict and the votes are gone forever | votes land **as-is and enter the snapshot**, so re-deriving is always possible |
 | ④ Derive pairs | a different bar is a different dataset, but the rule leaves no trace | the derivation rule goes in a **registry**, frozen with the version |
 | ⑤ Audit & curate | degenerate pairs and cycles can only be hunted by ad-hoc scripts | relational SQL on a **branch**; one `DIFF` produces the audit record |
-| ⑥ Adjudicate | several reviewers edit the same rows — whose verdict counts | one **branch** each; `MERGE` **surfaces conflicts explicitly**, or `PICK` takes only adjudicated rows |
-| ⑦ Release | the dataset training reads keeps changing | a database **`SNAPSHOT`** freezes it; the registry binds **RM ← dataset** |
+| ⑥ Adjudicate | several reviewers edit the same rows — whose verdict counts | one **branch** each; materialize the overlapping rows into a conflict list with SQL before merging, then `MERGE` under an **explicit policy** (`SKIP`/`FAIL`/`ACCEPT`), or `PICK` only the adjudicated rows |
+| ⑦ Release | the dataset training reads keeps changing | a database **`SNAPSHOT`** freezes it; the registry binds **model ← dataset** |
 | ⑧ Trace back | a policy-model symptom can't be traced to the preference data | follow `rm_vN → pref_vN → snapshot`, and `DIFF` across versions |
 
 In one line: **preference data needs relational queries (find cycles, find degenerate pairs, compute bias), row-level version semantics (who overturned which rows), and conflict semantics (two reviewers disagreed) at the same time — and all three are the same thing on the same table.**
 
 From here the article focuses on **③ → ⑦**, walking from raw votes all the way to release.
 
-![The eight stages of preference data: generate → pair & assign → annotate → derive pairs → audit & curate → adjudicate → release → train the reward model, with evaluation feeding more labels and rule changes back into ③④⑤; votes enter the snapshot as-is, the derivation rule goes in a registry, auditing uses branch+DIFF, adjudication uses branches with conflict/PICK, release snapshots and binds the RM, and tracing back uses a cross-version DIFF — while the policy model, labeling platform and RL framework sit outside the Git4Data capability](./images/fig_rlhf-pipeline_en.svg)
+![The eight stages of preference data: generate → pair & assign → annotate → derive pairs → audit & curate → adjudicate → release → train and evaluate, with evaluation feeding more labels and rule changes back into ③④⑤; votes enter the snapshot as-is, the derivation rule goes in a registry, auditing uses branch+DIFF, adjudication uses branches with an explicit conflict policy/PICK, release snapshots and binds the model, and tracing back uses a cross-version DIFF — while the policy model, labeling platform and RL / DPO framework sit outside the Git4Data capability](./images/fig_rlhf-pipeline_en.svg)
 
 ---
 
@@ -120,9 +127,9 @@ Here's a classic and well-hidden RLHF failure mode.
 
 The team trains reward model `rm_v1`, hooks up PPO, and runs policy optimization. A few rounds in, the responses get **longer and longer**, more padded — while the reward score climbs steadily. Humans reading them think they got worse.
 
-The problem isn't PPO; it's the preference data. Human annotators (and the models used for labeling) have a well-documented tendency: **between two decent answers, they lean toward the longer, more detailed one.** If that tendency goes unnoticed, the preference data systematically shows "chosen is longer than rejected," so the reward model learns **length** as a shortcut feature instead of quality. The policy model then climbs that reward — straight into verbosity.
+The problem isn't PPO; it's the preference data. Human annotators (and the models used for labeling) have a tendency research has observed repeatedly: **between two decent answers, they lean toward the longer, more detailed one** (Singhal et al.'s analysis of length correlations in RLHF is in the References). If that tendency goes unnoticed, the preference data systematically shows "chosen is longer than rejected," so the reward model learns **length** as a shortcut feature instead of quality. The policy model then climbs that reward — straight into verbosity.
 
-What makes this dangerous: **nothing errors out, and every metric looks like it's improving.** The only way to catch it early is a **statistical audit of the preference data before training** — which is one SQL away.
+What makes this awkward: **nothing errors out, and every metric looks like it's improving.** Catching it before training takes a **statistical audit** of the preference data — there's more than one way to do that (the modeling side has length de-biasing and length-stratified evaluation too), and the advantage here is simply that the data already lives in tables, so the number is one SQL away.
 
 We'll see it below: this article's pool measures **75.9% of chosen responses longer than rejected, by 95.2 characters on average.** That number belongs on the table before training starts.
 
@@ -228,6 +235,15 @@ JOIN candidates c1 ON p.chosen_id   = c1.cand_id
 JOIN candidates c2 ON p.rejected_id = c2.cand_id
 WHERE c1.response = c2.response;
 --   measured 200
+
+DELETE FROM pairs_curated WHERE pair_id IN (
+  SELECT pair_id FROM (
+    SELECT p.pair_id FROM pairs_curated p
+    JOIN candidates c1 ON p.chosen_id   = c1.cand_id
+    JOIN candidates c2 ON p.rejected_id = c2.cand_id
+    WHERE c1.response = c2.response
+  ) t
+);
 ```
 
 Note this check **must JOIN back to the candidates table** — looking at `preference_pairs` alone can't find it, because `chosen_id` and `rejected_id` are two different IDs and only the body text reveals they're identical. That's a direct consequence of preference data being relational.
@@ -246,7 +262,7 @@ DELETE FROM pairs_curated WHERE agree_rate < 0.6;
 
 ### Check 3: preference cycles — A>B, B>C, and yet C>A
 
-This problem is unique to preference data, and the most interesting. Each judgment is legitimate on its own, but **together they can't logically hold**:
+This is the classic failure of **pairwise preference / ranking data** — not unique to RLHF; any setting that derives an ordering from head-to-head comparisons hits it. It just matters more here. Each judgment is legitimate on its own, but **together they can't logically hold**:
 
 ```text
         A ────▶ B          A is better than B
@@ -268,7 +284,21 @@ WHERE p3.rejected_id = p1.chosen_id;
 --   measured 630 pairs caught in cycles
 ```
 
-Two ways to handle it: **drop the whole cycle** (what this article does — clean), or **send it back for re-adjudication** (more expensive, but keeps the hard samples). Either way, the prerequisite is that you **can find them**.
+Two ways to handle it: **drop the whole cycle** (what this article does — clean), or **send it back for re-adjudication** (more expensive, but keeps the hard samples). This article takes the first:
+
+```sql
+DELETE FROM pairs_curated WHERE pair_id IN (
+  SELECT pair_id FROM (
+    SELECT DISTINCT p1.pair_id
+    FROM pairs_curated p1
+    JOIN pairs_curated p2 ON p1.prompt_id = p2.prompt_id AND p1.rejected_id = p2.chosen_id
+    JOIN pairs_curated p3 ON p2.prompt_id = p3.prompt_id AND p2.rejected_id = p3.chosen_id
+    WHERE p3.rejected_id = p1.chosen_id
+  ) t
+);
+```
+
+**Order changes the number directly here.** That `630` is measured *after* degenerate pairs and no-consensus pairs are already gone. Query cycles without dropping degenerate pairs first, and the same data measures **1,050** pairs in cycles — because a degenerate pair (chosen and rejected being the same text) manufactures spurious cycles of its own. **So the order of these three checks is itself part of this version's curation rule**: a different order is a different dataset, and it has to be recorded with the version.
 
 ### Check 4: length bias — this step doesn't delete, it measures
 
@@ -301,7 +331,7 @@ DATA BRANCH DIFF pairs_curated AGAINST preference_pairs OUTPUT SUMMARY;
 
 `2830 = 200 (degenerate) + 2000 (no consensus) + 630 (cycles)`, and the pool's 21,000 pairs never moved a row. **18,170** pairs go on to the next step.
 
-![The preference-data flow: 63,000 raw votes derive 21,000 preference pairs by majority, agreement distribution 15000/4000/2000; audited on a branch — degenerate 200, no consensus 2000, cycles 630 all dropped, while 75.9% length bias is audited not deleted; DIFF audit record DELETED 2830 leaving 18,170; two reviewers overturn 985 and 657 on their own branches with conflicts skipped; finally register-then-snapshot publishes pref_v1 bound to rm_v1, freezing all 63,000 raw votes with it](./images/fig_rlhf-preference_en.svg)
+![The preference-data flow: 63,000 raw votes derive 21,000 preference pairs by majority, agreement distribution 15000/4000/2000; audited on a branch — degenerate 200, no consensus 2000, cycles 630 all dropped, while 75.9% length bias is audited not deleted; DIFF audit record DELETED 2830 leaving 18,170; two reviewers overturn 985 and 657 on their own branches, the overlap queried into a conflict list before merging under SKIP; finally register-then-snapshot publishes pref_v1 bound to rm_v1, freezing all 63,000 raw votes with it](./images/fig_rlhf-preference_en.svg)
 
 ---
 
@@ -330,14 +360,30 @@ DATA BRANCH DIFF pairs_alice AGAINST pairs_curated OUTPUT SUMMARY;   -- measured
 DATA BRANCH DIFF pairs_bob   AGAINST pairs_curated OUTPUT SUMMARY;   -- measured UPDATED 657
 ```
 
-Their edits **partly overlap** (the pair_ids divisible by both 4 and 6). On merge, the overlap is the real conflict:
+Their edits **partly overlap** (the pair_ids divisible by both 4 and 6). That overlap is exactly the set a human has to settle.
+
+**Query it and keep it before merging — this step is not optional:**
+
+```sql
+-- the same rows both branches edited: this is the round's conflict list
+SELECT a.pair_id, a.chosen_id AS alice_chosen, b.chosen_id AS bob_chosen
+FROM pairs_alice   a
+JOIN pairs_bob     b ON a.pair_id = b.pair_id
+JOIN pairs_curated m ON m.pair_id = a.pair_id
+WHERE a.chosen_id <> m.chosen_id      -- Alice edited this row
+  AND b.chosen_id <> m.chosen_id;     -- Bob edited it too
+```
+
+Why you have to query it yourself: **`WHEN CONFLICT SKIP` skips conflicting rows by policy, but it does not return the skipped `pair_id`s** — you get a merged result, not a list. To keep a record of "which rows were skipped and what Bob thought at the time," the only way is to materialize it with that ordinary query before merging (`CREATE TABLE … AS SELECT` it into a conflict table and it freezes with the version).
+
+List in hand, now merge:
 
 ```sql
 DATA BRANCH MERGE pairs_alice INTO pairs_curated;                    -- merge first
 DATA BRANCH MERGE pairs_bob   INTO pairs_curated WHEN CONFLICT SKIP; -- keep the mainline's existing verdict
 ```
 
-`SKIP` means: where Bob touched a row the mainline already has Alice's verdict on, keep the mainline version and skip Bob's; everything non-conflicting merges normally. **Disagreement is never silently overwritten — it's surfaced and handled explicitly**, which matters especially for preference data, since "whose judgment counts" is itself a decision worth recording.
+`SKIP` means: where Bob touched a row the mainline already has Alice's verdict on, keep the mainline version and skip Bob's; everything non-conflicting merges normally. **The point is "handled under an explicitly declared policy," not "surfaced automatically by the system"** — you choose the policy (`SKIP` keeps the mainline, `FAIL` aborts with an error, `ACCEPT` takes the source branch), and **the record of the conflict set comes from the query above**. Together they make "whose judgment counts" an on-the-record decision rather than a silent overwrite.
 
 If the process requires that only rows a final adjudicator approved may enter the mainline, use `PICK` to take just the reviewed queue back, rather than merging a whole branch.
 
@@ -394,23 +440,25 @@ And the raw votes (63,000 of them) are frozen in the same snapshot — which mea
 
 A few common ways preference data gets managed:
 
-**Approach 1: export JSONL from the labeling platform, and have training scripts read it.** The most common. The platform (Label Studio, Argilla, or in-house) collects, then exports `pref_v1.jsonl`. The problem is that export **breaks the chain**: agreement rates, who voted, who later overturned what — all stay in the platform; the dataset side keeps only the final `(chosen, rejected)`. Changing the derivation rule means re-exporting; finding preference cycles means another script to read the JSONL back.
+**Approach 1: export a file from the labeling platform, and have training scripts read it.** The most common. The platform (Label Studio, Argilla, or in-house) collects and exports downstream — the exact shape depends on the platform and its configuration: Label Studio supports JSON / JSON-MIN / CSV and others (raw annotations included), while Argilla's usual path is exporting to a HuggingFace dataset. Call it `pref_v1.jsonl` below for short. The problem isn't the format — it's that **the export itself breaks the chain**: agreement rates, who voted, who later overturned what all stay in the platform; the dataset side keeps only the final `(chosen, rejected)`. Changing the derivation rule means re-exporting; finding preference cycles means another script to read the file back.
 
 **Approach 2: keep raw votes in the platform, only the finished product in a warehouse.** Better than #1 — at least the votes survive. But **votes and product live in two systems**, and the versions don't line up: you can't say which moment's votes produced `pref_v1`, because annotation in the platform keeps growing and changing.
 
-**Approach 3: HuggingFace Datasets + Hub for versioning.** The dataset gets revisions, with a good ecosystem. The granularity is still dataset-level: it can tell you v2 isn't v1, but not that "these 630 pairs went because they formed preference cycles"; and the derivation rule and audit queries still live in external scripts.
+**Approach 3: HuggingFace Datasets + Hub for versioning.** The dataset gets revisions (every Hub repo is a git repo), with a good ecosystem. But **in this workflow** the traceable granularity is the dataset revision: it can tell you v2 isn't v1; saying "these 630 pairs went because they formed preference cycles" is something you record yourself in the script. The derivation rule and audit queries still live in external scripts too.
 
-**Approach 4: derive and audit in a warehouse (Spark / BigQuery).** Aggregating votes, finding cycles, computing length bias in SQL — this path matches this article exactly, and is a common choice at larger teams. The difference is again version semantics: keeping each version means new tables or table versions, **row-level branch / DIFF / conflict merge isn't native**, and "several reviewers overturning verdicts in parallel, with conflicts surfaced explicitly" is very hard to express with table versions.
+**Approach 4: derive and audit in a warehouse (Spark / BigQuery).** Aggregating votes, finding cycles, computing length bias in SQL — this path matches this article exactly, and is a common choice at larger teams. The difference is again version semantics: keeping each version means new tables or table versions, **row-level branch / DIFF / conflict merge isn't native semantics for these systems**, and "several reviewers overturning verdicts in parallel, with the overlap on the record" is very hard to express with table versions.
+
+Put in one table. **First, the table's scope**: it compares the **default path of each workflow listed above**, not the full capability of the products involved — treat each vendor's own documentation as authoritative (see References). Most "no" cells can be filled in with extra engineering; the cost is that you build and maintain it yourself.
 
 | Approach | Votes & product in one version | Row-level audit record | Parallel adjudication & conflict | Relational audit (cycles / degenerate) | Re-derive under a new rule |
 |---|---|---|---|---|---|
 | Platform JSONL export | no (chain broken) | no | inside the platform, invisible outside | another script | re-export from the platform |
 | Votes in platform + product in warehouse | no (two systems) | no | inside the platform | partial (product side) | versions don't line up |
 | HF Datasets + Hub | no | no (dataset level) | no | external scripts | re-upload |
-| Warehouse SQL | yes (same database) | no (table-version level) | **no native conflict semantics** | **SQL** ✅ | yes |
-| **MatrixOne (Git4Data capability)** | **yes (one database snapshot)** | **yes (`DATA BRANCH DIFF`)** | **branches + `MERGE` conflict / `PICK`** | **SQL** ✅ | **yes (votes are in the snapshot too)** |
+| Warehouse SQL | yes (same database) | no (table-version level) | no row-level conflict semantics | **SQL** ✅ | yes |
+| **MatrixOne (Git4Data capability)** | **yes (one database snapshot)** | **yes (`DATA BRANCH DIFF`)** | **branches + explicit `MERGE` conflict policy / `PICK`** | **SQL** ✅ | **yes (votes are in the snapshot too)** |
 
-In one line: preference data needs **relational queries** (find cycles, find degenerate pairs, compute bias), **row-level version semantics** (who overturned which rows), and **conflict semantics** (two reviewers judged differently) at the same time. Warehouses give you the first two halfway; almost nothing supports the third natively — and all three are the same thing on the same table.
+In one line: preference data needs **relational queries** (find cycles, find degenerate pairs, compute bias), **row-level version semantics** (who overturned which rows), and **conflict semantics** (two reviewers judged differently) at the same time. **Among the paths listed here**, warehouses give you the first two halfway, and the third either stays inside the labeling platform where nothing outside can see it, or you assemble it yourself — whereas on MatrixOne all three are the same thing on the same table.
 
 ---
 
@@ -422,9 +470,25 @@ In one line: preference data needs **relational queries** (find cycles, find deg
 
 - **Don't "fix" length bias by deleting data.** Cutting the "chosen is longer" samples removes real signal along with the bias. The audit's value is making it visible; how to de-bias is a modeling decision.
 
-- **The Git4Data capability makes no semantic judgments.** Which answer is better, where the threshold sits, how cycles get handled — your decisions. What it guarantees: votes and product in one version, every overturn on record, conflicts surfaced explicitly, any historical version reproducible.
+- **The Git4Data capability makes no semantic judgments.** Which answer is better, where the threshold sits, how cycles get handled — your decisions. What it guarantees: votes and product in one version, every overturn on record, conflicts handled under an explicit policy, any historical version reproducible.
+
+- **Materialize the conflict list yourself.** `WHEN CONFLICT SKIP` handles conflicts but doesn't return the skipped rows. To keep a record, query the rows both branches edited into a table before merging.
+
+- **The order of the checks is part of the rule.** Reorder degenerate / no-consensus / cycles and the cycle count is a different number (630 vs 1,050, both measured here). The order belongs in the registry alongside the thresholds.
 
 - **Keep the raw votes long-term.** They're this dataset's source code. Delete them and you permanently lose the ability to re-derive under a new rule.
+
+---
+
+## References
+
+- OpenAI, [Aligning language models to follow instructions (InstructGPT)](https://openai.com/index/instruction-following/) — the RLHF chain: demonstrations → human comparisons → reward model → PPO
+- Rafailov et al., [Direct Preference Optimization: Your Language Model is Secretly a Reward Model](https://arxiv.org/abs/2305.18290) — DPO: optimize the policy directly on preference pairs, no reward model
+- Singhal et al., [A Long Way to Go: Investigating Length Correlations in RLHF](https://arxiv.org/abs/2310.03716) — how length bias in preference data affects reward models
+- Label Studio, [Export annotations (JSON / JSON-MIN / CSV, …)](https://labelstud.io/guide/export.html)
+- Argilla, [Quickstart (import / annotate / export to the Hub)](https://docs.argilla.io/latest/getting_started/quickstart/)
+- HuggingFace, [Repositories getting started (revision / commit semantics)](https://huggingface.co/docs/hub/en/repositories-getting-started)
+- Apache Spark, [Spark SQL Programming Guide](https://spark.apache.org/docs/latest/sql-programming-guide.html) ｜ Google Cloud, [BigQuery introduction](https://cloud.google.com/bigquery/docs/introduction)
 
 ---
 
@@ -432,6 +496,6 @@ In one line: preference data needs **relational queries** (find cycles, find deg
 
 Preference data is the link in the whole large-model training chain that **rests most on subjective judgment**: it isn't collected fact but a conclusion derived from a pile of human judgments; its smallest unit isn't a row but a pair; and it breaks not by missing fields but by **contradicting itself (preference cycles) or systematically favoring a shortcut feature (length bias)**.
 
-Which is exactly why it needs to be queryable, adjudicable, and reproducible: **of 21,000 pairs, 630 were caught in preference cycles, 2,000 reached no consensus at all, and 75.9% of chosen responses were longer than rejected** — three numbers, each one SQL away, and each one that should be seen before the reward model starts training. The 985 and 657 verdicts two reviewers overturned in parallel had their conflicts surfaced at merge rather than silently overwritten. And in the end `rm_v1` and `pref_v1` are bound inside the same snapshot, with all 63,000 raw votes frozen alongside — so re-deriving under a different rule is always one query away.
+Which is exactly why it needs to be queryable, adjudicable, and reproducible: **of 21,000 pairs, 630 were caught in preference cycles, 2,000 reached no consensus at all, and 75.9% of chosen responses were longer than rejected** — three numbers, each one SQL away, and each one that should be seen before training starts. The 985 and 657 verdicts two reviewers overturned in parallel had their overlap queried into a conflict list *before* the merge, then handled under the `SKIP` policy rather than silently overwritten. And in the end `rm_v1` and `pref_v1` are bound inside the same snapshot, with all 63,000 raw votes frozen alongside — so re-deriving under a different rule is always one query away.
 
-> 📎 Runnable SQL: [github.com/matrixorigin/git4data-tutorial](https://github.com/matrixorigin/git4data-tutorial) ｜ Source & community: [github.com/matrixorigin/matrixone](https://github.com/matrixorigin/matrixone)
+> 📎 Runnable SQL (pinned to commit `354b9cf`): [github.com/matrixorigin/git4data-tutorial](https://github.com/matrixorigin/git4data-tutorial/blob/354b9cff424cafb50d0b58128e78cc36970fe211) ｜ Source & community: [github.com/matrixorigin/matrixone](https://github.com/matrixorigin/matrixone)

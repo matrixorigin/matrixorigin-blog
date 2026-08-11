@@ -1,7 +1,7 @@
 ---
 title: "MatrixOne Git4Data 技术详解（十二）·大模型篇：RLHF 偏好数据——分歧、裁决与可复现"
 author: MatrixOrigin
-description: "Git4Data 系列（十二），大模型篇：偏好数据的单位不是行而是对，而且不是采集来的、是从标注投票算出来的二阶数据。本文用 20000 个 prompt 的偏好池，从 63000 条投票推导偏好对，在分支上审计退化对、无共识、偏好环与长度偏置，DIFF 出收据，用分支与冲突合并裁决标注分歧，最后先登记后快照把数据集与奖励模型绑成可复现的一对。SQL 在 MatrixOne 4.1.0 上实测，全部确定性可复现。"
+description: "Git4Data 系列（十二），大模型篇：偏好数据的单位不是行而是对，而且不是采集来的、是从标注投票算出来的二阶数据——RLHF 与 DPO 两条路线共用同一份。本文用 20000 个 prompt 的偏好池，从 63000 条投票推导偏好对，在分支上审计退化对、无共识、偏好环与长度偏置，DIFF 出这一轮的净变更，用分支裁决标注分歧、合并前先把冲突清单物化下来，最后先登记后快照把数据集与奖励模型绑成可复现的一对。SQL 在 MatrixOne 4.1.0 上实测，全部确定性可复现。"
 tags: ["技术干货"]
 keywords: ["Git4Data", "MatrixOne", "大模型", "RLHF", "DPO", "偏好数据", "奖励模型", "数据版本"]
 publishTime: "2026-07-24T17:00:00+08:00"
@@ -19,11 +19,18 @@ translations:
 
 [上一篇](https://github.com/matrixorigin/matrixorigin-blog/blob/main/matrixorigin/git4data-part11-sft-curation-zh/index.md)我们做了一轮完整的 SFT 数据 curation：在分支上做六步过滤，每步先计数，DIFF 留下审计记录，先登记后快照发布。这一篇沿着大模型的训练链路往下走一步，进入**偏好对齐**——RLHF / DPO 依赖的那份**偏好数据**。
 
-[第十一篇](https://github.com/matrixorigin/matrixorigin-blog/blob/main/matrixorigin/git4data-part11-sft-curation-zh/index.md)讲过，SFT 教模型「按人期望的方式回答」。但 SFT 有个天花板：它只能学「这是一个好回答」，学不了「**这两个都还行的回答里，哪个更好**」。而后者恰恰是把模型从"能用"推到"好用"的关键。偏好对齐要解决的就是这个：让人（或模型）在多个候选回答之间做比较，用这些比较训练一个**奖励模型（Reward Model）**，再用它去指导策略模型。
+[第十一篇](https://github.com/matrixorigin/matrixorigin-blog/blob/main/matrixorigin/git4data-part11-sft-curation-zh/index.md)讲过，SFT 教模型「按人期望的方式回答」。但 SFT 有个天花板：它只能学「这是一个好回答」，学不了「**这两个都还行的回答里，哪个更好**」。而后者恰恰是把模型从"能用"推到"好用"的关键。偏好对齐要解决的就是这个：让人（或模型）在多个候选回答之间做比较，再用这些比较去调整模型。
+
+这里要先分清两条路线——**它们吃的是同一份偏好数据，但下游完全不同**：
+
+- **RLHF**：先用这些比较训练一个**奖励模型（Reward Model）**，再用强化学习（PPO 等）拿奖励模型去优化策略模型；
+- **DPO**（[Direct Preference Optimization](https://arxiv.org/abs/2305.18290)）：**不训练奖励模型**，直接从偏好对上优化策略模型。
+
+本文讲的是**这份偏好数据本身**——它对两条路线是共用的。后文凡是出现「奖励模型 / `rm_v1`」的地方（包括把数据集和奖励模型绑定的那张注册表），说的都是 **RLHF 这条链路**；如果你走 DPO，绑定的对象换成策略模型的版本，前面的构建、审计、裁决、发布流程完全一样。
 
 于是训练数据的形态又变了一次。这一次的变化，比前面几篇都更根本。
 
-> 这一篇讲清楚偏好数据特殊在哪、它会以什么方式坏掉（退化对、无共识、偏好环、长度偏置）、多个标注员的分歧怎么裁决、以及一份偏好数据集怎么和奖励模型绑成可复现的一对。文中 SQL 全部在 MatrixOne `4.1.0` 上实测，且**全部使用确定性表达式**（没有 `rand()`），每个数字都可逐次复现；可跑版本见 [matrixorigin/git4data-tutorial](https://github.com/matrixorigin/git4data-tutorial) 的 `12-rlhf-preference/`。
+> 这一篇讲清楚偏好数据特殊在哪、它会以什么方式坏掉（退化对、无共识、偏好环、长度偏置）、多个标注员的分歧怎么裁决、以及一份偏好数据集怎么和奖励模型绑成可复现的一对。文中 SQL 全部在 **MatrixOne `4.1.0`** 上实测，且**全部使用确定性表达式**（没有 `rand()`），每个数字都可逐次复现；可跑版本见 [git4data-tutorial 的 `12-rlhf-preference/rlhf_preference_demo.sql`](https://github.com/matrixorigin/git4data-tutorial/blob/354b9cff424cafb50d0b58128e78cc36970fe211/12-rlhf-preference/rlhf_preference_demo.sql)（已固定到具体 commit，避免后续改动导致数字对不上）。
 
 ---
 
@@ -34,7 +41,7 @@ translations:
 ```text
 ① 候选生成 ─▶ ② 配对派发 ─▶ ③ 标注投票 ─▶ ④ 推导偏好对 ─▶ ⑤ 审计 curation
                                                                     │
-                                    ⑧ 训练 RM → 策略优化 → 评估 ◀── ⑦ 发布 ◀── ⑥ 分歧裁决
+                                    ⑧ 训练与评估（RM+PPO / DPO） ◀── ⑦ 发布 ◀── ⑥ 分歧裁决
                                                     │
                                                     └──── 补标注 / 调规则 / 换门槛 ──▶ 回到 ③④⑤
 ```
@@ -53,26 +60,26 @@ translations:
 
 **⑦ 发布**：冻结成一个确定版本，并和即将训练的奖励模型绑定。
 
-**⑧ 训练奖励模型 → 策略优化 → 评估**：RM 训完接 PPO/DPO 优化策略，评估后回头补标注、调规则——回到 ③④⑤ 再来一轮。**而"策略模型开始说废话"这种症状，往往要回溯三层才能找到根因。**
+**⑧ 训练与评估**：走 RLHF 就是「训奖励模型 → PPO 优化策略」，走 DPO 就是直接用偏好对优化策略；评估之后回头补标注、调规则——回到 ③④⑤ 再来一轮。**而"策略模型开始说废话"这种症状，往往要回溯三层才能找到根因。**
 
 ### 这八个环节里，哪些是数据版本控制的地盘
 
-同样先划清楚：① 归策略模型，② 归标注平台，⑧ 归 RL 训练框架和评估体系——**这些判断 Git4Data 这套能力都不碰**。它管的是中间那段：投票怎么变成数据集、数据集怎么被审计和裁决、怎么被冻成一个能追溯到奖励模型的版本。
+同样先划清楚：① 归策略模型，② 归标注平台，⑧ 归 RL / DPO 训练框架和评估体系——**这些判断 Git4Data 这套能力都不碰**。它管的是中间那段：投票怎么变成数据集、数据集怎么被审计和裁决、怎么被冻成一个能追溯到奖励模型的版本。
 
 | 环节 | 真实问题 | MatrixOne 的 Git4Data 能力怎么帮 |
 |---|---|---|
 | ③ 标注投票 | 只存最终结论，投票丢了就再也算不回去 | 投票**原样入库并进快照**，换规则随时可重算 |
 | ④ 推导偏好对 | 换个门槛就是另一份数据集，但规则没留痕 | 推导规则写进**注册表**，随版本一起冻结 |
 | ⑤ 审计 curation | 退化对、偏好环这类问题只能靠脚本零散查 | 在**分支**上用 SQL 关系型查询，一条 `DIFF` 出审计记录 |
-| ⑥ 分歧裁决 | 多个评审改同一批数据，谁的判断算数 | 每人一条**分支**，`MERGE` 时冲突**显式暴露**，或用 `PICK` 只取终审行 |
-| ⑦ 发布 | 训练读的数据集一直在变 | 库级 **`SNAPSHOT`** 冻结；注册表把 **RM ← 数据集**绑成一对 |
+| ⑥ 分歧裁决 | 多个评审改同一批数据，谁的判断算数 | 每人一条**分支**，合并前用 SQL 把重叠的行物化成冲突清单，`MERGE` 时按**显式策略**（`SKIP`/`FAIL`/`ACCEPT`）处理，或用 `PICK` 只取终审行 |
+| ⑦ 发布 | 训练读的数据集一直在变 | 库级 **`SNAPSHOT`** 冻结；注册表把**模型 ← 数据集**绑成一对 |
 | ⑧ 回溯 | 策略模型出症状，追不到偏好数据 | 沿 `rm_vN → pref_vN → 快照` 一路查回去，跨版本 `DIFF` 看差异 |
 
 一句话：**偏好数据同时需要关系型查询（查环、查退化对、算偏置）、行级版本语义（谁改判了哪些行）和冲突语义（两个评审判得不一样）——而这三件事，恰好是同一张表上的同一件事。**
 
 本文接下来聚焦 **③→⑦** 这一整段，从投票一路走到发布。
 
-![偏好数据的八个环节：候选生成→配对派发→标注投票→推导偏好对→审计 curation→分歧裁决→发布→训练奖励模型，评估后补标注/调规则回流到 ③④⑤；其中投票原样进快照、推导规则进注册表、审计用分支+DIFF、裁决用分支+冲突/PICK、发布打快照并绑定 RM、回溯用跨版本 DIFF，而策略模型、标注平台、RL 训练框架不归 Git4Data 能力管](./images/fig_rlhf-pipeline_zh.svg)
+![偏好数据的八个环节：候选生成→配对派发→标注投票→推导偏好对→审计 curation→分歧裁决→发布→训练与评估，评估后补标注/调规则回流到 ③④⑤；其中投票原样进快照、推导规则进注册表、审计用分支+DIFF、裁决用分支+显式冲突策略/PICK、发布打快照并绑定模型、回溯用跨版本 DIFF，而策略模型、标注平台、RL / DPO 训练框架不归 Git4Data 能力管](./images/fig_rlhf-pipeline_zh.svg)
 
 ---
 
@@ -118,9 +125,9 @@ pair #1024   标注员 anno_1: 选 A     标注员 anno_2: 选 A     标注员 a
 
 团队训完奖励模型 `rm_v1`，接上 PPO 跑策略优化。几轮之后发现：模型的回答**越来越长**，废话越来越多，但奖励分一路走高。人工看反而觉得变差了。
 
-问题不在 PPO，在偏好数据。人类标注员（以及用来打标的模型）有一个众所周知的倾向：**在两个都还行的回答之间，倾向于选更长、更详细的那个**。如果这个倾向没被察觉，偏好数据里就会系统性地出现「chosen 比 rejected 长」，于是奖励模型学到的其实是**长度**这个捷径特征，而不是质量。策略模型再顺着这个奖励爬——就爬成了废话生成器。
+问题不在 PPO，在偏好数据。人类标注员（以及用来打标的模型）有一个已被研究反复观察到的倾向：**在两个都还行的回答之间，倾向于选更长、更详细的那个**（Singhal 等人对 RLHF 中长度相关性的系统分析见文末参考资料）。如果这个倾向没被察觉，偏好数据里就会系统性地出现「chosen 比 rejected 长」，于是奖励模型学到的其实是**长度**这个捷径特征，而不是质量。策略模型再顺着这个奖励爬——就爬成了废话生成器。
 
-这个问题的可怕之处在于：**它不会报错，各项指标看着都在涨**。唯一能提前发现它的方式，是**在训练之前，对偏好数据做一次统计审计**——而这，恰好是一条 SQL 的事。
+这个问题的麻烦之处在于：**它不会报错，各项指标看着都在涨**。要在训练之前发现它，得对偏好数据做一次**统计审计**——检测手段不止一种（建模侧也有长度去偏、长度分层评估等做法），而本文这套的好处是：数据本来就在表里，一条 SQL 就能把这个数字算出来。
 
 后面我们会看到：本文这份数据池实测 **75.9% 的 chosen 比 rejected 长，平均长 95.2 个字符**。这个数字必须在训练之前被摆到桌面上。
 
@@ -226,6 +233,15 @@ JOIN candidates c1 ON p.chosen_id   = c1.cand_id
 JOIN candidates c2 ON p.rejected_id = c2.cand_id
 WHERE c1.response = c2.response;
 --   实测 200
+
+DELETE FROM pairs_curated WHERE pair_id IN (
+  SELECT pair_id FROM (
+    SELECT p.pair_id FROM pairs_curated p
+    JOIN candidates c1 ON p.chosen_id   = c1.cand_id
+    JOIN candidates c2 ON p.rejected_id = c2.cand_id
+    WHERE c1.response = c2.response
+  ) t
+);
 ```
 
 注意这条检查**必须 JOIN 回候选表**——光看 `preference_pairs` 是发现不了的，因为 `chosen_id` 和 `rejected_id` 是两个不同的 ID，只有正文才知道它们其实一样。这正是"偏好数据是关系型的"的直接体现。
@@ -244,7 +260,7 @@ DELETE FROM pairs_curated WHERE agree_rate < 0.6;
 
 ### 检查三：偏好环——A>B，B>C，却又 C>A
 
-这是偏好数据独有、也最有意思的一类问题。单看每一条都是合法的判断，但**放在一起在逻辑上不可能成立**：
+这是**成对比较（pairwise preference / ranking）数据里的典型问题**——不限于 RLHF，任何靠两两比较得出排序的场景都会遇到；只是在偏好数据里格外要紧。单看每一条都是合法的判断，但**放在一起在逻辑上不可能成立**：
 
 ```text
         A ────▶ B          A 比 B 好
@@ -266,7 +282,21 @@ WHERE p3.rejected_id = p1.chosen_id;
 --   实测 630 个 pair 卷在环里
 ```
 
-处理方式有两种：**整环丢弃**（本文的做法，干净），或者**送回人工重裁**（更贵但保留了难样本）。无论选哪种，前提都是你**能把它们查出来**。
+处理方式有两种：**整环丢弃**（本文的做法，干净），或者**送回人工重裁**（更贵但保留了难样本）。本文选前者：
+
+```sql
+DELETE FROM pairs_curated WHERE pair_id IN (
+  SELECT pair_id FROM (
+    SELECT DISTINCT p1.pair_id
+    FROM pairs_curated p1
+    JOIN pairs_curated p2 ON p1.prompt_id = p2.prompt_id AND p1.rejected_id = p2.chosen_id
+    JOIN pairs_curated p3 ON p2.prompt_id = p3.prompt_id AND p2.rejected_id = p3.chosen_id
+    WHERE p3.rejected_id = p1.chosen_id
+  ) t
+);
+```
+
+**这里的顺序会直接改变数字**：`630` 是在删掉退化对和无共识 pair **之后**测出来的。如果不先删退化对就查环，同一份数据实测是 **1,050** 个 pair 卷在环里——因为退化对本身（chosen 和 rejected 是同一段文本）也在制造虚假的环。**所以三步检查的先后顺序，本身就是这一版 curation 规则的一部分**，换个顺序就是另一份数据集，必须记进版本里。
 
 ### 检查四：长度偏置——这一步不删数据，只做统计
 
@@ -299,7 +329,7 @@ DATA BRANCH DIFF pairs_curated AGAINST preference_pairs OUTPUT SUMMARY;
 
 `2830 = 200（退化）+ 2000（无共识）+ 630（环）`，主池 21,000 个 pair 一行没动。剩下 **18,170** 个 pair 进入下一步。
 
-![偏好数据全流程：63,000 条原始投票按多数票推导出 21,000 个偏好对，一致率分布 15000/4000/2000；在分支上审计——退化对 200、无共识 2000、偏好环 630 全部删除，长度偏置 75.9% 只审计不删；DIFF 留下审计记录 DELETED 2830 剩 18,170；两位评审各在分支上改判 985 和 657，冲突处 SKIP；最后先登记后快照发布 pref_v1 并绑定 rm_v1，63,000 条原始投票一同冻结](./images/fig_rlhf-preference_zh.svg)
+![偏好数据全流程：63,000 条原始投票按多数票推导出 21,000 个偏好对，一致率分布 15000/4000/2000；在分支上审计——退化对 200、无共识 2000、偏好环 630 全部删除，长度偏置 75.9% 只审计不删；DIFF 留下审计记录 DELETED 2830 剩 18,170；两位评审各在分支上改判 985 和 657，重叠行先查成冲突清单、再按 SKIP 合并；最后先登记后快照发布 pref_v1 并绑定 rm_v1，63,000 条原始投票一同冻结](./images/fig_rlhf-preference_zh.svg)
 
 ---
 
@@ -328,14 +358,30 @@ DATA BRANCH DIFF pairs_alice AGAINST pairs_curated OUTPUT SUMMARY;   -- 实测 U
 DATA BRANCH DIFF pairs_bob   AGAINST pairs_curated OUTPUT SUMMARY;   -- 实测 UPDATED 657
 ```
 
-两人改判的集合是**部分重叠**的（`pair_id` 同时被 4 和 6 整除的那些）。合并时，重叠部分就是真正的冲突：
+两人改判的集合是**部分重叠**的（`pair_id` 同时被 4 和 6 整除的那些）。重叠的这部分，就是真正需要人来定夺的集合。
+
+**合并之前，先把这个集合查出来存下来——这一步不能省：**
+
+```sql
+-- 两条分支都改过的同一批行：这就是这一轮的冲突清单
+SELECT a.pair_id, a.chosen_id AS alice_chosen, b.chosen_id AS bob_chosen
+FROM pairs_alice   a
+JOIN pairs_bob     b ON a.pair_id = b.pair_id
+JOIN pairs_curated m ON m.pair_id = a.pair_id
+WHERE a.chosen_id <> m.chosen_id      -- Alice 改过这行
+  AND b.chosen_id <> m.chosen_id;     -- Bob 也改过这行
+```
+
+为什么必须自己先查：**`WHEN CONFLICT SKIP` 会按策略跳过冲突行，但它不会把被跳过的 `pair_id` 返回给你**——执行完你只拿到一个合并后的结果，没有清单。想留下「哪些行被跳过了、Bob 当时的意见是什么」，只能在合并之前用上面这条普通查询把它物化下来（`CREATE TABLE … AS SELECT` 存成一张冲突表，跟着版本一起冻住）。
+
+清单在手，再合并：
 
 ```sql
 DATA BRANCH MERGE pairs_alice INTO pairs_curated;                    -- 先合入
 DATA BRANCH MERGE pairs_bob   INTO pairs_curated WHEN CONFLICT SKIP; -- 冲突处保留主线已有裁决
 ```
 
-`SKIP` 的语义是：Bob 改到的行如果主线已经被 Alice 改过，就保留主线的版本、跳过 Bob 的；不冲突的部分照常合入。**分歧不会被悄悄覆盖，而是被显式地暴露和处理**——这是偏好数据里尤其重要的一点，因为"谁的判断算数"本身就是需要留痕的决策。
+`SKIP` 的语义是：Bob 改到的行如果主线已经被 Alice 改过，就保留主线的版本、跳过 Bob 的；不冲突的部分照常合入。**要点在于「按显式声明的策略处理」，而不是「系统替你自动暴露」**——策略是你选的（`SKIP` 保主线、`FAIL` 直接报错中止、`ACCEPT` 采纳来源分支），而**冲突集合的留痕要靠上面那条查询**。这两件事合起来，才让"谁的判断算数"变成一个有据可查的决策，而不是一次静默覆盖。
 
 如果流程上要求"只有终审裁决过的行才能进主线"，那就该用 `PICK`，只把评审队列里那批行挑回去，而不是整条分支合并。
 
@@ -392,23 +438,25 @@ rm_v1
 
 偏好数据的管理，业内常见这么几种：
 
-**做法一：标注平台导出 JSONL，训练脚本直接读。** 最常见。标注平台（Label Studio、Argilla、或自研）负责收集，导出成 `pref_v1.jsonl`。问题是导出即**断链**：一致率、谁投的票、后来谁改判过，都留在平台里；数据集这边只剩最终的 `(chosen, rejected)`，想换推导规则得回平台重导，想查偏好环得另写脚本把 JSONL 读回来。
+**做法一：标注平台导出一份文件，训练脚本直接读。** 最常见。标注平台（Label Studio、Argilla、或自研）负责收集，再导出给下游——具体形态取决于平台和配置：Label Studio 支持导出 JSON / JSON-MIN / CSV 等多种格式（也能导出原始 annotations），Argilla 的常见路径是导出成 HuggingFace 数据集。下面统一用一份 `pref_v1.jsonl` 代指。问题不在格式，而在**导出这个动作本身就是断链**：一致率、谁投的票、后来谁改判过，都留在平台里；数据集这边只剩最终的 `(chosen, rejected)`，想换推导规则得回平台重导，想查偏好环得另写脚本把文件读回来。
 
 **做法二：把原始投票留在标注平台，只把成品进仓库。** 比做法一好，至少投票没丢。但**投票和成品分处两个系统**，版本对不齐——你没法说清"`pref_v1` 是从哪一时刻的投票算出来的"，因为平台里的标注还在继续增加和修改。
 
-**做法三：HuggingFace Datasets + Hub 管版本。** 数据集有 revision，生态好用。粒度仍是数据集级：能告诉你 v2 不是 v1，但说不出"这 630 个 pair 因为构成偏好环被删了"；而且推导规则、审计查询依然在外部脚本里。
+**做法三：HuggingFace Datasets + Hub 管版本。** 数据集有 revision（Hub 上每个仓库就是一个 git 仓库），生态好用。但**在这条工作流里**，可回溯的粒度是数据集的 revision：能告诉你 v2 不是 v1，要说清"这 630 个 pair 因为构成偏好环被删了"，得你自己在脚本里另外记；推导规则、审计查询也依然在外部脚本里。
 
-**做法四：数仓（Spark / BigQuery）里做推导和审计。** 用 SQL 做聚合投票、查环、算长度偏置——这条路和本文完全一致，也是大团队的常见选择。差别还是在版本语义：留住每一版靠新表或表版本，**行级的分支 / DIFF / 冲突合并不是原生能力**，而"多个评审并行改判、冲突要显式暴露"这件事，用表版本很难表达。
+**做法四：数仓（Spark / BigQuery）里做推导和审计。** 用 SQL 做聚合投票、查环、算长度偏置——这条路和本文完全一致，也是大团队的常见选择。差别还是在版本语义：留住每一版靠新表或表版本，**行级的分支 / DIFF / 冲突合并不是这类系统的原生语义**，而"多个评审并行改判、重叠部分要留痕"这件事，用表版本很难表达。
+
+放进一张表里。**先说清这张表的范围**：它比较的是上面列出的这几种**典型工作流的默认路径**，不是对相关产品全部能力的评价——各家的能力边界以官方文档为准（见文末参考资料），标「否」的格子多数能靠额外工程补上，代价是你得自己拼装和维护。
 
 | 做法 | 原始投票与成品同版本 | 行级审计记录 | 并行裁决与冲突 | 关系型审计（环 / 退化对） | 换推导规则重算 |
 |---|---|---|---|---|---|
 | 平台导出 JSONL | 否（断链） | 否 | 平台内，外部不可见 | 另写脚本 | 要回平台重导 |
 | 投票留平台 + 成品进仓 | 否（跨系统） | 否 | 平台内 | 半（成品侧可查） | 版本对不齐 |
 | HF Datasets + Hub | 否 | 否（数据集级） | 否 | 外部脚本 | 重新上传 |
-| 数仓 SQL | 是（同库） | 否（表版本级） | **无原生冲突语义** | **SQL** ✅ | 是 |
-| **MatrixOne（Git4Data 能力）** | **是（同一个库级快照）** | **是（`DATA BRANCH DIFF`）** | **分支 + `MERGE` 冲突 / `PICK`** | **SQL** ✅ | **是（投票也在快照里）** |
+| 数仓 SQL | 是（同库） | 否（表版本级） | 无行级冲突语义 | **SQL** ✅ | 是 |
+| **MatrixOne（Git4Data 能力）** | **是（同一个库级快照）** | **是（`DATA BRANCH DIFF`）** | **分支 + `MERGE` 显式冲突策略 / `PICK`** | **SQL** ✅ | **是（投票也在快照里）** |
 
-一句话：偏好数据同时需要**关系型查询**（查环、查退化对、算偏置）、**行级版本语义**（谁改判了哪些行）和**冲突语义**（两个评审判得不一样）。前两者数仓能给一半，第三者几乎没有工具原生支持——而它们恰好是同一张表上的同一件事。
+一句话：偏好数据同时需要**关系型查询**（查环、查退化对、算偏置）、**行级版本语义**（谁改判了哪些行）和**冲突语义**（两个评审判得不一样）。**就本文列出的这几条路径而言**，前两者数仓能给一半，第三者要么留在标注平台里、外部看不到，要么得自己拼装——而在 MatrixOne 上，它们恰好是同一张表上的同一件事。
 
 ---
 
@@ -420,9 +468,25 @@ rm_v1
 
 - **长度偏置不要靠删数据来"修"。** 直接砍掉"chosen 更长"的样本会连真实信号一起砍掉。审计的价值是让它被看见，具体怎么去偏是建模侧的决策。
 
-- **Git4Data 这套能力不做语义判断。** 谁的回答更好、门槛卡多少、环怎么处理，都是你的决策。它保证的是：投票和成品在同一个版本里、每次改判有据可查、冲突显式暴露、任何历史版本可复现。
+- **Git4Data 这套能力不做语义判断。** 谁的回答更好、门槛卡多少、环怎么处理，都是你的决策。它保证的是：投票和成品在同一个版本里、每次改判有据可查、冲突按显式策略处理、任何历史版本可复现。
+
+- **冲突清单要自己物化。** `WHEN CONFLICT SKIP` 处理冲突，但不返回被跳过的行。要留痕，就在合并之前把两条分支都改过的那批行查出来存成一张表。
+
+- **检查的先后顺序是规则的一部分。** 退化对、无共识、偏好环三步换个顺序，数出来的环就不是同一个数（本文实测 630 vs 1050）。顺序要和门槛一起写进注册表。
 
 - **原始投票要长期保留。** 它是这份数据的源代码。删了它，你就永远失去了换规则重算的能力。
+
+---
+
+## 参考资料
+
+- OpenAI, [Aligning language models to follow instructions（InstructGPT）](https://openai.com/index/instruction-following/) —— RLHF 的「示范 → 人类比较 → 奖励模型 → PPO」链路
+- Rafailov et al., [Direct Preference Optimization: Your Language Model is Secretly a Reward Model](https://arxiv.org/abs/2305.18290) —— DPO：不训练奖励模型，直接从偏好对优化策略
+- Singhal et al., [A Long Way to Go: Investigating Length Correlations in RLHF](https://arxiv.org/abs/2310.03716) —— 偏好数据长度偏置对奖励模型的影响
+- Label Studio, [导出标注结果（JSON / JSON-MIN / CSV 等）](https://labelstud.io/guide/export.html)
+- Argilla, [Quickstart（导入 / 标注 / 导出到 Hub）](https://docs.argilla.io/latest/getting_started/quickstart/)
+- HuggingFace, [Repositories getting started（revision / commit 语义）](https://huggingface.co/docs/hub/en/repositories-getting-started)
+- Apache Spark, [Spark SQL Programming Guide](https://spark.apache.org/docs/latest/sql-programming-guide.html) ｜ Google Cloud, [BigQuery 介绍](https://cloud.google.com/bigquery/docs/introduction)
 
 ---
 
@@ -430,6 +494,6 @@ rm_v1
 
 偏好数据是整个大模型训练链路里**最依赖主观判断的一环**：它不是采集来的事实，而是从一堆人类判断里推导出来的结论；它的最小单位不是一行，而是一对；它坏掉的方式也不是缺字段，而是**逻辑上自相矛盾（偏好环）或系统性地偏向某个捷径特征（长度偏置）**。
 
-也正因如此，它特别需要「可查、可裁、可复现」：**21,000 个 pair 里 630 个卷在偏好环里、2,000 个根本没达成共识、75.9% 的 chosen 比 rejected 长**——这三个数字都是一条 SQL 的事，而且都应该在奖励模型开训之前就被看到。两位评审并行改判的 985 和 657 条，冲突在合并时显式暴露而不是被悄悄覆盖。最后 `rm_v1` 和 `pref_v1` 绑在同一个快照里，连 63,000 条原始投票一起冻住——换个推导规则重算，随时可以。
+也正因如此，它特别需要「可查、可裁、可复现」：**21,000 个 pair 里 630 个卷在偏好环里、2,000 个根本没达成共识、75.9% 的 chosen 比 rejected 长**——这三个数字都是一条 SQL 的事，而且都应该在训练开始之前就被看到。两位评审并行改判的 985 和 657 条，重叠部分在合并之前先被查出来记成清单，再按 `SKIP` 策略统一处理，而不是被悄悄覆盖。最后 `rm_v1` 和 `pref_v1` 绑在同一个快照里，连 63,000 条原始投票一起冻住——换个推导规则重算，随时可以。
 
-> 📎 可运行 SQL：[github.com/matrixorigin/git4data-tutorial](https://github.com/matrixorigin/git4data-tutorial) ｜ 源码与社区：[github.com/matrixorigin/matrixone](https://github.com/matrixorigin/matrixone)
+> 📎 可运行 SQL（固定 commit `354b9cf`）：[github.com/matrixorigin/git4data-tutorial](https://github.com/matrixorigin/git4data-tutorial/blob/354b9cff424cafb50d0b58128e78cc36970fe211) ｜ 源码与社区：[github.com/matrixorigin/matrixone](https://github.com/matrixorigin/matrixone)

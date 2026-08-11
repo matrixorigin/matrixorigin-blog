@@ -65,7 +65,7 @@
   <text x="64" y="386" fill="#E6EDF3" font-size="12.5" font-weight="700">adjudicating the 4,000 split (2:1) pairs</text>
   <text x="64" y="408" fill="#79C0FF" font-size="11">Alice branch: 985 overturned　Bob: 657</text>
   <text x="64" y="428" fill="#A371F7" font-size="10.5">MERGE alice → MERGE bob WHEN CONFLICT SKIP</text>
-  <text x="64" y="447" fill="#6E7681" font-size="10">the overlap is the real conflict — surfaced, not silently overwritten</text>
+  <text x="64" y="447" fill="#6E7681" font-size="10">materialise the overlap before merging, then apply the SKIP policy</text>
   <line x1="444" y1="338" x2="240" y2="360" stroke="#6E7681" stroke-width="1.5" marker-end="url(#arr)"/>
 
   <!-- publish + rm binding -->
@@ -80,6 +80,6 @@
   <text x="880" y="412" fill="#9DA7B3" font-size="10.5" font-weight="700">dataset version = votes × derivation rule</text>
   <text x="880" y="434" fill="#6E7681" font-size="11">so the votes must freeze with it.</text>
 
-  <text x="44" y="492" fill="#6E7681" font-size="11.5">Which answer is better, where the threshold sits, how cycles are handled — your decisions. MatrixOne's Git4Data capability guarantees: votes and product in one version, every overturn on record, conflicts explicit, history reproducible.</text>
+  <text x="44" y="492" fill="#6E7681" font-size="11.5">Which answer is better, where the threshold sits, how cycles are handled — your decisions. MatrixOne's Git4Data capability guarantees: votes and product in one version, every overturn on record, conflicts handled by an explicit policy and recorded, history reproducible.</text>
   <text x="44" y="512" fill="#6E7681" font-size="11.5">All numbers measured on MatrixOne 4.1.0 using deterministic expressions (no rand()), reproducible run to run.</text>
 </svg>
