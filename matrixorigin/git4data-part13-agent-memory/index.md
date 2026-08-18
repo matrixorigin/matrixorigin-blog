@@ -117,7 +117,7 @@ The difference isn't only the bill. Every irrelevant token in the window dilutes
 
 A misunderstanding in the context usually disappears when the session ends. A misunderstanding in long-term memory can be retrieved repeatedly for months, shaping answers and actions the whole time.
 
-So memory amplifies both capability and risk. The more autonomous the agent, the longer memory is kept and the wider it's shared, the more auditing and recovery matter — OWASP's risk list for agentic applications already gives "memory and context poisoning" an entry of its own (see References).
+So memory amplifies both capability and risk. The more autonomous the agent, the longer memory is kept and the wider it's shared, the more auditing and recovery matter — OWASP's risk list for agentic applications already gives "memory and context poisoning" an entry of its own.
 
 ---
 
@@ -224,7 +224,7 @@ That capability doesn't decide for the agent what deserves remembering. It guara
 
 ### 6. Seen alongside the other options
 
-Set against several common approaches, it looks like this. **First, the table's scope**: it compares what each option looks like on its **default path**, not the full extent of any product's capability — treat each vendor's own documentation as authoritative (see References), and most "none" cells can be filled in with extra engineering, at the cost of building and maintaining it yourself.
+Set against several common approaches, it looks like this. **First, the table's scope**: it compares what each option looks like on its **default path**, not the full extent of any product's capability — treat each vendor's own documentation as authoritative, and most "none" cells can be filled in with extra engineering, at the cost of building and maintaining it yourself.
 
 | Capability | Memoria | Mem0 | Letta | Markdown file |
 |---|---|---|---|---|
@@ -380,17 +380,6 @@ So the Git4Data capability's value for memory isn't "smarter retrieval." It's th
 - **Read-only knowledge Q&A** — if the agent only retrieves human-maintained documents and never modifies the knowledge base, ordinary RAG already covers most of it.
 
 The pragmatic architecture is layered: Markdown for static guardrails, a short-term buffer for the current task, vector and full-text search for recall, structured tables for state and permissions, and MatrixOne's Git4Data capability for versioning and recovery of high-value long-term memory.
-
----
-
-## References
-
-- OWASP, [Top 10 for Agentic Applications](https://genai.owasp.org/2025/12/09/owasp-top-10-for-agentic-applications-the-benchmark-for-agentic-security-in-the-age-of-autonomous-ai/) — "memory and context poisoning" listed as a significant risk for agentic systems
-- Anthropic, [Manage Claude's memory](https://code.claude.com/docs/en/memory) — how file-based memory (`CLAUDE.md`) is officially positioned
-- GitHub, [About GitHub Copilot Memory](https://docs.github.com/en/copilot/concepts/agents/copilot-memory) — repository facts, validation before use, and expiry
-- Letta, [Context Hierarchy](https://docs.letta.com/guides/core-concepts/memory/context-hierarchy) — resident memory blocks, files and archival memory
-- [MatrixOne documentation](https://docs.matrixorigin.cn/) — vector search, full-text search and the Git for Data capability
-- [Memoria on GitHub](https://github.com/matrixorigin/Memoria) ｜ product page: [thememoria.ai](https://thememoria.ai)
 
 ---
 

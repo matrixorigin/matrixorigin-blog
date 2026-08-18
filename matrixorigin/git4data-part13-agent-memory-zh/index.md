@@ -116,7 +116,7 @@ Agent 如果能记住"哪种方案在这个项目里失败过、为什么失败"
 
 上下文中的一次误解，通常会随着会话结束而消失；长期记忆中的一次误解，却可能在未来几个月反复被检索，持续影响回答和行动。
 
-这意味着 Memory 同时是 Agent 的能力放大器和风险放大器。Agent 越自主、记忆保存得越久、共享范围越大，审计与恢复就越重要——OWASP 的 Agentic 应用风险清单里，「记忆与上下文投毒」已经单列成一项（见文末参考资料）。
+这意味着 Memory 同时是 Agent 的能力放大器和风险放大器。Agent 越自主、记忆保存得越久、共享范围越大，审计与恢复就越重要——OWASP 的 Agentic 应用风险清单里，「记忆与上下文投毒」已经单列成一项。
 
 ---
 
@@ -223,7 +223,7 @@ MatrixOne 的向量检索支持 GPU 加速，这条路径的上限还能再往�
 
 ### 6. 和其他方案放在一起看
 
-和几种常见方案放在一起看是这样。**先说清这张表的范围**：它比较的是各方案**默认路径**下的形态，不是对相关产品全部能力的评价——各家的边界以官方文档为准（见文末参考资料），而且标"无"的格子多半都能靠额外的工程手段补上，代价是你得自己拼装和维护。
+和几种常见方案放在一起看是这样。**先说清这张表的范围**：它比较的是各方案**默认路径**下的形态，不是对相关产品全部能力的评价——各家的能力边界请以其官方文档为准，而且标"无"的格子多半都能靠额外的工程手段补上，代价是你得自己拼装和维护。
 
 | 能力维度 | Memoria | Mem0 | Letta | Markdown 文件 |
 |---|---|---|---|---|
@@ -379,17 +379,6 @@ RESTORE TABLE agent_mem.agent_memory {SNAPSHOT = mem_v1};
 - **只读知识问答**：如果 Agent 只检索经过人工维护的文档，不会自主修改知识库，普通 RAG 已能解决大部分问题。
 
 务实的架构通常是分层的：Markdown 管静态护栏，短期缓冲管当前任务，向量与全文检索负责召回，结构化表负责状态与权限，MatrixOne 的 Git4Data 能力负责高价值长期记忆的版本和恢复。
-
----
-
-## 参考资料
-
-- OWASP, [Top 10 for Agentic Applications](https://genai.owasp.org/2025/12/09/owasp-top-10-for-agentic-applications-the-benchmark-for-agentic-security-in-the-age-of-autonomous-ai/) —— 「记忆与上下文投毒」被列为 Agent 系统的重要风险
-- Anthropic, [Manage Claude's memory](https://code.claude.com/docs/zh-CN/memory) —— 文件型 Memory（`CLAUDE.md`）的官方定位
-- GitHub, [About GitHub Copilot Memory](https://docs.github.com/en/copilot/concepts/agents/copilot-memory) —— 仓库事实、使用前验证与过期机制
-- Letta, [Context Hierarchy](https://docs.letta.com/guides/core-concepts/memory/context-hierarchy) —— 常驻记忆块、文件与归档记忆的分层
-- [MatrixOne 文档](https://docs.matrixorigin.cn/) —— 向量检索、全文检索与 Git for Data 能力
-- [Memoria 开源仓库](https://github.com/matrixorigin/Memoria) ｜ 产品页：[thememoria.ai](https://thememoria.ai)
 
 ---
 
