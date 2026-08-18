@@ -1,9 +1,9 @@
 ---
-title: "MatrixOne Git4Data 技术详解（十三）·Agent 篇：Agent 的记忆该存在哪里——从 Markdown 文件到可回滚的数据库"
+title: "Agent 为什么需要 Memory？从行业方案到 MatrixOne 的可治理记忆"
 author: MatrixOrigin
-description: "Git4Data 系列（十三），Agent 篇：先讲清楚 Agent 记忆是什么、它为什么决定了 Agent 能不能完成长任务，再看行业里几种做法各自卡在哪——Markdown 会无声腐化、向量库只会追加、框架缓冲活不过一次会话、平台记忆绑死单个工具。然后是生产级记忆需要的六件事，以及 Git4Data 能力解决了其中最难的三条：矛盾保留历史、版本与回滚、写入可溯源。以 MatrixOne 上的开源项目 Memoria 为参照，SQL 在 MatrixOne 4.1.0 上实测。"
+description: "Agent Memory 不是更长的上下文，而是 Agent 跨任务持续工作的状态层。本文从 Memory 的定义与价值出发，梳理提示词文件、对话摘要、向量检索、结构化存储和平台内建记忆等行业方案，再介绍如何在 MatrixOne 上利用结构化数据、混合检索与 Git4Data 的分支、DIFF、快照和回滚能力，构建可检索、可审计、可恢复的长期记忆。"
 tags: ["技术干货"]
-keywords: ["Git4Data", "MatrixOne", "Memoria", "Agent", "AI Agent", "记忆", "数据版本", "回滚", "溯源"]
+keywords: ["Agent Memory", "AI Agent", "MatrixOne", "Memoria", "Git4Data", "向量检索", "数据版本", "回滚", "溯源"]
 publishTime: "2026-07-25T17:00:00+08:00"
 date: '2026-07-25'
 image:
@@ -15,423 +15,414 @@ translations:
   en: git4data-part13-agent-memory
 ---
 
-# MatrixOne Git4Data 技术详解（十三）·Agent 篇：Agent 的记忆该存在哪里——从 Markdown 文件到可回滚的数据库
+# Agent 为什么需要 Memory？从行业方案到 MatrixOne 的可治理记忆
 
-前十二篇，我们把 MatrixOne 的 Git4Data 能力一路带过了[数据运维](https://github.com/matrixorigin/matrixorigin-blog/blob/main/matrixorigin/git4data-part7-write-audit-publish-zh/index.md)、[传统机器学习](https://github.com/matrixorigin/matrixorigin-blog/blob/main/matrixorigin/git4data-part8-ml-lifecycle-zh/index.md)、[深度学习的文件型数据](https://github.com/matrixorigin/matrixorigin-blog/blob/main/matrixorigin/git4data-part10-multimodal-zh/index.md)，以及大模型的 [SFT](https://github.com/matrixorigin/matrixorigin-blog/blob/main/matrixorigin/git4data-part11-sft-curation-zh/index.md) 和 [RLHF 偏好数据](https://github.com/matrixorigin/matrixorigin-blog/blob/main/matrixorigin/git4data-part12-rlhf-preference-zh/index.md)。
+在 Git4Data 系列的前十二篇里，我们讨论过数据运维、机器学习数据集、多模态数据、SFT 和 RLHF。场景不断变化，但有一件事始终没有变：**决定修改数据、执行修改并检查结果的，最终还是人。**
 
-从这一篇起，进入最后一档：**Agent**。而 Agent 这一档的第一个问题，也是最基础的一个：**它的记忆该存在哪里。**
+到了 Agent，这条边界开始消失。
 
-这一篇会按这个顺序走：先说清楚 Agent 的「记忆」到底是什么、它对 Agent 的能力有多大影响；再看行业里现有的几种做法各自卡在哪；然后是生产级记忆真正需要的能力清单；最后才轮到本系列的主角——在 MatrixOne 上构建记忆能带来什么，Git4Data 这套能力具体解决了清单里的哪几条，以及什么场景适合、什么场景不必。
+一个 Agent 可以在对话中发现事实、形成判断，再把这些内容写入自己的长期状态。写入完成后，不需要重新训练，也不需要等待下一次发布；它可能在几秒后就读到这条信息，并据此回答问题或调用工具。
 
-> 文中 SQL 全部在 MatrixOne `4.1.0` 上实测，且使用确定性表达式（无 `rand()`），每个数字可逐次复现；可跑版本见 [git4data-tutorial 的 `13-agent-memory/agent_memory_demo.sql`](https://github.com/matrixorigin/git4data-tutorial/blob/354b9cff424cafb50d0b58128e78cc36970fe211/13-agent-memory/agent_memory_demo.sql)（已固定到具体 commit）。
+这让 Git4Data 面对了一类新的数据：**写入者是 Agent，使用者也是 Agent；数据一旦写下，就可能立刻改变它后续的行为。**
+
+先看一个很普通的场景。
+
+一个编程 Agent 今天完成了三件事：确认项目统一使用 pnpm，发现鉴权模块有一个历史兼容约束，并决定下一步迁移数据库连接层。
+
+第二天重新打开会话，它却再次建议 npm，重复踩进同一个兼容问题，也不知道迁移做到哪一步。
+
+模型没有突然变笨。真正缺失的是一层能跨会话保存、检索和更新状态的系统：**Memory**。
+
+Memory 经常被理解成"把聊天记录存下来"，但这远远不够。一个可用的 Agent Memory 不仅要记住信息，还要回答一组更难的问题：什么值得记、什么时候取出来、旧信息如何更新、互相冲突的记忆如何处理、错误写入能否撤销，以及多个 Agent 共享记忆时如何追溯来源。
+
+所以，Git4Data 系列进入 Agent 篇后，首先要回答的不是"Agent 能调用哪些工具"，而是一个更基础的问题：**Agent 的记忆应该如何保存，又怎样才能安全地变化？**
+
+这篇文章先从 Memory 的本质和作用讲起，再梳理行业里的主要做法，最后介绍 MatrixOne 为什么适合承载 Agent Memory，以及 Git4Data 的分支、DIFF、快照与回滚能力，能为长期记忆带来什么。
+
+> 文中的示例 SQL 已在 MatrixOne `4.1.0` 上验证。完整脚本见 [git4data-tutorial](https://github.com/matrixorigin/git4data-tutorial/blob/354b9cff424cafb50d0b58128e78cc36970fe211/13-agent-memory/agent_memory_demo.sql)。
 
 ---
 
-## 一、先说清楚：Agent 的「记忆」到底是什么
+## 一、Memory 是什么：Agent 的长期状态层
 
-「记忆」这个词被用得很泛，先把它和三个容易混淆的东西分开。
+对 Agent 而言，Memory 是一组能够**跨会话保存，并在未来任务中被检索、更新或遗忘的信息**。它不是某一种固定的数据结构，而是一套持续运行的状态机制。
 
-**记忆不是上下文窗口。** 上下文窗口是这一次对话里模型能看见的内容，对话结束就没了；而记忆是**跨会话持久存在**的。你今天告诉 Agent「这个项目用 pnpm 不用 npm」，明天新开一个会话它还知道——这才叫记忆。
+常见的记忆大致可以分为几类：
 
-**记忆不是训练数据。** 训练数据改变的是模型的**权重**，要等下一次训练才生效；记忆改变的是模型每次推理时**读到的内容**，写下的一瞬间就生效。
-
-**记忆也不完全等于 RAG 知识库。** 知识库存的是相对静态的资料（文档、手册、代码），主要是给模型"查资料"用的；而记忆存的是**关于你、关于这个项目、关于世界的事实**，而且它是**会变的**：偏好会改、决策会被推翻、状态会推进。
-
-所以一条 Agent 记忆长这样——是一条**结构化的事实**，而不是一段文本：
-
-```text
-cust_1042 · preferred_channel · email        （这个客户偏好邮件联系）
-cust_1042 · plan_tier         · pro          （他是 pro 套餐）
-cust_1042 · open_issue        · ticket_8821  （有一个未结工单）
-```
-
-放在一起对比，三者的差别就很清楚了：
-
-| | 训练数据 | 上下文窗口 | **Agent 记忆** |
+| 类型 | 记录什么 | 示例 | 生命周期 |
 |---|---|---|---|
-| **谁写的** | 人（工程师 / 标注员） | 当前会话的输入 | **Agent 自己**，对话中即时写入 |
-| **活多久** | 永久（进权重） | 一次会话 | **跨会话持久** |
-| **什么时候生效** | 下一次训练 | 立刻，但只在本次会话 | **下一秒，且一直生效** |
-| **写错了怎样** | 下一版训练前能修 | 关掉窗口就没了 | **立刻在线上生效，且会一直错下去** |
+| 工作记忆 | 当前任务的临时状态 | "正在排查 auth 模块的 token 过期问题" | 任务结束后可清理 |
+| 语义记忆 | 相对稳定的事实与知识 | "服务端使用 Go 1.22" | 长期保存，随事实变化而更新 |
+| 情景记忆 | 过去发生过的事件 | "上次迁移因旧版驱动不兼容而回退" | 可归档、压缩或总结 |
+| 程序记忆 | 可复用的做事方法 | "发布前先运行集成测试，再执行灰度部署" | 长期保存，可被新流程替代 |
+| 用户画像 | 偏好、权限与交互习惯 | "用户偏好简洁回答" | 长期保存，但必须可查看和删除 |
 
-**最后一行是这一篇的起点。** 前面十二篇里，改数据的都是人——工程师跑 ETL、标注员打标签、评审员改判。到了 Agent 记忆这里，**写数据的是 Agent 自己，而且没有人审、写下即刻生效**。这是整个系列里第一份具有这个性质的数据。
+这张表不是理论分类。后面会看到，把这几类记忆**显式建模成不同的类型、配上各自的生命周期**，正是一个生产级 Memory 系统和"一个大文件"之间最实际的差别之一。
 
----
+Memory 还容易和三个概念混淆。
 
-## 二、记忆对 Agent 到底有多大作用
+### Memory 不是上下文窗口
 
-如果记忆只是"体验更顺手一点"，它值不上一整篇文章。真正的原因是：**它直接决定了 Agent 能不能完成长任务、能不能被信任。**
+上下文窗口是模型在**当前一次推理**中能看到的内容。它容量有限，也不天然跨会话。Memory 则在模型之外持久保存，需要时再把相关内容送入上下文。
 
-### 1. 没有记忆，长任务根本做不完
+### Memory 不是训练数据
 
-一次复杂的重构可能横跨好几个会话。Agent 崩了、上下文窗口满了、或者你只是合上了电脑——回来之后它**完全不知道之前在做什么、试过哪些方案、做过哪些决策**，只能从头开始。这不是体验问题，是**能力上限**问题。
+训练数据通过训练或微调改变模型参数，周期长、成本高。Memory 不改模型权重，而是在推理时提供外部状态，因此可以即时写入、即时生效，也可以被更新或删除。
 
-更隐蔽的是[长会话里的静默失忆](https://github.com/matrixorigin/matrixorigin-blog/blob/main/matrixorigin/markdown-agent-memoria-zh/index.md)：为了腾出空间，Agent 会压缩早期上下文。一个跑 6-Agent 生产系统的开发者记录过这个现象——Agent 无声地丢失指令、忘记改过哪些文件、重复三十分钟前做过的工作，**而且它们从不告诉你**。这是上下文窗口的物理限制，写更好的提示词修不了。
+### Memory 也不等于 RAG 知识库
 
-### 2. 多个 Agent 之间的上下文，本来是重复劳动
+RAG 通常帮助模型从文档、代码或知识库中"查资料"。Memory 更强调 Agent 自己在工作过程中形成的状态：用户偏好、任务进度、过去的决策、成功或失败的经验。两者会共享检索技术，但数据的来源、变化频率和治理要求不同。
 
-很多人会在 Cursor、Claude Code、Kiro 之间来回切换。每切一次，你就要把项目规范、偏好的库、架构决策**再讲一遍**。一个共享的记忆层意味着：Cursor 学到你换了 ruff，Claude Code 也知道。
+更准确地说，Agent Memory 不是一个"存储盒子"，而是一条完整链路：
 
-### 3. 有验证的记忆能直接提升产出质量
+> 捕获信息 → 判断是否值得记忆 → 结构化或总结 → 检索 → 使用 → 更新、合并或遗忘 → 审计与恢复
 
-这一点有公开数据：GitHub 的 Copilot Memory 不只是记，而是**记忆使用前先验证——检查被引用的代码是否还存在**，28 天没被验证的记忆自动过期。结果是 **PR 合并率提升了 7%**。Anthropic 给 Claude Code 加的 Auto Memory 也是同一个方向：Agent 自己记录构建命令、调试洞察和观察到的模式。
-
-**两家头部产品都选择了超越静态文件——这件事本身就在说明问题。**
-
-### 4. 按需检索能省出"注意力预算"
-
-Anthropic 的上下文工程指南把这叫**注意力预算**问题：窗口里每一个无关 token 都在降低有关 token 的处理质量。如果记忆是全量加载的，你问 CSS 格式化的事，Agent 也得读一遍数据库迁移规则。**按需检索不只是省钱，它直接提升回答质量。**
+只完成"存"和"搜"，还不等于建立了可靠的 Memory。
 
 ---
 
-## 三、行业里的几种做法，各自卡在哪
+## 二、Memory 对 Agent 有多重要
 
-理清了价值，再看现在大家都是怎么做的。
+Memory 的价值并不只是让 Agent "更懂你"。它直接影响 Agent 能否从一次性问答工具，变成能够持续工作的系统。
 
-### 做法一：静态 Markdown 文件（`.cursorrules` / `CLAUDE.md` / `AGENTS.md`）
+### 1. 让任务跨越上下文窗口和会话
 
-最普遍，也确实有它对的地方：零基础设施、Git 管版本、团队共享、完全透明——打开文件就知道 Agent 的输入是什么。对于"用 TypeScript""pytest 写测试"这类**季度级才变一次**的稳定规则，Markdown 完全够用。
+复杂的编码、研究、运维或客户服务任务，往往无法在一个会话里结束。Memory 可以保留目标、阶段结果、已尝试方案和未解决问题，让 Agent 在新的会话中继续工作，而不是从头重建上下文。
 
-问题在于项目会演进，而静态、平坦、无状态的文本承载不了演进带来的复杂度。[《为什么 AI Agent 的记忆不能只靠一个 Markdown 文件》](https://github.com/matrixorigin/matrixorigin-blog/blob/main/matrixorigin/markdown-agent-memoria-zh/index.md)里总结了三个结构性缺陷：
+### 2. 避免重复探索，积累可复用经验
 
-**① 单向读写，然后无声地腐化。** Agent 能读，但很难精准、逻辑自洽地写回去（放任模型自己改，文件很快就自相矛盾）。于是维护责任落回你身上——而在一个每天演进的项目里，你刚重构完目录、换了状态管理库、填完一个诡异的 API 坑之后，**有几次真的会切出去把它记下来？** 现实是想不起来。于是你把 `app/api/` 改名成 `app/routers/`，按旧路径写的规则就悄悄失效了：没有编译器报错，没有 Linter 警告，**文件只是安静地对 Agent 撒谎**。
+Agent 如果能记住"哪种方案在这个项目里失败过、为什么失败"，就能减少重复试错。长期来看，系统积累的不只是事实，还有对特定用户、项目和环境有效的工作方式。
 
-**② 全量加载浪费注意力，而且越长越不稳定。** Anthropic 文档明确指出 `CLAUDE.md` 的实用上限约 200 行，超过之后模型对规则的遵守率显著下降。有开发者甚至发现，让长规则偶尔生效的偏方是在文件名里加 "very-important" 去触发注意力权重——这已经说明问题了。
+### 3. 支持个性化和一致性
 
-**③ 长会话中被压缩掉。** 上面提过，物理限制。
+用户偏好、业务约束和团队规范如果只能靠每次提示重复输入，Agent 的表现就很难稳定。Memory 让这些信息能够跨任务持续生效，同时允许用户查看、修正和删除。
 
-### 做法二：向量库 + RAG
+### 4. 让多个 Agent 共享状态
 
-把历史对话和笔记切块、嵌入、检索。**解决了按需加载**，是相对做法一的明确进步。但它有自己的代价：切块和嵌入会**丢掉结构**——对话语料丢掉时序、说话人身份、跨会话关系；而且它天然是**只追加**的。Letta 团队的判断很准确：
+当编程、测试、研究和运维 Agent 协同工作时，共享记忆可以减少上下文搬运。不过，共享也带来了新的治理问题：谁写入了这条事实，其他 Agent 是否应该信任它，它影响过哪些任务？
 
-> 追加原始体验是对"学习"的糟糕近似。人类会创建记忆，但也会精炼、整合、压缩它们。
+### 5. 精准召回还直接省下上下文预算
 
-一个只追加的向量库里，"我们用 PostgreSQL"和"测试用 SQLite"会**同时躺着**，检索到哪条全看相似度。
+这一点常被当成附带收益，但它其实是可量化的。如果没有 Memory，维持连续性的常见做法是把历史全量注入上下文——**注入量会随对话轮次滚雪球**。Memoria 官网给出的一组对照很直观：
 
-### 做法三：Agent 框架里的会话缓冲
+| | 第 1 轮 | 第 3 轮 | 第 5 轮 | 第 10 轮 |
+|---|---|---|---|---|
+| 全量注入历史 | 500 | 1,900 | 4,200 | **10,000+** |
+| 按需召回（每轮 3–5 条相关记忆） | 500 | 800 | 900 | **~2,500** |
 
-用 LangChain、CrewAI 或原生 API 自建 Agent，记忆大概率是个 Python 列表，太长就裁剪。没有跨会话持久化、没有按需检索、没有结构、没有多用户隔离。原型够用，上生产不够。
+差别不只是账单。上下文窗口里每一个无关 token 都在稀释模型对相关内容的注意力，所以**"取回该取的、不取不该取的"同时改善成本和质量**。
 
-### 做法四：平台内建的记忆
+### 6. Memory 也会放大错误
 
-Claude Code 的 Auto Memory、GitHub 的 Copilot Memory 都属于这一类，而且做得不错（前面那个 +7% 就是证据）。局限在于它**绑定在单个工具里**——你换个 Agent，记忆不跟着走；而且治理策略是平台定的，你能调的空间有限。
+上下文中的一次误解，通常会随着会话结束而消失；长期记忆中的一次误解，却可能在未来几个月反复被检索，持续影响回答和行动。
 
-### 顺便说一个大多数人还没想到的问题：安全
-
-Markdown 格式的 Agent 文件不只是不可靠——**它可以被主动利用**。MemoryGraft 攻击用 README 作为注入向量，植入虚假的"成功经验"让 Agent 反复调用；Rules File Backdoor 攻击在 `.cursorrules` 里嵌入不可见的 unicode 字符，重定向代码生成引入漏洞。这些被污染的规则还会通过共享社区传播（仅 awesome-cursorrules 就有 33,000+ stars）。
-
-OWASP 2026 Agentic Top 10 把**记忆与上下文投毒**列为顶级威胁。而它推荐的全部缓解措施——**来源追踪、信任评分、过期策略、完整性快照**——**在纯文本文件上一项都实现不了。**
-
-### 放进一张表
-
-| 做法 | 按需检索 | 结构与类型 | 矛盾治理 | 版本与回滚 | 跨 Agent 共享 | 来源可追溯 |
-|---|---|---|---|---|---|---|
-| Markdown 文件 | 否（全量加载） | 否（平坦文本） | 否 | 文件级（Git） | 是（同一仓库） | 否 |
-| 向量库 + RAG | **是** | 弱（切块丢结构） | 否（只追加） | 否 | 看部署 | 弱 |
-| 框架内会话缓冲 | 否 | 否 | 否 | 否 | 否 | 否 |
-| 平台内建记忆 | **是** | 部分 | 部分 | 部分 | 否（绑定工具） | 部分 |
-| **数据库 + 版本能力** | **是** | **是（行 + 类型）** | **是（SQL 可查）** | **行级 + 快照** | **是（独立服务）** | **是（溯源列）** |
+这意味着 Memory 同时是 Agent 的能力放大器和风险放大器。Agent 越自主、记忆保存得越久、共享范围越大，审计与恢复就越重要。OWASP 已把持久记忆与上下文投毒列为 Agent 系统的重要风险之一：[Memory & Context Poisoning](https://genai.owasp.org/2025/12/09/owasp-top-10-for-agentic-applications-the-benchmark-for-agentic-security-in-the-age-of-autonomous-ai/)。
 
 ---
 
-## 四、那么，生产级的 Agent 记忆到底需要什么
+## 三、行业里如何构建 Agent Memory
 
-从具体工具里抽身出来，问"生产级记忆要做到什么"，会浮出六个需求：
+今天并不存在一种适合所有场景的 Memory 方案。行业实践大致可以分成以下几类，它们解决的是不同层次的问题。
 
-1. **人和 Agent 都能写。** 你设定护栏（静态规则），Agent 在工作中积累知识（动态记忆）。两条写入路径，一个共享存储。
-2. **按需检索，不是全量加载。** 对话开始时只检索与**当前任务**相关的几条。
-3. **有类型的记忆，不同的生命周期。** 用户偏好该长期保存；工作记忆（"正在调试 auth 模块"）任务结束就该过期；项目决策该持久但可被新决策覆盖。**平坦文件里这些生命周期没法独立管理。**
-4. **矛盾检测和自治。** 存了"我们用 PostgreSQL"，后来又遇到"测试用 SQLite"——系统要能识别这种张力：同一个主题、不同结论——然后要么解决（不同上下文），要么标记让人决策。
-5. **版本控制和回滚。** 每次记忆变更都有记录；重大重构前快照一下；Agent 学错了，回滚那条记忆；想试验不同方向，分支记忆，试完合并或丢弃。**这是应对记忆污染唯一可靠的防线。**
-6. **跨 Agent 共享，带来源追踪。** 所有 Agent 读写同一个记忆池，但你需要知道**哪个 Agent 在什么时候写了什么**，才能审计和选择性信任。
+### 1. 提示词与 Markdown 文件
 
-**注意第 4、5、6 条。** 前三条本质上是"存储 + 检索"问题，向量库和结构化存储都能解决一部分。而后三条——**保留矛盾的历史、版本化与回滚、写入的来源可追溯**——恰恰是本系列讲了十二篇的那套能力。
+典型代表是 `AGENTS.md`、`CLAUDE.md` 和各类 rules 文件。它们透明、易编辑、能随代码一起进入 Git，非常适合保存编码规范、常用命令和架构原则等**变化较慢的护栏**。Claude Code 官方文档也把项目规则和用户偏好作为文件型 Memory 的主要用途：[Manage Claude's memory](https://docs.anthropic.com/zh-CN/docs/claude-code/memory)。
+
+它的局限同样明显：内容通常需要人工维护；动态事实容易过期；文件变长后只能全量加载或人工拆分；不同生命周期和权限的数据也难以独立管理。
+
+因此，Markdown 不是"错误方案"，而是更适合静态规则，不适合独自承担持续变化的长期记忆。
+
+### 2. 对话历史与自动摘要
+
+把最近的消息保留在窗口里，较早的内容压缩成摘要，是最常见的短期记忆方式。它实现简单，适合保持一次任务的连续性。
+
+但摘要是一种有损压缩。随着会话拉长，早期细节、因果关系和少数关键约束可能被逐步丢失；它也很难支持精确查询、选择性更新和跨用户隔离。
+
+### 3. 向量库与 RAG
+
+将历史对话、笔记和经验切分后做向量化，再按语义相关性检索，可以避免每次全量加载。这是处理大规模非结构化记忆的有效方式。
+
+但相似度只能回答"哪段内容看起来相关"，不能天然回答"哪条是最新事实""两条记忆是否冲突""是谁写的""能否撤销某次写入"。如果只追加、不更新，旧结论和新结论可能同时被检索出来。
+
+### 4. 结构化数据库或知识图谱
+
+把用户、项目、实体、关系、时间和来源显式建模，可以进行精确过滤、冲突检查、权限控制和统计分析。知识图谱尤其适合表达复杂关系。
+
+代价是需要设计 schema、实体解析与更新策略；仅有结构化存储，也不能自动解决语义检索和版本治理问题。
+
+### 5. 专用 Memory 框架或平台内建记忆
+
+Letta 等 Memory 框架会组合常驻记忆块、文件和可检索的归档记忆，并让 Agent 通过工具主动管理它们：[Letta Context Hierarchy](https://docs.letta.com/guides/core-concepts/memory/context-hierarchy)。GitHub Copilot Memory 则会保存仓库事实和用户偏好，在使用仓库事实前验证其代码引用，并对长期未验证的记忆设置过期机制：[About GitHub Copilot Memory](https://docs.github.com/en/copilot/concepts/agents/copilot-memory)。
+
+这类方案降低了接入成本，也说明行业正在从"保存更多文本"走向"验证、更新和治理记忆"。局限在于平台绑定、数据控制范围和治理策略的可定制程度各不相同。
+
+### 这些方案不是互斥的
+
+生产系统通常会分层组合：
+
+- 静态规范放在 Markdown 中；
+- 当前任务状态放在短期工作记忆中；
+- 文档和历史事件通过向量检索召回；
+- 用户、项目、来源和有效期进入结构化存储；
+- 版本、审计和恢复由数据基础设施负责。
+
+问题的核心并不是"文件还是向量库"，而是能否覆盖 Memory 的完整生命周期。
 
 ---
 
-## 五、Memoria：在 MatrixOne 上把这六条落地
+## 四、生产级 Memory 需要哪些能力
 
-这不是一个假想的架构。[**Memoria**](https://github.com/matrixorigin/Memoria) 是一个开源（Apache 2.0）的 Agent 记忆项目，**完全构建在 MatrixOne 之上**，以 MCP Server 形式运行——任何支持 MCP 的 Agent（Cursor、Claude Code、Kiro、OpenClaw）都能直接连上，不需要定制集成（[一分钟接入教程](https://github.com/matrixorigin/matrixorigin-blog/blob/main/matrixorigin/start-agent-memoria-zh/index.md)）。
+当 Agent 开始自主写入长期记忆时，至少需要七类能力：
 
-### 为什么一个 Agent 记忆项目会长在数据库上
+1. **持久化**：跨会话、跨进程保存状态。
+2. **相关性检索**：综合语义相似度、关键词、实体、时间、类型和权限，取回当前任务真正需要的内容。
+3. **记忆分型与生命周期**：工作记忆可以自动过期，稳定规则长期保存，旧决策可被新决策替代。
+4. **来源与时间**：知道哪个用户、Agent 或任务在什么时候写入了什么。
+5. **冲突与更新**：识别重复、过期和互相矛盾的记忆，保留必要的历史。
+6. **写入隔离与审计**：高风险写入先进入隔离区，确认变化范围后再生效。
+7. **版本与恢复**：发生误写、批量污染或渐进漂移时，可以回到已知良好的状态。
 
-[《为什么我用 Rust 重写了 Memoria》](https://github.com/matrixorigin/matrixorigin-blog/blob/main/matrixorigin/rust-memoria-agent-zh/index.md)讲了这条路径：Memoria 最初是为 MatrixOne 的向量检索**自动调优**做的记忆层，后来才发现「数据库调优要记住哪些策略有效」和「coding agent 要记住你的项目是怎么回事」，在抽象层面是同一个问题——**都是跨会话持久化、需要语义检索、并且需要版本管理的记忆。**
+传统向量检索主要解决第 2 条；schema 与应用逻辑可以解决第 3、4、5 条的一部分；而第 6、7 条要求底层数据系统本身具备版本化能力。
 
-而这三件事，MatrixOne 恰好在**同一套引擎**里都有：向量索引、全文检索，以及本系列一直在讲的 CoW 版本能力。**这是"长在数据库上"的实际好处：混合检索和版本能力作用在同一份数据上，不需要在两套系统之间搬运和对齐。** 第十篇讲多模态时我们不得不接受"文件归 lakeFS、元数据归 MatrixOne"的两个世界，而 Agent 记忆是结构化事实，它整个住在一张表里。
+这正是 MatrixOne 和 Git4Data 的切入点。
 
-### Agent 看到的是工具，不是 SQL
+---
 
-接上之后，Agent 侧能直接调用的是这样一组工具（remote 模式实测）：
+## 五、在 MatrixOne 上构建 Memory，带来了什么
+
+[Memoria](https://github.com/matrixorigin/Memoria) 是一个构建在 MatrixOne 上的开源 Agent Memory 项目（Apache-2.0），[官网](https://thememoria.ai)把它定位成**"全球首个 AI Agent 记忆版本控制系统"**，一句话概括它的主张：
+
+> Git 让代码可以安全修改。Memoria 让记忆可以安全修改。
+
+它通过 MCP 向 Agent 暴露 `memory_store`、`memory_retrieve`、`memory_correct`、`memory_purge`、`memory_snapshot`、`memory_branch`、`memory_diff` 和 `memory_rollback` 等工具。Agent 使用的是 Memory 工具，而不是直接操作数据库；MatrixOne 则在底层提供统一的数据与版本能力：
 
 ```text
-memory_store       写入一条记忆
-memory_retrieve    按当前任务检索相关记忆（向量 + 全文混合）   ← 对应需求 2
-memory_search      显式检索
-memory_correct     原地更正一条已有记忆                      ← 对应需求 4
-memory_purge       清理（例如会话结束时清掉工作记忆）          ← 对应需求 3
-memory_governance  治理
-memory_consolidate 整合
-memory_reflect     反思
-memory_feedback    反馈
-memory_profile / memory_list
+你的 Agent                    Memoria                 MatrixOne
+Kiro / Cursor /   ──MCP──▶   MCP Server   ──────▶    CoW Engine
+Claude Code /     REST       记忆分型 / 检索          零拷贝分支
+Codex / OpenClaw  stdio·SSE  治理 / 快照管理          即时快照 · 回滚
 ```
 
-`memory_correct` 值得单独看一眼。**它的存在本身就是一个判断**：新事实和旧事实冲突时，正确的动作不是再追加一条，而是更正——否则记忆库里会同时躺着两个互相矛盾的"事实"，Agent 检索到哪条全看运气。这正好是做法二（只追加的向量库）没解决的那个问题。
+接入是工具无关的：Kiro、Cursor、Claude Code、Codex 有现成配置，OpenClaw 有插件，自建 Agent 走 MCP 或 REST API。**换模型、换 Agent 工具时，Memory 不必跟着迁移。**
 
-记忆分型也做进了产品：`profile` 是长期偏好，工作记忆是任务作用域的（会话结束 purge），还有目标追踪类的记忆——**对应需求 3。**
+下面几点是"建在 MatrixOne 上"带来的实际差别。
 
-而"记忆被写坏了怎么办"，Memoria 直接做成了产品功能：[备份与恢复](https://github.com/matrixorigin/matrixorigin-blog/blob/main/matrixorigin/memoria-backup-restore-zh/index.md)——任意时间点对记忆打快照，出问题一键恢复。**对应需求 5。**
+### 1. 一份数据，同时支持精确查询与混合检索
 
-![Memoria 与本文这套 SQL 的分层关系：上层是 Cursor / Claude Code / Kiro / OpenClaw 等 Agent 通过 MCP 接入，中层是 Memoria 暴露的记忆工具（store / retrieve / correct / purge / governance）与记忆分型和备份恢复，底层是 MatrixOne 的 CoW 存储引擎提供零拷贝分支、即时快照、行级 DIFF、MERGE 与时间点回滚，以及同一套引擎内的向量索引和全文检索；本文用 SQL 直接操作的就是最底下这一层](./images/fig_memoria-stack_zh.svg)
+Agent Memory 往往既包含结构化字段，也包含自然语言内容。MatrixOne 在同一套引擎中提供关系查询、向量检索和全文检索，可以把"语义上相关"与"属于这个项目、由这个用户创建、仍处于有效期内"等条件组合起来，而不必在关系数据库和向量库之间维护两份状态。MatrixOne 官方文档列出了内建的向量、全文检索及 Git for Data 能力：[MatrixOne Documentation](https://docs.matrixorigin.cn/)。
+
+混合检索解决的是纯关键词匹配的一个典型失败：记忆里存的是「black formatter」，用户问的是「格式化工具」——关键词匹配不上，语义检索能找到。而反过来，精确的项目名、路径、版本号又需要全文检索来兜底。**两者在同一份数据上同时可用，才不用在召回率和精确率之间二选一。**
+
+### 2. 记忆分型不是标签，而是不同的生命周期
+
+Memoria 把第一节那张表落成了六种显式类型：`semantic`、`profile`、`procedural`、`working`、`tool_result`、`episodic`。类型不只是一个用于过滤的字段——它决定了这条记忆**该活多久**：`working` 记忆在任务结束后应当被清理，`profile` 应当长期保存并可被用户查看和删除，`semantic` 会随事实变化被新版本替代。
+
+这正是 Markdown 文件做不到的地方：同一个文件里的所有内容共享同一个生命周期，你没法让其中三行自动过期。
+
+### 3. 自治治理：矛盾检测、低置信隔离、自动去重
+
+记忆库如果只增不减，检索质量会随时间下降。Memoria 内置了矛盾检测、低置信度隔离和自动去重，官网强调这条管线是**专用实现、不额外调用 LLM**——这一点在成本上有意义：治理如果每条记忆都要过一次模型，规模一上来就跑不动了。
+
+### 4. 规模与检索性能
+
+记忆库不会一直是几百条。官网给出的量级区间是：个人助手约 100 条、团队级 10K、企业级 1M（GPU 加速）、十亿级用 DiskANN；GPU 检索由 NVIDIA cuVS 驱动，官网标注约 **12× 加速**。
+
+这里想说明的不是具体倍数，而是一个结构性事实：**Memory 的检索路径最终是数据库问题**。当记忆规模从"能塞进上下文"跨过"必须索引"这条线之后，它需要的就是一个真正的检索引擎，而不是一个更大的文件。
+
+### 5. Git4Data 让记忆变更可隔离、可比较、可恢复
+
+这是 MatrixOne 与普通"数据库 + 向量索引"方案最不同的地方：记忆不仅能存和搜，还能像代码一样先开分支、查看差异、合并，并在出错时恢复——`snapshot → branch → diff → merge → rollback` 这条链路由 MatrixOne 原生的 Copy-on-Write 引擎驱动，是毫秒级的元数据操作，不产生数据副本。
+
+需要把边界说清楚：
+
+- `confidence`、`source_run`、记忆类型和冲突判定，是 **Memoria 或业务应用的模型与策略**；
+- branch、DIFF、merge、snapshot 和 restore，是 **MatrixOne Git4Data 提供的底层能力**。
+
+Git4Data 不替 Agent 判断"什么应该被记住"，但它能保证这个判断过程有隔离区、有变更记录，并且可以撤销。
+
+### 6. 和其他方案放在一起看
+
+官网给了一张横向对比，值得抄过来——注意它比较的是各方案的**默认路径**，不是产品能力的全部：
+
+| 能力维度 | Memoria | Mem0 | Letta | Markdown 文件 |
+|---|---|---|---|---|
+| 版本控制（快照/分支/回滚） | **原生 CoW** | 无 | Git 版本控制 | 无 |
+| 隔离实验（分支沙盒） | **用户可操作，一键创建** | 无 | Agent 内部 worktree | 无 |
+| 完整审计追踪 | **每次变更可溯源** | 有限日志 | Git 提交历史 | 无 |
+| 语义搜索 | 向量 + 全文混合 | 向量 + 图 + KV | 文件系统导航 | 仅关键词 |
+| 自治治理 | 专用管线（无 LLM 开销） | LLM 驱动自动化 | Git 合并 + 整理 | 无 |
+| 结构化记忆类型 | **6 种类型 + 生命周期** | 扁平 KV | 纯文本块 | 非结构化文本 |
+| Token 效率 | 按需召回（3–5 条） | 按需召回 | 按需召回 | 全文件注入 |
+| 多 Agent 共享 | **每用户共享记忆池** | 按 Agent 隔离 | 按 Agent 隔离 | 手动复制文件 |
+
+对比里最值得注意的是前三行：**语义检索这件事，几个方案都做了；真正拉开差距的是版本、隔离和审计**——而这三件事恰好不是 Memory 层能靠自己补上的，它取决于底层数据系统是否原生支持。
+
+![Memoria 与本文这套 SQL 的分层关系：上层是 Cursor / Claude Code / Kiro / Codex / OpenClaw 等 Agent 通过 MCP 或 REST 接入，中层是 Memoria 暴露的记忆工具（store / retrieve / correct / purge / snapshot / branch / diff / rollback）与六类记忆分型和自治治理，底层是 MatrixOne 的 CoW 存储引擎提供零拷贝分支、即时快照、行级 DIFF、MERGE 与时间点回滚，以及同一套引擎内的向量索引和全文检索](./images/fig_memoria-stack_zh.svg)
 
 ---
 
-## 六、Git4Data 这套能力，具体解决了清单里的哪几条
+## 六、Git4Data 如何让 Agent Memory 更安全
 
-上面六个需求里，需求 1、2、3 靠的是"数据库 + 混合检索 + 一点 schema 设计"。**真正需要 Git4Data 这套能力的是后三条**，而它们恰好也是最难的三条：
+下面用一个客服 Agent 的长期记忆库说明完整流程。
 
-| 需求 | 难在哪 | MatrixOne 的 Git4Data 能力怎么解决 |
-|---|---|---|
-| **4. 矛盾检测与自治** | 矛盾不能一删了之（人是会变的），得让新旧并存、旧的标记过期 | **行级版本语义**：`UPDATE … status='superseded'`，历史被保留而不是被覆盖 |
-| **5. 版本控制与回滚** | 记忆污染没有明确病因，逐条排查等于猜 | **即时快照 + `RESTORE`**：回到一个已知良好的版本，不需要先定位病因 |
-| **6. 来源追踪与审计** | "这一轮 Agent 到底想记住什么"，事后无从还原 | **零拷贝分支 + `DATA BRANCH DIFF`**：写入先进分支，审计通过再合并，净变更有据可查 |
-
-再加上一条上面清单里没写、但生产上一定会遇到的：**"这次写入到底改了什么"必须能在生效之前看到。** 这就是[第七篇 Write-Audit-Publish](https://github.com/matrixorigin/matrixorigin-blog/blob/main/matrixorigin/git4data-part7-write-audit-publish-zh/index.md)那套流程，只不过这次的"写"方是 Agent。
-
-下面这一节，就是把这三件事用 SQL 拆开跑一遍——看清楚每一步到底动了哪些行、留下了什么记录。
-
----
-
-## 七、把它拆开看：一轮记忆写入的完整流程
-
-### 先看一个真实会发生的故障
-
-某个客服 Agent 在一次对话里，把用户的一句反话理解成了字面意思，于是写下：
-
-```text
-cust_1042 · preferred_channel · 不要联系我
-```
-
-这条记忆此后被每一次对话读取。用户下次来咨询，Agent 表现得异常冷淡、拒绝主动跟进——因为它"记得"这个人不想被联系。
-
-几个月后有人终于发现，麻烦的地方在于：
-
-1. **这条记忆是什么时候写的？** 不知道，记忆表里只有当前值。
-2. **是哪一次对话写的？** 不知道，没有溯源字段。
-3. **同一次对话还写了别的什么？** 不知道，无从批量排查。
-4. **能不能把那次对话写的全部撤销？** 不能，它们和几十万条正常记忆混在一起。
-
-这四个问题，正好对应 Git4Data 能力的四件事：**溯源、审计、回滚、DIFF**。
-
-### 案例：一个客服 Agent 的记忆库
-
-记忆就是一张表。注意除了事实本身，还有三列**溯源信息**：
+### 1. 先为记忆补上应用层的治理字段
 
 ```sql
 CREATE TABLE agent_memory (
     mem_id      BIGINT PRIMARY KEY,
-    subject_key VARCHAR(64),    -- 这条事实是关于谁的（如客户 ID）
-    fact_key    VARCHAR(64),    -- 哪个属性（如 preferred_channel）
+    subject_key VARCHAR(64),
+    fact_key    VARCHAR(64),
     fact_value  VARCHAR(256),
-    confidence  DOUBLE,         -- 写下时 Agent 有多确信
-    source_run  VARCHAR(32),    -- 哪一次运行写的  ← 溯源
-    written_at  DATETIME,       -- 什么时候写的    ← 溯源
+    confidence  DOUBLE,
+    source_run  VARCHAR(32),
+    written_at  DATETIME,
     status      VARCHAR(16)     -- active / superseded
 );
 ```
 
-`source_run` 和 `written_at` 这两列，直接消灭了上面前两个"不知道"。而 `status` 这一列体现了需求 4 的那个设计选择：**记忆更新不是覆盖，而是把旧事实标记为 superseded**——历史被保留下来，而不是被抹掉。
+这里的 `source_run` 和 `written_at` 用于追溯来源，`confidence` 支持风险策略，`status` 保留事实被替代的历史。这些字段属于 Memory 的应用设计。
 
-案例规模：8,000 个客户 × 5 个属性 = **40,000 条已积累的记忆**。
+### 2. Agent 不直接写主记忆库，而是写入分支
 
-### 第一步：Agent 的记忆写入，先进分支
-
-**不要让 Agent 直接写主记忆库**，先写进一条分支：
+假设主记忆库已有 40,000 条事实，一次运行 `run_9001` 准备写入 3,000 条新记忆：
 
 ```sql
 DATA BRANCH CREATE TABLE memory_staging FROM agent_memory;
--- 这一轮会话（run_9001）提议写入 3,000 条新记忆
-INSERT INTO memory_staging SELECT ... ;
+
+INSERT INTO memory_staging SELECT ...;
 
 DATA BRANCH DIFF memory_staging AGAINST agent_memory OUTPUT SUMMARY;
---   实测 INSERTED 3000 —— 这一轮"想记住"什么，一目了然
+-- INSERTED 3000
 ```
 
-**这一步就是需求 6 的落点**：在任何东西生效之前，"这次会话想往记忆里写什么"是一个可查的确定数字，而不是一个已经发生的事实。
+分支提供了一个与主记忆隔离的写入空间。Agent 可以先写，主线数据在审核通过前保持不变。
 
-### 第二步：审计 Agent 想记住的东西
+### 3. 在分支上执行治理策略
 
-真实 Agent 会话产生的问题，主要是这三类：
+在示例数据中，审计发现：
 
-**矛盾：新事实和已有的活跃事实打架**
+- 300 条新事实与现有活跃事实冲突；
+- 428 条置信度低于阈值；
+- 120 条缺少来源信息。
 
-```sql
-SELECT COUNT(*) AS contradictions
-FROM memory_staging s
-JOIN agent_memory m ON s.subject_key = m.subject_key AND s.fact_key = m.fact_key
-WHERE s.mem_id >= 500000 AND m.status = 'active' AND s.fact_value <> m.fact_value;
---   实测 300
-```
-
-**低置信：Agent 其实是在猜**
+低置信和无来源的记忆被拒绝；对于冲突，不直接删除旧事实，而是根据业务策略把旧记录标记为 `superseded`，保留"Agent 在某个时间点曾经相信什么"的历史。
 
 ```sql
-SELECT COUNT(*) AS low_confidence FROM memory_staging
-WHERE mem_id >= 500000 AND confidence < 0.5;
---   实测 428
-```
-
-**无溯源：写了，但不知道是哪次运行写的**
-
-```sql
-SELECT COUNT(*) AS untraceable FROM memory_staging
-WHERE mem_id >= 500000 AND source_run IS NULL;
---   实测 120
-```
-
-**处理方式对三类不一样**，这一点值得强调：
-
-```sql
--- 低置信 + 无溯源：直接拒绝，不进记忆
 DELETE FROM memory_staging
-WHERE mem_id >= 500000 AND (confidence < 0.5 OR source_run IS NULL);
+WHERE mem_id >= 500000
+  AND (confidence < 0.5 OR source_run IS NULL);
 
--- 矛盾：不删新的，而是把旧事实标记为 superseded —— 保留历史，而不是静默覆盖
-UPDATE memory_staging m SET status = 'superseded'
-WHERE m.mem_id < 500000 AND m.status = 'active'
-  AND EXISTS (SELECT 1 FROM memory_staging s
-              WHERE s.mem_id >= 500000
-                AND s.subject_key = m.subject_key AND s.fact_key = m.fact_key
-                AND s.fact_value <> m.fact_value);
+UPDATE memory_staging m
+SET status = 'superseded'
+WHERE m.mem_id < 500000
+  AND m.status = 'active'
+  AND EXISTS (
+      SELECT 1
+      FROM memory_staging s
+      WHERE s.mem_id >= 500000
+        AND s.subject_key = m.subject_key
+        AND s.fact_key = m.fact_key
+        AND s.fact_value <> m.fact_value
+  );
 ```
 
-**矛盾不该被当成错误删掉**。人是会变的：客户真的可能改了偏好。矛盾的正确处理是**新旧并存、旧的标记为过期**——这样既让 Agent 用上最新认知，又保留了"它曾经这么认为过"的历史。只有当你需要排查"Agent 为什么在三月份那样回答"时，才会明白这段历史有多值钱。**这就是需求 4 说的"要么解决，要么标记"，落在行级版本语义上的样子。**
+这里需要再次区分：**冲突规则由应用定义，Git4Data 负责让规则在隔离分支上运行。**
 
-审计后的记录和合并：
+### 4. 用 DIFF 查看净变化，通过后再合并
 
 ```sql
 DATA BRANCH DIFF memory_staging AGAINST agent_memory OUTPUT SUMMARY;
---   实测 INSERTED 2469 / UPDATED 206
---   （3000 条提议里，531 条因低置信或无溯源被拒；206 条旧事实被标记过期）
+-- INSERTED 2469 / UPDATED 206
 
 DATA BRANCH MERGE memory_staging INTO agent_memory;
---   实测记忆库 40,000 → 42,469；其中 active 42,263、superseded 206
+-- 40,000 → 42,469
 ```
 
-![Agent 记忆全流程：40,000 条事实的记忆库不动，会话 run_9001 在分支上提议 3,000 条；审计出矛盾 300（标记 superseded）、低置信 428 与无溯源 120（拒绝）；合并后 DIFF 审计记录 INSERTED 2469 / UPDATED 206，记忆库到 42,469；run_9002 污染 5,000 条后一条 RESTORE 归零；溯源列让「谁在什么时候写了什么」都可查](./images/fig_agent-memory_zh.svg)
+DIFF 提供的不是一条模糊的"写入成功"日志，而是主线即将发生的实际变化。它可以接入自动规则，也可以在高风险场景下进入人工审批。
 
-### 第三步：当一次会话把记忆写坏了
+### 5. 用快照处理批量污染和渐进漂移
 
-审计能挡住大部分问题，但挡不住全部——比如一次批量导入的误读。这时需要的是**回滚**，也就是需求 5。
-
-先在已知良好的状态打一个快照：
+在一个已知良好的状态创建快照：
 
 ```sql
 CREATE SNAPSHOT mem_v1 FOR TABLE agent_mem agent_memory;
 ```
 
-然后 `run_9002` 出了问题，把 5,000 条事实覆盖成了垃圾值：
+如果后续某次运行污染了 5,000 条记忆，可以先用 DIFF 评估影响，再恢复：
 
 ```sql
--- 损失评估：相对已知良好版本，到底动了多少
-DATA BRANCH DIFF agent_memory AGAINST agent_memory {SNAPSHOT='mem_v1'} OUTPUT SUMMARY;
---   实测 UPDATED 5000
-SELECT COUNT(*) AS poisoned FROM agent_memory WHERE fact_value = 'GARBAGE';   -- 实测 5000
-```
+DATA BRANCH DIFF agent_memory
+AGAINST agent_memory {SNAPSHOT='mem_v1'}
+OUTPUT SUMMARY;
+-- UPDATED 5000
 
-整库回滚，一条语句：
-
-```sql
 RESTORE TABLE agent_mem.agent_memory {SNAPSHOT = mem_v1};
-SELECT COUNT(*) AS poisoned_after_restore FROM agent_memory WHERE fact_value = 'GARBAGE';   -- 实测 0
-SELECT COUNT(*) AS memory_after_restore FROM agent_memory;                                  -- 实测 42469
 ```
 
-这正是[第五篇误操作救援](https://github.com/matrixorigin/matrixorigin-blog/blob/main/matrixorigin/git4data-part5-incident-rescue-zh/index.md)那套能力，用在 Agent 记忆上。差别在于：**普通数据事故是人造成的，频率低；Agent 记忆事故是机器造成的，可能每天都在小规模发生**——所以"能回滚"不是应急预案，而是日常基础设施。
+回滚不仅适用于"某次运行明显写坏了 5,000 行"的事故，也适用于更难定位的渐进漂移：Agent 每次只学错一点，几周后整体行为开始偏离预期，却找不到唯一的故障会话。此时，回到一个已知良好的版本，比逐条猜测该删哪条记忆更可靠。
 
-**还有一种更常见、也更难查的坏法：渐进漂移。** 上面这个例子是**显性事故**——有明确的一次运行、明确的损失面，DIFF 一下就看见了。但 [Memoria 备份与恢复那篇](https://github.com/matrixorigin/matrixorigin-blog/blob/main/matrixorigin/memoria-backup-restore-zh/index.md)描述的是另一种形态：没有哪一次对话明显出错——一次把话题带偏的临时任务、一个你随手试的提示词、一段你几乎记不起的会话——Agent 只是像往常一样把发生的一切都记住了。等你察觉到"它不太对劲"时，那个你精心调教出来的状态早就不在了，**而且你指不出是哪一次对话搞坏的**。
+反过来说，**能回滚也改变了做事方式**：知道随时能退回一个已知良好的状态，你才敢让 Agent 去试新的工作流、新的提示词策略。这也是官网把"无惧实验"单列成一条价值的原因——分支和快照的意义不只是救火，更是让实验的成本变得可承受。
 
-这正是为什么它必须靠版本能力解决：你打开记忆列表逐条排查，删多了丢掉真正重要的，删少了问题依旧——**你不是在修复，只是在猜**。而"回到一个已知良好的快照"是确定的，它不需要你先定位病因。
+![Agent 记忆全流程：40,000 条事实的记忆库不动，会话 run_9001 在分支上提议 3,000 条；审计出矛盾 300（标记 superseded）、低置信 428 与无溯源 120（拒绝）；合并后 DIFF 审计记录 INSERTED 2469 / UPDATED 206，记忆库到 42,469；run_9002 污染 5,000 条后一条 RESTORE 归零；溯源列让「谁在什么时候写了什么」都可查](./images/fig_agent-memory_zh.svg)
 
-所以对长期运行的 Agent，快照不该只在出事时才想起来，而应该**在每个你满意的状态上都存一个档**：
+### Git4Data 带来的核心变化
 
-```sql
-CREATE SNAPSHOT mem_v2 FOR TABLE agent_mem agent_memory;   -- 调教到满意，先存档
--- 然后放心去试新的工作流 / 新的提示词策略
-```
-
-**知道自己随时能回退，才敢让 Agent 去学新东西**——这也是 Memoria 把它做成产品功能的原因。
-
-### 第四步：开头那四个问题，现在都能回答了
-
-```sql
--- 这一次运行到底写了多少条记忆？
-SELECT source_run, COUNT(*) AS facts_written
-FROM agent_memory WHERE source_run = 'run_9001' GROUP BY source_run;
---   实测 run_9001 / 2469
-
--- 三个月前那个版本的记忆里，这条事实是什么？
-SELECT COUNT(*) AS facts_at_mem_v1 FROM agent_memory {SNAPSHOT='mem_v1'};
---   实测 42469
-```
-
-| 开头的问题 | 现在的答案 |
+| 过去的问题 | 引入 Git4Data 后 |
 |---|---|
-| 这条记忆什么时候写的？ | `written_at` |
-| 哪一次对话写的？ | `source_run` |
-| 那次对话还写了什么？ | `WHERE source_run = 'run_XXXX'`，一条 SQL 列全 |
-| 能撤销那次对话的全部写入吗？ | 能——按 `source_run` 批量撤销，或整库 `RESTORE` |
+| Agent 写入后立即影响主记忆 | 先写分支，审核后合并 |
+| 不知道一次运行到底改了什么 | 用 DIFF 查看净变化 |
+| 批量污染只能逐条清理 | 用快照和 RESTORE 回到已知版本 |
+| 新策略只能直接在线试 | 在独立分支试验，成功后合并 |
+| 多 Agent 写入难以复盘 | 应用层来源字段 + 数据版本共同形成审计链 |
 
-**回过头看 OWASP 那四项缓解措施**——来源追踪、信任评分、过期策略、完整性快照——现在分别落在 `source_run`/`written_at`、`confidence` 门槛、`status='superseded'`、`CREATE SNAPSHOT` 上。**这就是"结构化记忆"相比纯文本文件的实际差别。**
+因此，Git4Data 对 Memory 的价值不是"让检索更聪明"，而是**让记忆可以安全地变化**。
 
 ---
 
-## 八、什么场景该上这套，什么场景不必
+## 七、哪些场景适合这套方案
 
-这套流程不是免费的，说清楚它的适用边界比推销它更有用。
+### 适合
 
-**值得上的：**
+- **长期运行的编程、研究和运维 Agent**：任务跨越多次会话，需要保存决策、进度和经验。
+- **客服、销售和个人助理**：用户偏好与历史状态会持续影响后续交互，错误记忆可能产生长期影响。
+- **多 Agent 协作系统**：多个写入者共享记忆，需要来源、权限、冲突处理和统一恢复点。
+- **Agent 可以自主写入的生产系统**：人工无法逐条审核，必须限制错误写入的影响范围。
+- **有审计、合规或数据主权要求的行业**：需要解释 Agent 为什么在某个时间点做出某种回答或行动。
+- **需要试验不同 Agent 策略的团队**：可以让不同分支积累不同记忆，比较效果后再选择是否合并。官网上"训练一个 Agent，把记忆 Fork 给每个队友"说的就是这个用法——一位资深工程师调教出来的工作方式，可以直接复制给团队里的其他人。
 
-- **长期记忆，也就是会被反复读取、影响后续所有交互的事实。** 用户偏好、项目决策、领域知识——这些错一条就会一直错下去。
-- **多个 Agent 或多个用户共享同一个记忆池。** 共享意味着你必须能回答"这条是谁写的"。
-- **Agent 有自主写入权限的场景。** 只要没有人逐条审，就需要一个可回退的锚点。
-- **需要审计和合规的场景。** 金融、医疗、客服——"Agent 三月份为什么那样回答"必须能查。
+### 不必过度设计
 
-**不必上的：**
+- **一次性、短时任务**：会话结束后不再使用的上下文，摘要或工作记忆已经足够。
+- **变化很慢的静态规范**：编码风格、目录规则和安全护栏放在 Markdown 中更透明。
+- **单人、单 Agent、数据量很小的项目**：人工可以清楚查看和修正全部记忆时，引入完整治理流程可能得不偿失。
+- **只读知识问答**：如果 Agent 只检索经过人工维护的文档，不会自主修改知识库，普通 RAG 已能解决大部分问题。
 
-- **会话内的临时上下文。** 高频、低风险、用完就丢，走分支反而是累赘——这类该走 `memory_purge` 那条路，不该走审计流程。
-- **单人、单 Agent、可随时手改的小项目。** 一个 `CLAUDE.md` 真的够用，别过度工程。
-- **纯静态的规范和护栏。** 编码规范、架构原则这类季度级才变的东西，留在 Markdown 里当护栏，反而更透明。
+务实的架构通常是分层的：Markdown 管静态护栏，短期缓冲管当前任务，向量与全文检索负责召回，结构化表负责状态与权限，Git4Data 负责高价值长期记忆的版本和恢复。
 
-**务实的做法是分层**：静态规则留在 Markdown 做护栏，动态知识交给带版本能力的记忆层，版本控制做安全网。
+---
 
-**还有几条要提前知道的代价：**
+## 八、使用时还要注意什么
 
-- **记忆审计不是内容审核。** 置信度门槛、矛盾如何裁决、什么算"不该记住的信息"，都是你的策略。Git4Data 能力保证的是：这些策略作用在可控的分支上、每次写入有据可查、错了能退回。
-- **superseded 会累积。** 保留历史有存储成本，需要给过期事实设定清理或归档策略。
-- **合规删除要穿透历史。** 用户要求删除个人数据时，只删 active 行不够——superseded 的历史行和保留中的快照里都可能还有，这需要专门的处理流程（[第八篇](https://github.com/matrixorigin/matrixorigin-blog/blob/main/matrixorigin/git4data-part8-ml-lifecycle-zh/index.md)提过同类问题）。
-- **产品化之后，判断仍然在你这边。** Memoria 把分支、审计、快照、恢复都收成了工具和界面，但"什么该被记住""置信门槛卡在哪""这条矛盾算改主意还是算误解"仍然是策略层的决定。**底层能力负责让决定可执行、可追溯、可撤销，不负责替你做决定。**
+版本能力解决不了所有 Memory 问题。
+
+- **检索质量仍然需要评估。** 记得正确但取不出来，和没有记忆一样；取回太多无关内容，也会挤占模型的注意力。
+- **冲突处理是业务策略。** "用户改变了偏好"和"Agent 误解了用户"在数据层可能长得一样，系统需要规则、置信度或人工确认来判断。
+- **长期记忆必须支持遗忘。** 过期事实、临时状态和无价值事件如果只增不减，会降低检索质量并增加成本。
+- **隐私和权限不能依赖提示词。** 用户隔离、最小权限、敏感信息处理和删除请求需要在数据层落实。
+- **合规删除要考虑历史版本。** 删除活跃记录并不代表快照和历史版本中的数据已经消失，需要单独设计保留期和彻底删除流程。
+- **分支审核应按风险分级。** 不是每条低风险记忆都需要人工审批；可以让自动规则处理常规写入，把高影响、低置信或冲突写入交给人。
+- **快照和分支是有成本的资源。** 零拷贝让它们很便宜，但不等于免费——托管服务上它们是有配额的（Memoria 免费版每个记忆空间 2 个快照、2 个分支），自建时也要为长期保留的历史版本规划存储和清理策略。**该在哪些节点打快照，本身就是一个需要设计的问题。**
 
 ---
 
 ## 结语
 
-Agent 的记忆决定了它能不能完成长任务、能不能被信任——但它同时也是这个系列里第一份**由机器自己写入、并立刻生效**的数据。没有训练数据那样的缓冲期，写下的一瞬间就开始影响线上行为。
+Agent Memory 的本质，是 Agent 在模型之外持续维护的一层状态。它决定了 Agent 能否跨会话推进任务、积累经验、保持个性化并与其他 Agent 协作。
 
-行业已经趟过了几种做法：Markdown 文件透明但会无声腐化，向量库解决了检索却只会追加，框架内的缓冲活不过一次会话，平台内建的记忆又绑死在单个工具里。**它们缺的不是存储，是治理**——矛盾怎么裁、错了怎么退、谁写的怎么查。
+行业已经形成了多种路径：Markdown 适合透明的静态规则，对话摘要适合短期连续性，向量检索适合大规模语义召回，结构化数据库适合状态与关系，专用平台负责把这些能力封装成 Agent 可以调用的工具。真正进入生产后，问题会从"如何记住"继续走向"如何更新、审计、隔离和恢复"。
 
-把记忆放进"分支 → 审计 → 合并"的流程，配上溯源列和定期快照之后，这三件事就都有了答案：**3,000 条提议里 531 条被挡在门外、300 条矛盾以"新旧并存"的方式化解、5,000 条被污染的记忆一条语句回滚归零**；而"这条记忆是谁在什么时候写的、那次会话还写了什么"，从此都是一条 SQL 的事。
+MatrixOne 的价值，在于把结构化数据、向量与全文检索，以及 Git4Data 的版本能力放在同一套系统里。Memoria 在上层负责记忆类型、提取、检索与治理策略；Git4Data 在底层提供分支、DIFF、合并、快照和回滚。
 
-这一篇也是整个系列里唯一一次，我们能指着一个正在跑的产品说"就是这么用的"：[Memoria](https://github.com/matrixorigin/Memoria) 把上面这套动作包成了 Agent 能调的工具和用户能点的按钮，底下正是 MatrixOne 的分支、快照与回滚。**Git for Data 这套能力的价值，在 Agent 这一档上第一次不再是"给数据团队用"，而是直接变成了终端产品的一个功能。**
+它不替 Agent 决定什么是真相，但能让每一次记忆变化都有边界、有记录、可撤销。
 
----
-
-## 延伸阅读
-
-- [为什么 AI Agent 需要 Memory？](https://github.com/matrixorigin/matrixorigin-blog/blob/main/matrixorigin/ai-agent-memory-zh/index.md) —— 记忆让 AI 从"工具"变成"关系"
-- [为什么 AI Agent 的记忆不能只靠一个 Markdown 文件？](https://github.com/matrixorigin/matrixorigin-blog/blob/main/matrixorigin/markdown-agent-memoria-zh/index.md) —— 静态文件的三个结构性缺陷，以及记忆投毒的安全面
-- [为什么我用 Rust 重写了 Memoria](https://github.com/matrixorigin/matrixorigin-blog/blob/main/matrixorigin/rust-memoria-agent-zh/index.md) —— Memoria 为什么长在 MatrixOne 上，以及它的架构演进
-- [Memoria 备份与恢复功能上线](https://github.com/matrixorigin/matrixorigin-blog/blob/main/matrixorigin/memoria-backup-restore-zh/index.md) —— 记忆快照在产品里长什么样
-- [1 分钟快速上手：将你的编程智能体接入 Memoria](https://github.com/matrixorigin/matrixorigin-blog/blob/main/matrixorigin/start-agent-memoria-zh/index.md)
-
-> 📎 可运行 SQL（固定 commit `354b9cf`）：[github.com/matrixorigin/git4data-tutorial](https://github.com/matrixorigin/git4data-tutorial/blob/354b9cff424cafb50d0b58128e78cc36970fe211) ｜ Memoria 开源仓库：[github.com/matrixorigin/Memoria](https://github.com/matrixorigin/Memoria) ｜ 源码与社区：[github.com/matrixorigin/matrixone](https://github.com/matrixorigin/matrixone)
+对于会长期运行、持续学习并自主写入状态的 Agent，这不是锦上添花，而是让它从"能记住"走向"可以被信任"的基础设施。
