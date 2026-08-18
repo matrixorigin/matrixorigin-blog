@@ -2,7 +2,7 @@
 title: "MatrixOne Git4Data Deep Dive (Part 13) · Agents — Memory: From the Industry's Approaches to Governable Long-Term Memory"
 author: MatrixOrigin
 mail: contact@matrixorigin.io
-description: "Agent memory isn't a longer context window — it's the state layer that lets an agent keep working across tasks. This piece starts from what memory is and what it does, surveys the industry's approaches (prompt files, summarisation, vector retrieval, structured stores, platform built-ins), then shows how MatrixOne combines structured data, hybrid retrieval, and the branching, DIFF, snapshots and rollback of its Git4Data capability into long-term memory that is retrievable, auditable and recoverable."
+description: "Agent memory isn't a longer context window — it's the state layer that lets an agent keep working across tasks. This piece starts from what memory is, surveys the industry's approaches (prompt files, summarisation, vector retrieval, structured stores, platform built-ins), then shows how MatrixOne combines structured data, hybrid retrieval, and the branching, DIFF, snapshots and rollback of its Git4Data capability into long-term memory that is retrievable, auditable and recoverable."
 tags: ["Technical Insights"]
 keywords: ["Agent Memory", "AI Agent", "MatrixOne", "Memoria", "Git4Data", "Vector Search", "Data Versioning", "Rollback", "Provenance"]
 publishTime: "2026-07-25T17:00:00+08:00"
