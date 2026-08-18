@@ -1,5 +1,5 @@
 ---
-title: "Why Do Agents Need Memory? From the Industry's Approaches to Governable Memory on MatrixOne"
+title: "MatrixOne Git4Data Deep Dive (Part 13) · Agents — Memory: From the Industry's Approaches to Governable Long-Term Memory"
 author: MatrixOrigin
 mail: contact@matrixorigin.io
 description: "Agent memory isn't a longer context window — it's the state layer that lets an agent keep working across tasks. This piece starts from what memory is and what it does, surveys the industry's approaches (prompt files, summarisation, vector retrieval, structured stores, platform built-ins), then shows how MatrixOne combines structured data, hybrid retrieval and Git4Data's branching, DIFF, snapshots and rollback into long-term memory that is retrievable, auditable and recoverable."
@@ -16,7 +16,7 @@ translations:
   zh: git4data-part13-agent-memory-zh
 ---
 
-# Why Do Agents Need Memory? From the Industry's Approaches to Governable Memory on MatrixOne
+# MatrixOne Git4Data Deep Dive (Part 13) · Agents — Memory: From the Industry's Approaches to Governable Long-Term Memory
 
 Across the first twelve parts of the Git4Data series we covered data operations, machine-learning datasets, multimodal data, SFT and RLHF. The scenarios kept changing, but one thing never did: **a human decided to change the data, made the change, and checked the result.**
 

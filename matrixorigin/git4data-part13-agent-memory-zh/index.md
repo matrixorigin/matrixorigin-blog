@@ -1,5 +1,5 @@
 ---
-title: "Agent 为什么需要 Memory？从行业方案到 MatrixOne 的可治理记忆"
+title: "MatrixOne Git4Data 技术详解（十三）·Agent 篇：Memory——从行业方案到可治理的长期记忆"
 author: MatrixOrigin
 description: "Agent Memory 不是更长的上下文，而是 Agent 跨任务持续工作的状态层。本文从 Memory 的定义与价值出发，梳理提示词文件、对话摘要、向量检索、结构化存储和平台内建记忆等行业方案，再介绍如何在 MatrixOne 上利用结构化数据、混合检索与 Git4Data 的分支、DIFF、快照和回滚能力，构建可检索、可审计、可恢复的长期记忆。"
 tags: ["技术干货"]
@@ -15,7 +15,7 @@ translations:
   en: git4data-part13-agent-memory
 ---
 
-# Agent 为什么需要 Memory？从行业方案到 MatrixOne 的可治理记忆
+# MatrixOne Git4Data 技术详解（十三）·Agent 篇：Memory——从行业方案到可治理的长期记忆
 
 在 Git4Data 系列的前十二篇里，我们讨论过数据运维、机器学习数据集、多模态数据、SFT 和 RLHF。场景不断变化，但有一件事始终没有变：**决定修改数据、执行修改并检查结果的，最终还是人。**
 
