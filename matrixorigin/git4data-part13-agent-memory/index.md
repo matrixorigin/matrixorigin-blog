@@ -198,10 +198,10 @@ That's precisely where MatrixOne's Git4Data capability comes in.
 It exposes tools to agents over MCP — `memory_store`, `memory_retrieve`, `memory_correct`, `memory_purge`, `memory_snapshot`, `memory_branch`, `memory_diff`, `memory_rollback` and others. Agents use memory tools rather than touching the database; MatrixOne supplies the unified data and version layer underneath:
 
 ```text
-Your agent                      Memoria                MatrixOne
-Kiro / Cursor /    ──MCP──▶    MCP Server   ─────▶    CoW Engine
-Claude Code /      REST        typing / retrieval     zero-copy branches
-Codex / OpenClaw   stdio·SSE   governance / snapshots instant snapshots · rollback
+Your agent                      Memoria                MatrixOne 4.1.0
+Kiro / Cursor /    ──MCP──▶    MCP Server   ─────▶    storage engine
+Claude Code /      REST        typing / retrieval     branch · DIFF · MERGE
+Codex / OpenClaw   stdio·SSE   governance / snapshots snapshot (CoW) · rollback
 ```
 
 Adoption is tool-agnostic: Kiro, Cursor, Claude Code and Codex have ready-made configurations, OpenClaw has a plugin, and custom agents go through MCP or the REST API. **Switch models or switch agent tools, and memory doesn't have to migrate with them.**
@@ -224,15 +224,24 @@ This is exactly what a Markdown file can't do: everything in one file shares one
 
 A memory store that only grows degrades in retrieval quality over time, so we built contradiction detection, low-confidence quarantine and automatic deduplication into Memoria. That pipeline is **purpose-built rather than LLM-driven**, which is a deliberate trade-off: if governance runs every memory through a model, it stops being viable at scale.
 
-### 4. Scale and retrieval performance
+### 4. Scale: past a certain line, retrieval is a database problem
 
-A memory store won't stay at a few hundred rows. The bands we cover today are roughly 100 memories for a personal assistant, 10K at team level, 1M at enterprise level with GPU acceleration, and a billion via DiskANN; GPU retrieval is powered by NVIDIA cuVS at around **12× acceleration**.
+A memory store won't stay at a few hundred rows. A personal assistant may sit at a few hundred indefinitely, but a memory pool shared by a team, or a support agent that has run for six months, reaches hundreds of thousands or millions before long.
 
-The point isn't the specific multiplier but a structural fact: **the retrieval path for memory is ultimately a database problem.** Once memory crosses the line from "fits in the context" to "must be indexed," what it needs is a real retrieval engine, not a bigger file.
+There's a structural boundary here: **once memory crosses the line from "fits in the context" to "must be indexed," what it needs is a real retrieval engine, not a bigger file.** Index build and update, filter pushdown, query concurrency, the memory-versus-disk trade-off — these are problems databases have spent decades on, and they aren't things you patch in at the application layer.
+
+MatrixOne's vector search supports GPU acceleration, which raises the ceiling on that path further. **The usable capacity range and the speedup depend on hardware, index type and parameters, data distribution and query shape, so this article won't quote a number detached from those conditions** — when you need to evaluate it, measure in your own environment.
 
 ### 5. The Git4Data capability makes memory changes isolatable, comparable and recoverable
 
-This is where MatrixOne differs most from an ordinary "database + vector index" stack: memory isn't only stored and searched — it can be branched, diffed, merged and restored like code. The `snapshot → branch → diff → merge → rollback` chain is driven by MatrixOne's native copy-on-write engine as millisecond-scale metadata operations, producing no data copies.
+This is where MatrixOne differs most from an ordinary "database + vector index" stack: memory isn't only stored and searched — it can be branched, diffed, merged and restored like code. The `snapshot → branch → diff → merge → rollback` chain is native to the storage engine rather than assembled at the application layer.
+
+**Two semantics need separating here**, because their costs are quite different (this describes **MatrixOne 4.1.0**):
+
+- **A snapshot (`CREATE SNAPSHOT`)** uses storage-layer copy-on-write: it freezes a point in time without copying data, and its cost grows with how much changes afterwards.
+- **A branch (`DATA BRANCH CREATE TABLE`)** goes through the clone path in 4.1.0: it copies at **data-object granularity** — it doesn't rewrite row data, and the work scales with object count rather than row count, but it does **create a new table and carry storage overhead**, which grows further as the two sides diverge.
+
+So a branch is far lighter than `SELECT INTO` a copy of the table, but it **isn't a free pointer flip**. Opening branches at scale in production needs capacity planning — which is why there's a separate section below on when a branch is worth it.
 
 The boundary needs stating clearly:
 
@@ -247,7 +256,7 @@ Set against several common approaches, it looks like this — with the caveat th
 
 | Capability | Memoria | Mem0 | Letta | Markdown file |
 |---|---|---|---|---|
-| Version control (snapshot / branch / rollback) | **native CoW** | none | Git version control | none |
+| Version control (snapshot / branch / rollback) | **native to the storage engine** | none | Git version control | none |
 | Isolated experiments (branch sandbox) | **user-facing, one click** | none | in-agent worktree | none |
 | Full audit trail | **every change traceable** | limited logs | Git commit history | none |
 | Semantic search | vector + full-text hybrid | vector + graph + KV | filesystem navigation | keywords only |
@@ -258,7 +267,7 @@ Set against several common approaches, it looks like this — with the caveat th
 
 The most notable part is the first three rows: **semantic retrieval is something every option does; what actually separates them is versioning, isolation and auditing** — and those three aren't things a memory layer can supply by itself. They depend on whether the underlying data system supports them natively.
 
-![How Memoria and this article's SQL stack up: agents such as Cursor, Claude Code, Kiro, Codex and OpenClaw connect over MCP or REST; Memoria in the middle exposes memory tools (store / retrieve / correct / purge / snapshot / branch / diff / rollback) plus six memory types and autonomous governance; underneath, MatrixOne's CoW storage engine provides zero-copy branches, instant snapshots, row-level DIFF, MERGE and point-in-time rollback, with vector indexing and full-text search in the same engine](./images/fig_memoria-stack_en.svg)
+![How Memoria and this article's SQL stack up: agents such as Cursor, Claude Code, Kiro, Codex and OpenClaw connect over MCP or REST; Memoria in the middle exposes memory tools (store / retrieve / correct / purge / snapshot / branch / diff / rollback) plus six memory types and autonomous governance; underneath, MatrixOne 4.1.0's storage engine provides object-granularity branches, copy-on-write instant snapshots, row-level DIFF, MERGE and point-in-time rollback, with vector indexing and full-text search in the same engine](./images/fig_memoria-stack_en.svg)
 
 ---
 

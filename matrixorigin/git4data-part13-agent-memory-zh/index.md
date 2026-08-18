@@ -197,10 +197,10 @@ Letta 等 Memory 框架会组合常驻记忆块、文件和可检索的归档记
 它通过 MCP 向 Agent 暴露 `memory_store`、`memory_retrieve`、`memory_correct`、`memory_purge`、`memory_snapshot`、`memory_branch`、`memory_diff` 和 `memory_rollback` 等工具。Agent 使用的是 Memory 工具，而不是直接操作数据库；MatrixOne 则在底层提供统一的数据与版本能力：
 
 ```text
-你的 Agent                    Memoria                 MatrixOne
-Kiro / Cursor /   ──MCP──▶   MCP Server   ──────▶    CoW Engine
-Claude Code /     REST       记忆分型 / 检索          零拷贝分支
-Codex / OpenClaw  stdio·SSE  治理 / 快照管理          即时快照 · 回滚
+你的 Agent                    Memoria                 MatrixOne 4.1.0
+Kiro / Cursor /   ──MCP──▶   MCP Server   ──────▶    存储引擎
+Claude Code /     REST       记忆分型 / 检索          分支 · DIFF · MERGE
+Codex / OpenClaw  stdio·SSE  治理 / 快照管理          快照（CoW）· 回滚
 ```
 
 接入是工具无关的：Kiro、Cursor、Claude Code、Codex 有现成配置，OpenClaw 有插件，自建 Agent 走 MCP 或 REST API。**换模型、换 Agent 工具时，Memory 不必跟着迁移。**
@@ -223,15 +223,24 @@ Agent Memory 往往既包含结构化字段，也包含自然语言内容。Matr
 
 记忆库如果只增不减，检索质量会随时间下降。所以我们在 Memoria 里内置了矛盾检测、低置信度隔离和自动去重。这条管线是**专用实现、不额外调用 LLM**——这是个有意的取舍：治理如果每条记忆都要过一次模型，规模一上来就跑不动了。
 
-### 4. 规模与检索性能
+### 4. 规模：跨过某条线之后，检索就是数据库问题
 
-记忆库不会一直是几百条。按我们目前覆盖的量级：个人助手约 100 条、团队级 10K、企业级 1M（GPU 加速），十亿级走 DiskANN；GPU 检索由 NVIDIA cuVS 驱动，约 **12× 加速**。
+记忆库不会一直是几百条。个人用的助手可能长期停在几百条，但一个团队共享的记忆池、或者一个跑了半年的客服 Agent，很快就是十万、百万量级。
 
-这里想说明的不是具体倍数，而是一个结构性事实：**Memory 的检索路径最终是数据库问题**。当记忆规模从"能塞进上下文"跨过"必须索引"这条线之后，它需要的就是一个真正的检索引擎，而不是一个更大的文件。
+这里有一个结构性的分界：**当记忆规模从"能塞进上下文"跨过"必须索引"这条线之后，它需要的就是一个真正的检索引擎，而不是一个更大的文件。** 索引的构建与更新、过滤条件下推、并发查询、内存与磁盘的取舍——这些都是数据库已经解决了几十年的问题，而不是在应用层能补上的。
+
+MatrixOne 的向量检索支持 GPU 加速，这条路径的上限还能再往上抬一截。**具体的容量区间和加速比取决于硬件、索引类型与参数、数据分布和查询形态，本文不给一个脱离条件的数字**——需要评估时，请以你自己环境下的实测为准。
 
 ### 5. Git4Data 能力让记忆变更可隔离、可比较、可恢复
 
-这是 MatrixOne 与普通"数据库 + 向量索引"方案最不同的地方：记忆不仅能存和搜，还能像代码一样先开分支、查看差异、合并，并在出错时恢复——`snapshot → branch → diff → merge → rollback` 这条链路由 MatrixOne 原生的 Copy-on-Write 引擎驱动，是毫秒级的元数据操作，不产生数据副本。
+这是 MatrixOne 与普通"数据库 + 向量索引"方案最不同的地方：记忆不仅能存和搜，还能像代码一样先开分支、查看差异、合并，并在出错时恢复——`snapshot → branch → diff → merge → rollback` 这条链路是存储引擎的原生能力，而不是应用层拼出来的。
+
+**这里要把两种语义分清楚**，因为它们的开销完全不同（以下针对 **MatrixOne 4.1.0**）：
+
+- **快照（`CREATE SNAPSHOT`）** 走的是存储层的 Copy-on-Write：它冻结一个时间点，不复制数据，代价随之后的改动量增长。
+- **分支（`DATA BRANCH CREATE TABLE`）** 在 4.1.0 上走的是 clone 路径：它按**数据对象的粒度**做拷贝——不重写行数据，工作量随对象数而不是行数增长，但它确实会**创建一张新表并带来存储开销**，之后两边各自的写入还会继续拉大差距。
+
+所以分支比"把表 `SELECT INTO` 一份"轻得多，但它**不是一次免费的指针翻转**。真要在生产上大量开分支，容量是需要规划的——这也是为什么本文后面把"什么场景值得走分支"单独讲了一节。
 
 需要把边界说清楚：
 
@@ -246,7 +255,7 @@ Agent Memory 往往既包含结构化字段，也包含自然语言内容。Matr
 
 | 能力维度 | Memoria | Mem0 | Letta | Markdown 文件 |
 |---|---|---|---|---|
-| 版本控制（快照/分支/回滚） | **原生 CoW** | 无 | Git 版本控制 | 无 |
+| 版本控制（快照/分支/回滚） | **存储引擎原生** | 无 | Git 版本控制 | 无 |
 | 隔离实验（分支沙盒） | **用户可操作，一键创建** | 无 | Agent 内部 worktree | 无 |
 | 完整审计追踪 | **每次变更可溯源** | 有限日志 | Git 提交历史 | 无 |
 | 语义搜索 | 向量 + 全文混合 | 向量 + 图 + KV | 文件系统导航 | 仅关键词 |
@@ -257,7 +266,7 @@ Agent Memory 往往既包含结构化字段，也包含自然语言内容。Matr
 
 对比里最值得注意的是前三行：**语义检索这件事，几个方案都做了；真正拉开差距的是版本、隔离和审计**——而这三件事恰好不是 Memory 层能靠自己补上的，它取决于底层数据系统是否原生支持。
 
-![Memoria 与本文这套 SQL 的分层关系：上层是 Cursor / Claude Code / Kiro / Codex / OpenClaw 等 Agent 通过 MCP 或 REST 接入，中层是 Memoria 暴露的记忆工具（store / retrieve / correct / purge / snapshot / branch / diff / rollback）与六类记忆分型和自治治理，底层是 MatrixOne 的 CoW 存储引擎提供零拷贝分支、即时快照、行级 DIFF、MERGE 与时间点回滚，以及同一套引擎内的向量索引和全文检索](./images/fig_memoria-stack_zh.svg)
+![Memoria 与本文这套 SQL 的分层关系：上层是 Cursor / Claude Code / Kiro / Codex / OpenClaw 等 Agent 通过 MCP 或 REST 接入，中层是 Memoria 暴露的记忆工具（store / retrieve / correct / purge / snapshot / branch / diff / rollback）与六类记忆分型和自治治理，底层是 MatrixOne 4.1.0 的存储引擎提供对象粒度的分支、基于 Copy-on-Write 的即时快照、行级 DIFF、MERGE 与时间点回滚，以及同一套引擎内的向量索引和全文检索](./images/fig_memoria-stack_zh.svg)
 
 ---
 
