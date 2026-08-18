@@ -104,7 +104,7 @@ When coding, testing, research and operations agents work together, shared memor
 
 ### 5. Precise recall also buys back context budget
 
-This gets treated as a side benefit, but it's quantifiable. Without memory, the usual way to maintain continuity is to inject the whole history into the context — and **that injection snowballs with the number of turns**. The comparison on Memoria's site makes it concrete:
+This gets treated as a side benefit, but it's quantifiable. Without memory, the usual way to maintain continuity is to inject the whole history into the context — and **that injection snowballs with the number of turns**. Here's a comparison we ran on Memoria:
 
 | | Turn 1 | Turn 3 | Turn 5 | Turn 10 |
 |---|---|---|---|---|
@@ -191,9 +191,9 @@ That's precisely where MatrixOne and Git4Data come in.
 
 ## 5. What building memory on MatrixOne brings
 
-[Memoria](https://github.com/matrixorigin/Memoria) is an open-source (Apache-2.0) agent-memory project built on MatrixOne. Its [website](https://thememoria.ai) positions it as **"the world's first version control system for AI agent memory,"** with the claim in one line:
+[Memoria](https://thememoria.ai) is the open-source agent-memory project we built on MatrixOne (Apache-2.0, [GitHub](https://github.com/matrixorigin/Memoria)). The premise behind it is simple:
 
-> Git made code safe to change. Memoria makes memory safe to change.
+> Git made code safe to change. We wanted memory to be the same.
 
 It exposes tools to agents over MCP — `memory_store`, `memory_retrieve`, `memory_correct`, `memory_purge`, `memory_snapshot`, `memory_branch`, `memory_diff`, `memory_rollback` and others. Agents use memory tools rather than touching the database; MatrixOne supplies the unified data and version layer underneath:
 
@@ -216,17 +216,17 @@ Hybrid retrieval fixes a classic failure of pure keyword matching: the memory sa
 
 ### 2. Memory types aren't labels — they're different lifecycles
 
-Memoria implements the table from section 1 as six explicit types: `semantic`, `profile`, `procedural`, `working`, `tool_result`, `episodic`. Type isn't just a filter field — it determines **how long the memory should live**: `working` memory should be cleared when the task ends, `profile` should persist and remain viewable and deletable by the user, and `semantic` gets superseded as facts change.
+In Memoria we implemented the table from section 1 as six explicit types: `semantic`, `profile`, `procedural`, `working`, `tool_result`, `episodic`. Type isn't just a filter field — it determines **how long the memory should live**: `working` memory should be cleared when the task ends, `profile` should persist and remain viewable and deletable by the user, and `semantic` gets superseded as facts change.
 
 This is exactly what a Markdown file can't do: everything in one file shares one lifecycle, and you can't make three of its lines expire on their own.
 
 ### 3. Autonomous governance: contradiction detection, low-confidence quarantine, deduplication
 
-A memory store that only grows degrades in retrieval quality over time. Memoria ships contradiction detection, low-confidence quarantine and automatic deduplication, and the site notes this pipeline is **purpose-built rather than LLM-driven** — which matters for cost: if governance runs every memory through a model, it stops being viable at scale.
+A memory store that only grows degrades in retrieval quality over time, so we built contradiction detection, low-confidence quarantine and automatic deduplication into Memoria. That pipeline is **purpose-built rather than LLM-driven**, which is a deliberate trade-off: if governance runs every memory through a model, it stops being viable at scale.
 
 ### 4. Scale and retrieval performance
 
-A memory store won't stay at a few hundred rows. The site gives the ranges as roughly 100 memories for a personal assistant, 10K at team level, 1M at enterprise level with GPU acceleration, and a billion via DiskANN; GPU retrieval is powered by NVIDIA cuVS, listed at around **12× acceleration**.
+A memory store won't stay at a few hundred rows. The bands we cover today are roughly 100 memories for a personal assistant, 10K at team level, 1M at enterprise level with GPU acceleration, and a billion via DiskANN; GPU retrieval is powered by NVIDIA cuVS at around **12× acceleration**.
 
 The point isn't the specific multiplier but a structural fact: **the retrieval path for memory is ultimately a database problem.** Once memory crosses the line from "fits in the context" to "must be indexed," what it needs is a real retrieval engine, not a bigger file.
 
@@ -243,7 +243,7 @@ Git4Data doesn't decide for the agent what deserves remembering. It guarantees t
 
 ### 6. Seen alongside the other options
 
-The site publishes a side-by-side comparison worth reproducing — note it compares each option's **default path**, not the full extent of any product's capability:
+Set against several common approaches, it looks like this — with the caveat that this compares each option's **default path**, not the full extent of any product's capability:
 
 | Capability | Memoria | Mem0 | Letta | Markdown file |
 |---|---|---|---|---|
@@ -362,7 +362,7 @@ RESTORE TABLE agent_mem.agent_memory {SNAPSHOT = mem_v1};
 
 Rollback isn't only for the obvious incident where one run clearly broke 5,000 rows. It's also for the much harder case of gradual drift: the agent learns something slightly wrong each time, behaviour starts diverging weeks later, and there's no single failing session to point at. Returning to a known-good version is more reliable than guessing, row by row, which memory to delete.
 
-Put the other way round, **being able to roll back changes how you work**: knowing you can always return to a known-good state is what makes it safe to let the agent try a new workflow or a new prompting strategy. That's why the site lists "experiment without fear" as a value in its own right — branches and snapshots aren't only for firefighting; they make experiments affordable.
+Put the other way round, **being able to roll back changes how you work**: knowing you can always return to a known-good state is what makes it safe to let the agent try a new workflow or a new prompting strategy. We treat that as a value in its own right: branches and snapshots aren't only for firefighting, they make experiments affordable.
 
 ![The agent-memory flow: the 40,000-fact store never moves while session run_9001 proposes 3,000 memories on a branch; the audit finds 300 contradictions (marked superseded), 428 low-confidence and 120 untraceable (both rejected); after merging, DIFF records INSERTED 2469 / UPDATED 206 and the store reaches 42,469; when run_9002 poisons 5,000 facts a single RESTORE returns it to zero; and the provenance columns make "who wrote what, when" queryable](./images/fig_agent-memory_en.svg)
 
@@ -389,9 +389,9 @@ So Git4Data's value for memory isn't "smarter retrieval." It's that **memory can
 - **Multi-agent systems** — several writers share memory and need provenance, permissions, conflict handling and a common recovery point.
 - **Production systems where agents write autonomously** — nobody can review row by row, so the blast radius of a bad write has to be bounded.
 - **Industries with audit, compliance or data-sovereignty requirements** — you must be able to explain why the agent answered or acted a certain way at a certain time.
-- **Teams experimenting with different agent strategies** — let different branches accumulate different memories, compare the results, then decide whether to merge. The site's "train one agent, fork its memory to every teammate" is exactly this: the way of working one senior engineer tuned can be copied to the rest of the team.
+- **Teams experimenting with different agent strategies** — let different branches accumulate different memories, compare the results, then decide whether to merge. A step further is "train one agent, fork its memory to every teammate": the way of working one senior engineer tuned can be copied to the rest of the team.
 
-### Don't over-engineer
+### Not a fit
 
 - **One-off, short tasks** — context that's unused after the session ends is fine with a summary or working memory.
 - **Slow-changing static conventions** — coding style, directory rules and safety guardrails are more transparent in Markdown.
@@ -399,20 +399,6 @@ So Git4Data's value for memory isn't "smarter retrieval." It's that **memory can
 - **Read-only knowledge Q&A** — if the agent only retrieves human-maintained documents and never modifies the knowledge base, ordinary RAG already covers most of it.
 
 The pragmatic architecture is layered: Markdown for static guardrails, a short-term buffer for the current task, vector and full-text search for recall, structured tables for state and permissions, and Git4Data for versioning and recovery of high-value long-term memory.
-
----
-
-## 8. What else to watch for
-
-Versioning doesn't solve every memory problem.
-
-- **Retrieval quality still needs evaluation.** Remembering correctly but failing to retrieve is the same as not remembering; retrieving too much irrelevant content crowds out the model's attention.
-- **Conflict handling is business policy.** "The user changed their preference" and "the agent misread the user" can look identical at the data layer; the system needs rules, confidence, or a human to decide.
-- **Long-term memory must support forgetting.** Stale facts, transient state and low-value events that only accumulate degrade retrieval quality and raise cost.
-- **Privacy and permissions can't rely on prompts.** User isolation, least privilege, sensitive-data handling and deletion requests have to be enforced at the data layer.
-- **Compliance deletion must account for historical versions.** Deleting the active record doesn't mean the data is gone from snapshots and historical versions; retention periods and a hard-delete process need their own design.
-- **Branch review should be tiered by risk.** Not every low-risk memory needs human approval; let automatic rules handle routine writes and route high-impact, low-confidence or conflicting writes to a person.
-- **Snapshots and branches are resources with a cost.** Zero-copy makes them cheap, not free — on the hosted service they come with quotas (Memoria's free tier allows 2 snapshots and 2 branches per memory space), and self-hosting still needs a storage and cleanup plan for long-retained versions. **Deciding which moments deserve a snapshot is itself a design question.**
 
 ---
 
