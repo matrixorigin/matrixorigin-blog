@@ -54,5 +54,5 @@
 
   <text x="44" y="448" fill="#6E7681" font-size="11">The boundary: confidence, source_run, memory types and conflict rules are Memoria's or your application's policy;</text>
   <text x="44" y="468" fill="#6E7681" font-size="11">branch / DIFF / merge / snapshot / restore are the underlying capability MatrixOne provides.</text>
-  <text x="44" y="490" fill="#6E7681" font-size="11">Git4Data doesn't decide what deserves remembering — it guarantees the deciding has an isolated area, a record of what changed, and a way back.</text>
+  <text x="44" y="490" fill="#6E7681" font-size="11">The Git4Data capability doesn't decide what deserves remembering — it guarantees the deciding has an isolated area, a record of what changed, and a way back.</text>
 </svg>

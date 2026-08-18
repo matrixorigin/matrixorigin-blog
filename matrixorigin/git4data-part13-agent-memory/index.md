@@ -2,7 +2,7 @@
 title: "MatrixOne Git4Data Deep Dive (Part 13) · Agents — Memory: From the Industry's Approaches to Governable Long-Term Memory"
 author: MatrixOrigin
 mail: contact@matrixorigin.io
-description: "Agent memory isn't a longer context window — it's the state layer that lets an agent keep working across tasks. This piece starts from what memory is and what it does, surveys the industry's approaches (prompt files, summarisation, vector retrieval, structured stores, platform built-ins), then shows how MatrixOne combines structured data, hybrid retrieval and Git4Data's branching, DIFF, snapshots and rollback into long-term memory that is retrievable, auditable and recoverable."
+description: "Agent memory isn't a longer context window — it's the state layer that lets an agent keep working across tasks. This piece starts from what memory is and what it does, surveys the industry's approaches (prompt files, summarisation, vector retrieval, structured stores, platform built-ins), then shows how MatrixOne combines structured data, hybrid retrieval, and the branching, DIFF, snapshots and rollback of its Git4Data capability into long-term memory that is retrievable, auditable and recoverable."
 tags: ["Technical Insights"]
 keywords: ["Agent Memory", "AI Agent", "MatrixOne", "Memoria", "Git4Data", "Vector Search", "Data Versioning", "Rollback", "Provenance"]
 publishTime: "2026-07-25T17:00:00+08:00"
@@ -24,7 +24,7 @@ With agents, that boundary starts to dissolve.
 
 An agent can discover a fact mid-conversation, form a judgment, and write both into its own long-term state. Once written, there is no retraining and no waiting for the next release; it may read that information seconds later and answer a question or call a tool based on it.
 
-That leaves Git4Data facing a new class of data: **the writer is an agent, the reader is an agent, and the moment something is written it can change the agent's subsequent behaviour.**
+That leaves data versioning facing a new class of data: **the writer is an agent, the reader is an agent, and the moment something is written it can change the agent's subsequent behaviour.**
 
 Start with an ordinary scenario.
 
@@ -38,7 +38,7 @@ Memory is often read as "save the chat log," which falls well short. A usable ag
 
 So as the Git4Data series enters the agent tier, the first question isn't "which tools can an agent call." It's more basic than that: **how should an agent's memory be stored, and how can it change safely?**
 
-This article starts from what memory is and what it does, then surveys the industry's main approaches, and finally covers why MatrixOne suits agent memory — and what Git4Data's branching, DIFF, snapshots and rollback bring to long-term memory.
+This article starts from what memory is and what it does, then surveys the industry's main approaches, and finally covers why MatrixOne suits agent memory — and what its Git4Data capability (branching, DIFF, snapshots and rollback) brings to long-term memory.
 
 > The example SQL is verified on MatrixOne `4.1.0`. The full script lives in [git4data-tutorial](https://github.com/matrixorigin/git4data-tutorial/blob/354b9cff424cafb50d0b58128e78cc36970fe211/13-agent-memory/agent_memory_demo.sql).
 
@@ -185,7 +185,7 @@ Once agents start writing long-term memory on their own, at least seven capabili
 
 Classic vector retrieval mainly addresses #2. Schema plus application logic can cover part of #3, #4 and #5. But #6 and #7 require the underlying data system itself to be versioned.
 
-That's precisely where MatrixOne and Git4Data come in.
+That's precisely where MatrixOne's Git4Data capability comes in.
 
 ---
 
@@ -230,16 +230,16 @@ A memory store won't stay at a few hundred rows. The bands we cover today are ro
 
 The point isn't the specific multiplier but a structural fact: **the retrieval path for memory is ultimately a database problem.** Once memory crosses the line from "fits in the context" to "must be indexed," what it needs is a real retrieval engine, not a bigger file.
 
-### 5. Git4Data makes memory changes isolatable, comparable and recoverable
+### 5. The Git4Data capability makes memory changes isolatable, comparable and recoverable
 
 This is where MatrixOne differs most from an ordinary "database + vector index" stack: memory isn't only stored and searched — it can be branched, diffed, merged and restored like code. The `snapshot → branch → diff → merge → rollback` chain is driven by MatrixOne's native copy-on-write engine as millisecond-scale metadata operations, producing no data copies.
 
 The boundary needs stating clearly:
 
 - `confidence`, `source_run`, memory types and conflict rules are **the model and policy of Memoria or your application**;
-- branch, DIFF, merge, snapshot and restore are **the underlying capability MatrixOne's Git4Data provides**.
+- branch, DIFF, merge, snapshot and restore are **the underlying mechanism MatrixOne provides through its Git4Data capability**.
 
-Git4Data doesn't decide for the agent what deserves remembering. It guarantees that the process of deciding has an isolated area, a record of what changed, and a way back.
+That capability doesn't decide for the agent what deserves remembering. It guarantees that the process of deciding has an isolated area, a record of what changed, and a way back.
 
 ### 6. Seen alongside the other options
 
@@ -262,7 +262,7 @@ The most notable part is the first three rows: **semantic retrieval is something
 
 ---
 
-## 6. How Git4Data makes agent memory safer
+## 6. How the Git4Data capability makes agent memory safer
 
 The full flow, using a support agent's long-term memory store.
 
@@ -327,7 +327,7 @@ WHERE m.mem_id < 500000
   );
 ```
 
-Worth restating: **the conflict rules are defined by the application; Git4Data makes them run on an isolated branch.**
+Worth restating: **the conflict rules are defined by the application; the Git4Data capability makes them run on an isolated branch.**
 
 ### 4. Read the net change with DIFF, then merge
 
@@ -366,9 +366,9 @@ Put the other way round, **being able to roll back changes how you work**: knowi
 
 ![The agent-memory flow: the 40,000-fact store never moves while session run_9001 proposes 3,000 memories on a branch; the audit finds 300 contradictions (marked superseded), 428 low-confidence and 120 untraceable (both rejected); after merging, DIFF records INSERTED 2469 / UPDATED 206 and the store reaches 42,469; when run_9002 poisons 5,000 facts a single RESTORE returns it to zero; and the provenance columns make "who wrote what, when" queryable](./images/fig_agent-memory_en.svg)
 
-### What Git4Data changes
+### What the Git4Data capability changes
 
-| The problem before | With Git4Data |
+| The problem before | With the Git4Data capability |
 |---|---|
 | an agent's write hits main memory immediately | write to a branch, merge after review |
 | no idea what a given run actually changed | read the net change with DIFF |
@@ -376,7 +376,7 @@ Put the other way round, **being able to roll back changes how you work**: knowi
 | new policies can only be tried live | try them on an isolated branch, merge on success |
 | multi-agent writes are hard to reconstruct | application provenance fields + data versions form the audit chain |
 
-So Git4Data's value for memory isn't "smarter retrieval." It's that **memory can change safely.**
+So the Git4Data capability's value for memory isn't "smarter retrieval." It's that **memory can change safely.**
 
 ---
 
@@ -398,7 +398,7 @@ So Git4Data's value for memory isn't "smarter retrieval." It's that **memory can
 - **A single person, a single agent, very little data** — when a human can inspect and fix all of the memory directly, a full governance flow may not pay for itself.
 - **Read-only knowledge Q&A** — if the agent only retrieves human-maintained documents and never modifies the knowledge base, ordinary RAG already covers most of it.
 
-The pragmatic architecture is layered: Markdown for static guardrails, a short-term buffer for the current task, vector and full-text search for recall, structured tables for state and permissions, and Git4Data for versioning and recovery of high-value long-term memory.
+The pragmatic architecture is layered: Markdown for static guardrails, a short-term buffer for the current task, vector and full-text search for recall, structured tables for state and permissions, and MatrixOne's Git4Data capability for versioning and recovery of high-value long-term memory.
 
 ---
 
@@ -408,7 +408,7 @@ Agent memory is, fundamentally, a layer of state the agent maintains outside the
 
 The industry has produced several paths: Markdown suits transparent static rules, summarisation suits short-term continuity, vector retrieval suits large-scale semantic recall, structured databases suit state and relations, and dedicated platforms package these into tools an agent can call. Once things reach production, the question moves on from "how to remember" to "how to update, audit, isolate and recover."
 
-MatrixOne's contribution is putting structured data, vector and full-text retrieval, and Git4Data's versioning in one system. Memoria handles memory types, extraction, retrieval and governance policy on top; Git4Data provides branching, DIFF, merge, snapshots and rollback underneath.
+MatrixOne's contribution is putting structured data, vector and full-text retrieval, and the Git4Data versioning capability in one system. Memoria handles memory types, extraction, retrieval and governance policy on top; MatrixOne provides branching, DIFF, merge, snapshots and rollback underneath through Git4Data.
 
 It doesn't decide for the agent what the truth is. It does make every memory change bounded, recorded and reversible.
 
