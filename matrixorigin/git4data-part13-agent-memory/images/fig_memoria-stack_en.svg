@@ -1,0 +1,58 @@
+<svg viewBox="0 0 1200 500" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system,'Segoe UI',Roboto,Arial,sans-serif">
+  <defs>
+    <pattern id="g" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0V40" fill="none" stroke="#161B22" stroke-width="1"/></pattern>
+    <marker id="a" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0 0L7 3L0 6Z" fill="#6E7681"/></marker>
+  </defs>
+  <rect width="1200" height="500" fill="#0D1117"/><rect width="1200" height="500" fill="url(#g)"/>
+  <text x="44" y="40" fill="#E6EDF3" font-size="22" font-weight="700">Memoria on MatrixOne: agents call memory tools, a version engine sits underneath</text>
+
+  <rect x="44" y="66" width="1112" height="56" rx="10" fill="#161B22" stroke="#30363D" stroke-width="1.3"/>
+  <text x="64" y="90" fill="#9DA7B3" font-size="12" font-weight="700">Your agent</text>
+  <text x="150" y="90" fill="#E6EDF3" font-size="12">Kiro  ·  Cursor  ·  Claude Code  ·  Codex  ·  OpenClaw (plugin)  ·  your own agent (MCP / REST API)</text>
+  <text x="64" y="110" fill="#6E7681" font-size="10.5">Switch models or switch agent tools and memory doesn't migrate with them — it's an independent data layer, not one tool's private state.</text>
+  <line x1="600" y1="124" x2="600" y2="144" stroke="#6E7681" stroke-width="1.6" marker-end="url(#a)"/>
+  <text x="616" y="139" fill="#6E7681" font-size="10.5">MCP / REST · stdio · SSE</text>
+
+  <rect x="44" y="148" width="1112" height="136" rx="10" fill="#10231A" stroke="#3FB950" stroke-width="1.6"/>
+  <text x="64" y="172" fill="#3FB950" font-size="13" font-weight="700">Memoria · open-source MCP Server (Apache-2.0)</text>
+  <text x="404" y="172" fill="#6E7681" font-size="10.5">thememoria.ai ｜ github.com/matrixorigin/Memoria</text>
+
+  <rect x="64" y="186" width="352" height="82" rx="8" fill="#0D1117" stroke="#21262D" stroke-width="1.1"/>
+  <text x="80" y="206" fill="#9DA7B3" font-size="11.5" font-weight="700">memory tools</text>
+  <text x="80" y="226" fill="#E6EDF3" font-size="10.5">store · retrieve · search · correct · purge</text>
+  <text x="80" y="245" fill="#79C0FF" font-size="10.5">snapshot · branch · diff · rollback</text>
+  <text x="80" y="262" fill="#6E7681" font-size="9.5">the agent calls tools, never the database</text>
+
+  <rect x="430" y="186" width="352" height="82" rx="8" fill="#0D1117" stroke="#21262D" stroke-width="1.1"/>
+  <text x="446" y="206" fill="#9DA7B3" font-size="11.5" font-weight="700">six memory types, six lifecycles</text>
+  <text x="446" y="226" fill="#E6EDF3" font-size="10.5">semantic · profile · procedural</text>
+  <text x="446" y="243" fill="#E6EDF3" font-size="10.5">working · tool_result · episodic</text>
+  <text x="446" y="262" fill="#6E7681" font-size="9.5">working is purged; profile persists, viewable and deletable</text>
+
+  <rect x="796" y="186" width="340" height="82" rx="8" fill="#0D1117" stroke="#21262D" stroke-width="1.1"/>
+  <text x="812" y="206" fill="#9DA7B3" font-size="11.5" font-weight="700">autonomous governance (no LLM in the loop)</text>
+  <text x="812" y="226" fill="#E6EDF3" font-size="10.5">contradiction detection · quarantine · dedup</text>
+  <text x="812" y="245" fill="#6E7681" font-size="9.5">a store that only grows degrades in retrieval quality</text>
+  <text x="812" y="262" fill="#6E7681" font-size="9.5">governance through a model per row doesn't scale</text>
+
+  <line x1="600" y1="286" x2="600" y2="306" stroke="#6E7681" stroke-width="1.6" marker-end="url(#a)"/>
+
+  <rect x="44" y="310" width="1112" height="110" rx="10" fill="#161B22" stroke="#79C0FF" stroke-width="1.6"/>
+  <text x="64" y="334" fill="#79C0FF" font-size="13" font-weight="700">MatrixOne 4.1.0 · retrieval and versioning in one engine　←　section 6 drives this layer directly in SQL</text>
+
+  <rect x="64" y="348" width="256" height="58" rx="8" fill="#0D1117" stroke="#21262D" stroke-width="1.1"/>
+  <text x="192" y="370" fill="#E6EDF3" font-size="11.5" text-anchor="middle" font-weight="700">vector + full-text hybrid</text>
+  <text x="192" y="390" fill="#6E7681" font-size="9" text-anchor="middle">store "black formatter", ask "code formatting tool"</text>
+
+  <rect x="334" y="348" width="256" height="58" rx="8" fill="#0D1117" stroke="#21262D" stroke-width="1.1"/>
+  <text x="462" y="370" fill="#E6EDF3" font-size="11.5" text-anchor="middle" font-weight="700">relational queries</text>
+  <text x="462" y="390" fill="#6E7681" font-size="9" text-anchor="middle">filter by user / project / validity / permission</text>
+
+  <rect x="604" y="348" width="532" height="58" rx="8" fill="#0D1117" stroke="#3FB950" stroke-width="1.3"/>
+  <text x="870" y="370" fill="#3FB950" font-size="11.5" text-anchor="middle" font-weight="700">the Git4Data capability · branching and versions</text>
+  <text x="870" y="390" fill="#9DA7B3" font-size="9" text-anchor="middle">snapshot (storage-layer CoW, no data copy) · branch (object-granularity clone, carries storage) · diff · merge · rollback</text>
+
+  <text x="44" y="448" fill="#6E7681" font-size="11">The boundary: confidence, source_run, memory types and conflict rules are Memoria's or your application's policy;</text>
+  <text x="44" y="468" fill="#6E7681" font-size="11">branch / DIFF / merge / snapshot / restore are the underlying capability MatrixOne provides.</text>
+  <text x="44" y="490" fill="#6E7681" font-size="11">The Git4Data capability doesn't decide what deserves remembering — it guarantees the deciding has an isolated area, a record of what changed, and a way back.</text>
+</svg>
