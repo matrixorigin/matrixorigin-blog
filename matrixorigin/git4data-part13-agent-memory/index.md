@@ -117,73 +117,45 @@ The difference isn't only the bill. Every irrelevant token in the window dilutes
 
 A misunderstanding in the context usually disappears when the session ends. A misunderstanding in long-term memory can be retrieved repeatedly for months, shaping answers and actions the whole time.
 
-So memory amplifies both capability and risk. The more autonomous the agent, the longer memory is kept and the wider it's shared, the more auditing and recovery matter. OWASP already lists persistent memory and context poisoning among the significant risks for agentic systems: [Memory & Context Poisoning](https://genai.owasp.org/2025/12/09/owasp-top-10-for-agentic-applications-the-benchmark-for-agentic-security-in-the-age-of-autonomous-ai/).
+So memory amplifies both capability and risk. The more autonomous the agent, the longer memory is kept and the wider it's shared, the more auditing and recovery matter — OWASP's risk list for agentic applications already gives "memory and context poisoning" an entry of its own (see References).
 
 ---
 
 ## 3. How the industry builds agent memory
 
-No single memory design fits every scenario today. Practice falls into roughly the following categories, which solve problems at different levels.
+No single memory design fits every scenario today. A few are common in practice, each solving part of it:
 
-### 1. Prompt and Markdown files
+**Approach 1: prompt and Markdown files.** The most widespread — `AGENTS.md`, `CLAUDE.md` and assorted rules files. Transparent, easy to edit, travelling with the code in Git, and a good fit for **slow-changing guardrails** like coding conventions, common commands and architectural principles; Claude Code's own documentation frames file-based memory exactly that way. The cost is that **it can't carry the part that keeps changing**: the content needs manual upkeep, and in a project that evolves daily — right after you've restructured directories and swapped state libraries — how often do you actually switch away to write it down? Old rules quietly stop applying, no compiler complains, and the file just calmly lies to the agent. Past a certain length it's load-everything or split-by-hand, and content with different lifecycles and permissions can't be managed independently.
 
-The typical examples are `AGENTS.md`, `CLAUDE.md` and various rules files. They're transparent, easy to edit, and travel with the code in Git — a good fit for **slow-changing guardrails** like coding conventions, common commands and architectural principles. Claude Code's own documentation frames project rules and user preferences as the main use of file-based memory: [Manage Claude's memory](https://docs.anthropic.com/en/docs/claude-code/memory).
+**Approach 2: conversation history plus automatic summarisation.** Recent messages stay in the window, earlier ones get compressed. Simple to implement, good at continuity within one task. The cost is that **summarisation is lossy**: as a session stretches, early details, causal links and a few critical constraints get worn away — and it supports neither precise queries, nor selective updates, nor cross-user isolation. You can't say "change just this one row."
 
-The limits are just as clear: the content generally needs manual upkeep; dynamic facts go stale; once the file grows, it's load-everything or split-by-hand; and data with different lifecycles and permissions can't be managed independently.
+**Approach 3: vector stores and RAG.** Chunk and embed past conversations, notes and experience, retrieve by semantic relevance, and stop loading everything. An effective way to handle unstructured memory at volume, and it genuinely solves on-demand retrieval. The cost is that **similarity only answers "which passage looks relevant."** It doesn't natively answer "which is the current fact," "do these two conflict," "who wrote this," or "can this write be undone." Append without updating and "we use PostgreSQL" sits alongside "tests use SQLite," with retrieval decided by score.
 
-So Markdown isn't the "wrong answer" — it suits static rules, and it isn't suited to carrying continuously changing long-term memory on its own.
+**Approach 4: structured databases or knowledge graphs.** Model users, projects, entities, relations, time and provenance explicitly and you get precise filtering, conflict checks, permission control and analytics; knowledge graphs are especially good at complex relations. The cost is **designing the schema, entity resolution and update strategy** — and structured storage on its own still leaves semantic retrieval and version governance unsolved.
 
-### 2. Conversation history and automatic summarisation
-
-Keep recent messages in the window and compress earlier ones into a summary. This is the most common form of short-term memory: simple to implement, good at maintaining continuity within one task.
-
-But summarisation is lossy compression. As a session stretches, early details, causal links and a handful of critical constraints get dropped; and it doesn't support precise queries, selective updates or cross-user isolation.
-
-### 3. Vector stores and RAG
-
-Chunk and embed past conversations, notes and experience, then retrieve by semantic relevance. This avoids loading everything and is an effective way to handle large volumes of unstructured memory.
-
-But similarity only answers "which passage looks relevant." It doesn't natively answer "which is the current fact," "do these two memories conflict," "who wrote this," or "can this write be undone." If the store only appends and never updates, the old conclusion and the new one can both come back.
-
-### 4. Structured databases or knowledge graphs
-
-Model users, projects, entities, relations, time and provenance explicitly, and you get precise filtering, conflict checks, permission control and analytics. Knowledge graphs are especially good at complex relations.
-
-The cost is designing the schema, entity resolution and update strategy — and structured storage alone doesn't solve semantic retrieval or version governance.
-
-### 5. Dedicated memory frameworks and platform built-ins
-
-Memory frameworks like Letta combine resident memory blocks, files and searchable archival memory, and let the agent manage them through tools: [Letta Context Hierarchy](https://docs.letta.com/guides/core-concepts/memory/context-hierarchy). GitHub Copilot Memory stores repository facts and user preferences, validates the code references behind a repository fact before using it, and expires memories that go unvalidated: [About GitHub Copilot Memory](https://docs.github.com/en/copilot/concepts/agents/copilot-memory).
-
-These lower the cost of adoption, and they show the industry moving from "store more text" toward "validate, update and govern memory." Their limits are platform binding, the scope of data control, and how customisable the governance policy is.
+**Approach 5: dedicated memory frameworks and platform built-ins.** Frameworks like Letta combine resident memory blocks, files and searchable archival memory, letting the agent manage them through tools. GitHub's Copilot Memory goes a step further — **memory is validated before use**, checking whether the code it references still exists, and memories that go unvalidated expire. These have the lowest adoption cost, and they show the industry moving from "store more text" toward "validate, update and govern memory." The cost is **binding**: memory follows the tool and doesn't come with you when you switch agents, and the governance policy is the platform's, leaving you little room to adjust.
 
 ### These approaches aren't mutually exclusive
 
-Production systems usually layer them:
+Production systems usually layer them: static conventions stay in Markdown as guardrails, current task state goes in short-term working memory, documents and past events are recalled by vector search, users and projects and provenance and validity go into structured storage, and versioning, auditing and recovery fall to the data infrastructure.
 
-- static conventions in Markdown;
-- current task state in short-term working memory;
-- documents and past events recalled by vector search;
-- users, projects, provenance and validity in structured storage;
-- versioning, auditing and recovery handled by the data infrastructure.
-
-The real question isn't "file or vector store." It's whether the full memory lifecycle is covered.
+**In one line: the real question was never "file or vector store" — it's whether the combination covers the full memory lifecycle.** The five approaches above each have strengths in storing and searching; it's the next stretch — updating, adjudicating, undoing, tracing — that mostly falls back on you to build at the application layer.
 
 ---
 
 ## 4. What production-grade memory requires
 
-Once agents start writing long-term memory on their own, at least seven capabilities are needed:
+Step back from those five approaches and ask what such a system actually has to do once an agent starts writing long-term memory on its own, and seven things surface:
 
-1. **Persistence** — state that survives across sessions and processes.
-2. **Relevance retrieval** — combining semantic similarity, keywords, entities, time, type and permissions to return what the current task actually needs.
-3. **Typing and lifecycle** — working memory can expire automatically, stable rules persist, old decisions get superseded by new ones.
-4. **Provenance and time** — knowing which user, agent or task wrote what, and when.
-5. **Conflict and update** — detecting duplicate, stale and contradictory memories while keeping the history that matters.
-6. **Write isolation and audit** — high-risk writes land in an isolated area first, and take effect only after the scope of change is confirmed.
-7. **Versioning and recovery** — after a bad write, bulk poisoning or gradual drift, being able to return to a known-good state.
+**It has to persist** — across sessions and processes; that's the threshold. **It has to retrieve the right things** — combining semantic similarity, keywords, entities, time, type and permissions to return the few memories the current task needs, rather than pouring everything into the context. **It has to type them** — working memory should expire, stable rules should persist, old decisions should be superseded by new ones; put all three in one file and their lifecycles can't be managed apart.
 
-Classic vector retrieval mainly addresses #2. Schema plus application logic can cover part of #3, #4 and #5. But #6 and #7 require the underlying data system itself to be versioned.
+The next three are a different kind of thing:
+
+**It has to trace** — which user, which agent, which task wrote what, and when. **It has to adjudicate** — recognise duplicate, stale and contradictory memories, and **keep the history that matters** rather than deleting its way out. **It has to isolate** — high-risk writes land in a holding area and take effect only once the scope of change is confirmed.
+
+And one more, easy to skip and yet the backstop: **it has to go back** — after a bad write, bulk poisoning or gradual drift, return to a known-good state.
+
+**The first three are largely solved by vector retrieval plus a little schema design**, and the dedicated platforms above generally do them well. **What the last four share is that they're all about change — who altered what, whether it can be undone, whether you can get back to how it was.** That isn't a retrieval problem; it's a versioning problem, and it needs the underlying data system to be versioned itself.
 
 That's precisely where MatrixOne's Git4Data capability comes in.
 
@@ -191,7 +163,7 @@ That's precisely where MatrixOne's Git4Data capability comes in.
 
 ## 5. What building memory on MatrixOne brings
 
-[Memoria](https://thememoria.ai) is the open-source agent-memory project we built on MatrixOne (Apache-2.0, [GitHub](https://github.com/matrixorigin/Memoria)). The premise behind it is simple:
+[Memoria](https://github.com/matrixorigin/Memoria) is the open-source agent-memory project we built on MatrixOne (Apache-2.0). The premise behind it is simple:
 
 > Git made code safe to change. We wanted memory to be the same.
 
@@ -210,7 +182,7 @@ The points below are the practical differences that come from building on Matrix
 
 ### 1. One copy of the data, serving both precise queries and hybrid retrieval
 
-Agent memory usually contains both structured fields and natural-language content. MatrixOne provides relational queries, vector search and full-text search in the same engine, so "semantically relevant" can be combined with "belongs to this project, created by this user, still within its validity window" — without maintaining two copies of state across a relational database and a vector store. MatrixOne's documentation lists the built-in vector, full-text and Git for Data capabilities: [MatrixOne Documentation](https://docs.matrixorigin.cn/).
+Agent memory usually contains both structured fields and natural-language content. MatrixOne provides relational queries, vector search and full-text search in the same engine, so "semantically relevant" composes directly with "belongs to this project, created by this user, still within its validity window" in one query — no two copies of state across a relational database and a vector store, and no second filtering pass in the application.
 
 Hybrid retrieval fixes a classic failure of pure keyword matching: the memory says "black formatter" and the user asks about a "code formatting tool" — keywords miss, semantics find it. Conversely, exact project names, paths and version numbers need full-text search as a backstop. **Having both available over the same data is what lets you avoid choosing between recall and precision.**
 
@@ -252,7 +224,7 @@ That capability doesn't decide for the agent what deserves remembering. It guara
 
 ### 6. Seen alongside the other options
 
-Set against several common approaches, it looks like this — with the caveat that this compares each option's **default path**, not the full extent of any product's capability:
+Set against several common approaches, it looks like this. **First, the table's scope**: it compares what each option looks like on its **default path**, not the full extent of any product's capability — treat each vendor's own documentation as authoritative (see References), and most "none" cells can be filled in with extra engineering, at the cost of building and maintaining it yourself.
 
 | Capability | Memoria | Mem0 | Letta | Markdown file |
 |---|---|---|---|---|
@@ -265,7 +237,7 @@ Set against several common approaches, it looks like this — with the caveat th
 | Token efficiency | on-demand recall (3–5 memories) | on-demand recall | on-demand recall | whole file injected |
 | Multi-agent sharing | **shared pool per user** | isolated per agent | isolated per agent | copy files by hand |
 
-The most notable part is the first three rows: **semantic retrieval is something every option does; what actually separates them is versioning, isolation and auditing** — and those three aren't things a memory layer can supply by itself. They depend on whether the underlying data system supports them natively.
+**In one line: semantic retrieval is something every option does — what separates them is the first three rows, versioning, isolation and auditing.** Those aren't things a memory layer can supply by itself; they depend on whether the underlying data system supports them natively. Which returns to section 4's split: the first three requirements are retrieval problems, the last four are versioning problems.
 
 ![How Memoria and this article's SQL stack up: agents such as Cursor, Claude Code, Kiro, Codex and OpenClaw connect over MCP or REST; Memoria in the middle exposes memory tools (store / retrieve / correct / purge / snapshot / branch / diff / rollback) plus six memory types and autonomous governance; underneath, MatrixOne 4.1.0's storage engine provides object-granularity branches, copy-on-write instant snapshots, row-level DIFF, MERGE and point-in-time rollback, with vector indexing and full-text search in the same engine](./images/fig_memoria-stack_en.svg)
 
@@ -408,6 +380,17 @@ So the Git4Data capability's value for memory isn't "smarter retrieval." It's th
 - **Read-only knowledge Q&A** — if the agent only retrieves human-maintained documents and never modifies the knowledge base, ordinary RAG already covers most of it.
 
 The pragmatic architecture is layered: Markdown for static guardrails, a short-term buffer for the current task, vector and full-text search for recall, structured tables for state and permissions, and MatrixOne's Git4Data capability for versioning and recovery of high-value long-term memory.
+
+---
+
+## References
+
+- OWASP, [Top 10 for Agentic Applications](https://genai.owasp.org/2025/12/09/owasp-top-10-for-agentic-applications-the-benchmark-for-agentic-security-in-the-age-of-autonomous-ai/) — "memory and context poisoning" listed as a significant risk for agentic systems
+- Anthropic, [Manage Claude's memory](https://code.claude.com/docs/en/memory) — how file-based memory (`CLAUDE.md`) is officially positioned
+- GitHub, [About GitHub Copilot Memory](https://docs.github.com/en/copilot/concepts/agents/copilot-memory) — repository facts, validation before use, and expiry
+- Letta, [Context Hierarchy](https://docs.letta.com/guides/core-concepts/memory/context-hierarchy) — resident memory blocks, files and archival memory
+- [MatrixOne documentation](https://docs.matrixorigin.cn/) — vector search, full-text search and the Git for Data capability
+- [Memoria on GitHub](https://github.com/matrixorigin/Memoria) ｜ product page: [thememoria.ai](https://thememoria.ai)
 
 ---
 
