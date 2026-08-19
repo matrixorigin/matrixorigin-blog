@@ -2,7 +2,7 @@
 title: "矩阵起源入选 2026 年度 Gartner® 数据管理领域最具创新力厂商"
 author: MatrixOrigin
 description: "矩阵起源入选 2026 年 Gartner®《数据管理领域最具创新力厂商》报告，并成为报告收录的四家公司中唯一一家来自中国的企业。MatrixOne Intelligence 通过统一数据、AI 工作流、智能体运行时与持久化记忆，为企业构建可信、可控的 AI 应用底座。"
-tags: ["News"]
+tags: ["新闻"]
 keywords: ["矩阵起源", "Gartner", "数据管理", "MatrixOne Intelligence", "Git4Data"]
 date: "2026-08-19T17:00:00+08:00"
 publishTime: "2026-08-19T17:00:00+08:00"
