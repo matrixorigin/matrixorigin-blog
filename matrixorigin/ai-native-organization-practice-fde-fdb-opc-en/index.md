@@ -2,7 +2,7 @@
 title: "AI-Native Organization in Practice: From FDE to FDB to an OPC Incubator"
 author: MatrixOrigin
 description: "MatrixOrigin shares how it moved from FDE to Forward Deployed Builder (FDB), and why an AI-native organization should become a virtual incubator for builders, projects, and new businesses."
-tags: ["技术干货"]
+tags: ["Technical Insights"]
 keywords: ["AI-native organization", "Forward Deployed Builder", "FDE", "OPC", "organizational innovation"]
 date: "2026-08-24T17:00:00+08:00"
 publishTime: "2026-08-24T17:00:00+08:00"
@@ -21,7 +21,7 @@ For some time, one question kept coming up as we worked on enterprise AI project
 
 The question did not stay at the org-chart level. The deeper the work went, the clearer it became that enterprise AI may change far more than "adding one new role." It is changing how much one person can do. It is changing how projects are organized, how products grow, and even how a company relates to exceptional talent.
 
-We did not create a seperate FDE department. Instead, we began practicing **FDB-Forward Deployed Builder** as a virtual role.
+We did not create a separate FDE department. Instead, we began practicing **FDB-Forward Deployed Builder** as a virtual role.
 
 This practice is still in its early days. We are in no position to present it as a proven methodology. Even so, our experience has made one point increasingly clear: as AI continues to expand the limits of what one person can do, a great FDB will increasingly resemble an OPC (One-Person Company)-one that is deeply connected to, and fully empowered by, a larger organization.
 
