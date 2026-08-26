@@ -176,7 +176,7 @@ Let's look at TAE's MVCC version information storage mechanism. The version stor
 
 These schemes have different characteristics that affect their performance in OLTP workloads. For LSM Tree, since it is inherently Append-only structure, it is closer to the first one. The linked list of the version chain may need to be reflected. For example, in RocksDB, all write operations are later merged, so naturally there are also multiple versions of the Key (different versions may be on different Levels). When the amount of updates is not large, this structure is simple and can easily achieve better performance. TAE currently chooses a variant of the third scheme, as shown below:
 
-![](public/content/en/transactional-analytical-engine/picture12.jpg)
+![](./images/picture12.webp)
 
 **This is mainly based on the following considerations:** When the amount of updates is huge, the old version data in the LSM Tree structure will cause more read amplification. While version chain of TAE is maintained by the Buffer Manager, when it needs to be evicted, it will be merged with the main table data to regenerate new blocks. Therefore semantically it is In-Place Update, but implementation-wise it is Copy On Write, which is required for cloud storage. The regenerated new block will have less read amplification, which is more beneficial for AP queries after frequent updates, currently DuckDB also uses a similar mechanism in columnar storage. Of course, on the other hand, the semantic In Place Update also brings additional difficulties, which will be gradually introduced in future TAE articles.
 
