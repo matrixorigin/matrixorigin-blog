@@ -2,7 +2,7 @@
 title: MatrixOne2.0.0：AI向量与高可用能力的重磅升级
 author: MatrixOrigin
 mail: wudi@matrixorigin.cn
-description: MatrixOne 2.0直播解析AI向量引擎、高可用性及RAG应用，展示多模数据管理与实操案例。
+description: 介绍 MatrixOne 2.0.0 的存算分离架构、灵活部署方式，以及面向生成式 AI 的向量和全文检索能力。
 tags:
   - 新闻
 keywords:
