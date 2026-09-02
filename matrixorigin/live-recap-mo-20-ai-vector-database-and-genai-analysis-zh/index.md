@@ -2,7 +2,7 @@
 title: 直播回顾 | MatrixOne 2.0 AI 向量数据库与 GenAI 能力深度解析
 author: MatrixOrigin
 mail: lichuanzi@matrixorigin.cn
-description: MatrixOne 2.0直播解析AI向量引擎、高可用性及RAG应用，展示多模数据管理与实操案例。
+description: 回顾 MatrixOne 2.0 第二期直播中的 GenAI 架构、混合多模态 RAG、向量数据库和图片检索案例。
 tags:
   - 新闻
 keywords:

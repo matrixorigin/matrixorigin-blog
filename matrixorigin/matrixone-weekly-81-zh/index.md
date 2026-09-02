@@ -2,7 +2,7 @@
 title: 'MatrixOne 数据库星球之音 #81'
 author: 矩阵起源 News
 mail: contact@matrixorigin.cn
-description: DB-Engines 2024 年 3 月数据库排行榜出炉。亚马逊取消客户迁移云服务的费用。SQLAlchemy 2.0.28 发布。
+description: 本期聚焦 DTC2024 云原生数据库演讲预告、绿色算力报告、蚂蚁集团业务调整，以及 Milvus 2.4 GPU 向量检索发布。
 tags:
   - 新闻
 keywords:

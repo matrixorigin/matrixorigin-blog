@@ -2,7 +2,7 @@
 title: 直播回顾 | MatrixOne 2.0 AI 向量与高可用性深度解析
 author: MatrixOrigin
 mail: lichuanzi@matrixorigin.cn
-description: MatrixOne 2.0直播解析AI向量引擎、高可用性及RAG应用，展示多模数据管理与实操案例。
+description: 回顾 MatrixOne 2.0 直播中介绍的向量搜索、高可用容灾、多模态数据接入，以及 RAG 实操案例。
 tags:
   - 新闻
 keywords:

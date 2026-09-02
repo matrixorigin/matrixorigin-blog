@@ -2,7 +2,7 @@
 title: "Live Recap | In-Depth Analysis of MatrixOne 2.0 AI Vector Database and GenAI Capabilities"
 author: MatrixOrigin
 mail: lichuanzi@matrixorigin.cn
-description: This MatrixOne 2.0 live session analyzed the AI vector engine, high availability, and RAG applications, showcasing multimodal data management and hands-on examples.
+description: A recap of MatrixOne 2.0's GenAI architecture, hybrid multimodal RAG, vector database, and image search demo from the November 12 livestream.
 tags:
   - News
 keywords:

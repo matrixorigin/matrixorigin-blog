@@ -2,7 +2,7 @@
 title: "Live Recap | In-Depth Analysis of MatrixOne 2.0 AI Vector and High Availability Capabilities"
 author: MatrixOrigin
 mail: lichuanzi@matrixorigin.cn
-description: This MatrixOne 2.0 live session analyzed the AI vector engine, high availability, and RAG applications, showcasing multimodal data management and hands-on examples.
+description: A recap of MatrixOne 2.0's vector search, disaster recovery, multimodal data access, and hands-on RAG demos from the November 5 livestream.
 tags:
   - News
 keywords:
