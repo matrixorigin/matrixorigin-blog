@@ -67,14 +67,7 @@ Agent 工程未必会沿着数据库的架构演进，但正在跨过同一道�
 
 ![ContextPipe 相对追加式上下文构造的初步实验结果](./images/fig4-contextpipe-results.svg)
 
-**9 月 4 日 VLDB 2026 波士顿现场预告。** 美国东部时间 2026 年 9 月 4 日 11:55 至 12:10，张祖羽博士和田丰博士将在 VLDB 2026 ADS/DATAI Workshop 现场介绍 ContextPipe。
-
-- 演讲人：张祖羽博士、田丰博士
-- 演讲题目：ContextPipe: Database-Inspired Context Assembly for Long-Horizon Agents
-- 地点：The Westin Boston Seaport District，Commonwealth A
-- 北京时间：9 月 4 日 23:55 至 9 月 5 日 00:10
-
-欢迎关注 Agent Runtime、Context Engineering 和 Agentic Data Systems 的朋友到现场交流。
+北京时间 9 月 4 日深夜，张祖羽博士和田丰博士会在波士顿的 ADS/DATAI Workshop 现场讲这篇论文，具体时间地点见[会议日程](https://vldb-ads.top/)，在现场的朋友欢迎来聊。
 
 Context Pipeline 后来成为 Astra 内核的一部分。但上下文只是开始：模型知道什么之后，仍然要解决任务怎样存在、修改如何恢复、能力在哪里，以及动作由谁授权。
 
