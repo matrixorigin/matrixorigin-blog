@@ -11,6 +11,8 @@ image:
   "235": "/images/blog-covers/news.png"
 lang: zh
 status: published
+translations:
+  en: astra-open-source
 ---
 
 # Astra 正式开源了：面向长期复杂工作的企业级 Agent Runtime
