@@ -47,7 +47,7 @@ To address the challenges of multimodal data processing, MatrixOrigin has launch
 
 2. MatrixOne is a hyper-converged data management platform responsible for overall data access, parsing, storage, and metadata management. Based on a cloud-native compute-storage separation architecture, it can access structured relational data, log data, JSON data, document data, images, audio, and video data, and call AI algorithms for parsing. It can also integrate OLTP, OLAP, time-series, vector, search, and other data workloads, realizing hyper-converged integration for multimodal AI data processing.
 
-3. MatrixGenesis is an AI model foundation and Agent development platform. It hosts and tunes AI models of various sizes, serving tasks such as multimodal data parsing, text semantic understanding, and content generation in multimodal data pipelines. It can also build knowledge bases and RAG/Agent applications based on MatrixOne capabilities.
+3. Genesis is an AI model foundation and Agent development platform. It hosts and tunes AI models of various sizes, serving tasks such as multimodal data parsing, text semantic understanding, and content generation in multimodal data pipelines. It can also build knowledge bases and RAG/Agent applications based on MatrixOne capabilities.
 
 4. MatrixSearch is a unified search engine for multimodal data. It integrates semantic search, keyword search, and structured search, and further uses large model capabilities for search reranking to return the most accurate search answers to users.
 

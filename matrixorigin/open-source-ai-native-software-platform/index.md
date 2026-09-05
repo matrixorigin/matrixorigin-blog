@@ -13,7 +13,7 @@ keywords:
   - MatrixOne
   - MatrixDC
   - MatrixOS
-  - MatrixGenesis
+  - Genesis
   - AI
   - AIDC
 publishTime: '2024-05-24 17:00:00+00:00'
@@ -47,16 +47,16 @@ Additionally, MatrixDC supports deep integration with NVIDIA AI Enterprise and O
 
 MatrixOne is a hyper-converged data management platform. As the data processing layer of MatrixOS, it is designed for cloud-native and containerized environments, employing a storage-compute separation architecture. It supports various heterogeneous workloads such as OLTP, OLAP, time-series, stream processing, machine learning, and handles multiple data types. Its storage layer, based on shared object storage, enables low-cost storage of massive data and facilitates collaboration. The computing layer, based on stateless containerization, allows rapid elastic scaling to cope with fluctuations in workloads. Developers can quickly and comprehensively build business systems and data analysis applications with MatrixOne. For LLM (Large Language Model) scenarios, its vector capabilities enable the rapid construction of knowledge bases based on contextual data understanding. MatrixOne is also a fully open-source project, and we warmly welcome community developers to join and contribute.
 
-## MatrixGenesis: AI Intelligent Agent Development Platform
+## Genesis: AI Intelligent Agent Development Platform
 
-MatrixGenesis, as the core application development layer of MatrixOS, is leading enterprise-level AI applications into a new era. This innovative platform not only covers the entire development process of large models but also provides full lifecycle development support from model selection, deployment, inference services, fine-tuning, to real-time integration with structured system data. MatrixGenesis is committed to providing end-to-end development process experience for enterprises, ensuring seamless integration at every step to accelerate the development and deployment of AI applications.
+Genesis, as the core application development layer of MatrixOS, is leading enterprise-level AI applications into a new era. This innovative platform not only covers the entire development process of large models but also provides full lifecycle development support from model selection, deployment, inference services, fine-tuning, to real-time integration with structured system data. Genesis is committed to providing end-to-end development process experience for enterprises, ensuring seamless integration at every step to accelerate the development and deployment of AI applications.
 
-The MatrixGenesis development platform is designed specifically for AI developers, aiming to provide an efficient, flexible toolchain and platform to support rapid iteration of large model applications from scratch. Whether based on existing base models or user-selected models, users can develop intelligent applications that fit their application scenarios. MatrixGenesis covers the full range of development needs from Model Finetune (DPO, PPO), Model Alignment, and Model Evaluation, to the establishment of knowledge bases, knowledge graphs, and low-code construction of Multi-Agent Workflows. Additionally, we offer RAG/Prompt tuning and evaluation for specific scenarios, helping developers iterate quickly and continuously improve the actual AI capabilities of their applications.
+The Genesis development platform is designed specifically for AI developers, aiming to provide an efficient, flexible toolchain and platform to support rapid iteration of large model applications from scratch. Whether based on existing base models or user-selected models, users can develop intelligent applications that fit their application scenarios. Genesis covers the full range of development needs from Model Finetune (DPO, PPO), Model Alignment, and Model Evaluation, to the establishment of knowledge bases, knowledge graphs, and low-code construction of Multi-Agent Workflows. Additionally, we offer RAG/Prompt tuning and evaluation for specific scenarios, helping developers iterate quickly and continuously improve the actual AI capabilities of their applications.
 
-At the same time, MatrixGenesis will also collaborate with partners to create open models, application stores, and intelligence-sharing subscription capabilities, allowing more developers to participate in the ecosystem construction of intelligent applications, quickly gather users for their intelligent applications, and better serve the users they face.
+At the same time, Genesis will also collaborate with partners to create open models, application stores, and intelligence-sharing subscription capabilities, allowing more developers to participate in the ecosystem construction of intelligent applications, quickly gather users for their intelligent applications, and better serve the users they face.
 
 ## Looking forward to the future: openness, cooperation and innovation.
 
 Based on the capabilities of MatrixOS and 21vianet AIDC Wanka cluster, the AI-native cloud platform [neolink.AI](https://neolink.ai/) is also set to be released soon, marking the first large-scale implementation of MatrixOS in the industry.
 
-The release of MatrixOS is not only a bold prediction and proactive layout of MatrixGenesis for the future of AI but also a sincere invitation to the entire technology community. We welcome more AIDC providers, large model manufacturers, and data intelligence application vendors to join this open and open-source ecosystem. We firmly believe that through open collaboration and shared innovation, we can collectively promote the advancement of AI technology and create greater value for enterprises and society.
+The release of MatrixOS is not only a bold prediction and proactive layout of Genesis for the future of AI but also a sincere invitation to the entire technology community. We welcome more AIDC providers, large model manufacturers, and data intelligence application vendors to join this open and open-source ecosystem. We firmly believe that through open collaboration and shared innovation, we can collectively promote the advancement of AI technology and create greater value for enterprises and society.

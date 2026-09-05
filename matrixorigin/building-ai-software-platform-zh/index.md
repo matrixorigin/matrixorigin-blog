@@ -2,7 +2,7 @@
 title: 围绕算力+数据，矩阵起源建设开源 AI 原生软件平台
 author: MatrixOrigin
 mail: lichuanzi@matrixorigin.cn
-description: 矩阵起源发布 MatrixOS、MatrixDC、MatrixGenesis 等产品以应对 AI 大模型时代的挑战。
+description: 矩阵起源发布 MatrixOS、MatrixDC、Genesis 等产品以应对 AI 大模型时代的挑战。
 tags:
   - 产品中心
 keywords:
@@ -45,13 +45,13 @@ MatrixOne 是一款超融合数据管理平台。作为 MatrixOS 的数据处理
 
 <img src="./images/image3.png" width="1000">
 
-### MatrixGenesis：AI 智能开发平台
+### Genesis：AI 智能开发平台
 
-MatrixGenesis，作为 MatrixOS 的核心应用开发层，引领企业级 AI 应用进入一个全新的时代。这一创新平台不仅全链路覆盖了大模型的开发环节，还提供了从模型选择、部署、推理服务、精调，到与结构化系统数据实时打通的全生命周期开发支持。MatrixGenesis 致力于为企业提供端到端的开发流程体验，确保每一个环节都能无缝对接，从而加速 AI 应用的开发与部署。
+Genesis，作为 MatrixOS 的核心应用开发层，引领企业级 AI 应用进入一个全新的时代。这一创新平台不仅全链路覆盖了大模型的开发环节，还提供了从模型选择、部署、推理服务、精调，到与结构化系统数据实时打通的全生命周期开发支持。Genesis 致力于为企业提供端到端的开发流程体验，确保每一个环节都能无缝对接，从而加速 AI 应用的开发与部署。
 
-MatrixGenesis 开发平台是专为 AI 开发者设计的，旨在提供一个高效、灵活的工具链和平台，支持从零到一的快速迭代大模型应用。无论是基于现有的基础模型还是自选模型，用户都能开发出符合自身应用场景的智能应用。MatrixGenesis 涵盖了从 Model Finetune（DPO，PPO）、Model Alignment 和 Model Evaluation，到知识库、知识图谱的建立，以及低代码构建 Multi-Agent Workflow 的全链路开发需求。此外，我们还提供针对特定场景的 RAG/Prompt 调优和评测，帮助开发者快速迭代，不断提升应用的实际AI能力。
+Genesis 开发平台是专为 AI 开发者设计的，旨在提供一个高效、灵活的工具链和平台，支持从零到一的快速迭代大模型应用。无论是基于现有的基础模型还是自选模型，用户都能开发出符合自身应用场景的智能应用。Genesis 涵盖了从 Model Finetune（DPO，PPO）、Model Alignment 和 Model Evaluation，到知识库、知识图谱的建立，以及低代码构建 Multi-Agent Workflow 的全链路开发需求。此外，我们还提供针对特定场景的 RAG/Prompt 调优和评测，帮助开发者快速迭代，不断提升应用的实际AI能力。
 
-同时 MatrixGenesis 也将联合合作伙伴打造开放式的模型，应用商店和智能体分享订阅能力，使得更多的开发者可以参与到智能应用的生态建设中，迅速为自己的智能体应用聚集用户，更好的服务所面对的用户。
+同时 Genesis 也将联合合作伙伴打造开放式的模型，应用商店和智能体分享订阅能力，使得更多的开发者可以参与到智能应用的生态建设中，迅速为自己的智能体应用聚集用户，更好的服务所面对的用户。
 
 <img src="./images/image4.png" width="1000">
 

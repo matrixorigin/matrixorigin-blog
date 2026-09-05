@@ -32,7 +32,7 @@ status: published
 
 2024 年国内企业数字化转型进程随着大模型技术的发展，又加速跨越进入到了新的智能化阶段。AI 未来无处不在，对数据的存储/传输/使用出现了新的需求，又进一步影响 IaaS 算力规划、PaaS 和 Data 开发工作流的构建方式。这也让企业急需一套从基础设施到数据库层，再到应用开发层的简捷统一的解决方案，实现更高层次的智能化和数字化。
 
-MatrixOS 是一款极简统一、开源开放的 AI-Native 数据智能全域操作系统，由大规模异构算力纳管调度平台 MatrixDC、超融合异构数据管理平台 MatrixOne 和 AI 智能体应用开发平台 MatrixGenesis 三部分组成，目标是打造链接算力、数据、知识、模型与企业应用的 AI Native 软件平台。
+MatrixOS 是一款极简统一、开源开放的 AI-Native 数据智能全域操作系统，由大规模异构算力纳管调度平台 MatrixDC、超融合异构数据管理平台 MatrixOne 和 AI 智能体应用开发平台 Genesis 三部分组成，目标是打造链接算力、数据、知识、模型与企业应用的 AI Native 软件平台。
 
 ![Architecture Diagram](./images/waic-3.png?width=600)
 

@@ -2,13 +2,13 @@
 title: 客户案例｜集贤科技：全球领先的AIoT开发和云服务平台
 author: MatrixOrigin
 description: >-
-  集贤科技结合MatrixOne向量能力和MatrixGenesis
+  集贤科技结合MatrixOne向量能力和Genesis
   Agent服务，打造AI驱动的智能语音助手，实现自然语言控制家电设备，大幅提升产品易用性和用户体验。
 tags:
   - 客户案例
 keywords:
   - MatrixOne
-  - MatrixGenesis
+  - Genesis
   - AIoT
   - 智能语音助手
 publishTime: '2025-12-10T17:00:00+08:00'
@@ -40,11 +40,11 @@ status: published
 
 ## 解决方案
 
-结合MatrixOne（以下简称MO）的向量能力和MatrixGenesis（以下简称MG）的Agent服务能力，理解用户的自然语言并检索出匹配的指令，再向终端设备发出一系列动作。
+结合MatrixOne（以下简称 MO）的向量能力和 Genesis 的 Agent 服务能力，理解用户的自然语言并检索出匹配的指令，再向终端设备发出一系列动作。
 
 ![1.png](./images/1.png)
 
-MatrixGenesis是MatrixOrigin提供的另一款AI服务产品，在这个案例中，MG的Agent服务可以将文字信息理解并转化成MO的数据检索SQL，MO作为向量数据的存储和服务方提供了快速的向量检索服务，将指令返回给MG，最终由智能管理平台向多个终端设备发送操作指令。
+Genesis是MatrixOrigin提供的另一款AI服务产品，在这个案例中，MG的Agent服务可以将文字信息理解并转化成MO的数据检索SQL，MO作为向量数据的存储和服务方提供了快速的向量检索服务，将指令返回给MG，最终由智能管理平台向多个终端设备发送操作指令。
 
 ![2.png](./images/2.png)
 

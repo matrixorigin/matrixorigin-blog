@@ -13,7 +13,7 @@ keywords:
   - MatrixOne
   - MatrixDC
   - MatrixOS
-  - MatrixGenesis
+  - Genesis
   - AI
   - AIDC
 publishTime: '2024-06-13 17:00:00+08:00'

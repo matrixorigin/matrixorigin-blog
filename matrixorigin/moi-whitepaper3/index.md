@@ -48,7 +48,7 @@ By introducing MatrixOne Intelligence, Extreme Vision built an end-to-end multim
 
 1. Data ingestion and integration: Extreme Vision unified multimodal data scattered across different storage systems, such as local file systems and cloud storage, into the MatrixOne database, covering core data types such as images and videos. Through MatrixPipeline's automated pipeline capabilities, the platform implemented batch archiving, deduplication, and format standardization, ensuring data consistency and manageability.
 
-2. Data parsing and featurization: For massive image and video data, MatrixGenesis's intelligent parsing capabilities were used to extract semantic labels, object features, and embedding vectors from the data, and store these parsed results in the MatrixOne database. Multimodal features were uniformly managed and versioned, greatly improving feature traceability and reusability.
+2. Data parsing and featurization: For massive image and video data, Genesis's intelligent parsing capabilities were used to extract semantic labels, object features, and embedding vectors from the data, and store these parsed results in the MatrixOne database. Multimodal features were uniformly managed and versioned, greatly improving feature traceability and reusability.
 
 3. Feature engineering and sharing: With the Feature Store capabilities of MatrixOne Intelligence, Extreme Vision implemented centralized feature management and distributed storage. Through a unified mechanism for feature generation, optimization, and reuse, different teams can quickly call existing features, avoid duplicated development, and significantly accelerate AI algorithm iteration.
 
@@ -114,7 +114,7 @@ By introducing MatrixOne Intelligence, Jiangxi Copper successfully built an end-
 
 1. Data ingestion and integration: With MatrixPipeline, Jiangxi Copper unified real-time data from IoT devices, such as sensor data, and multimodal data, such as converter operation videos, into the platform. Edge computing nodes preprocess high-frequency IoT data, such as compression and cleaning, and upload the processed data together with video stream data to the MatrixOne database, achieving real-time integration of multi-source data.
 
-2. Data parsing and feature extraction: MatrixGenesis's intelligent parsing capabilities are used to extract key features from multimodal data. From IoT data, time-series features such as temperature fluctuation trends and pressure anomaly points are extracted to provide key indicators for production monitoring. From video data, video analysis technology extracts keyframes during converter operations and combines algorithms to identify parameter information on equipment displays, providing data support for operational optimization.
+2. Data parsing and feature extraction: Genesis's intelligent parsing capabilities are used to extract key features from multimodal data. From IoT data, time-series features such as temperature fluctuation trends and pressure anomaly points are extracted to provide key indicators for production monitoring. From video data, video analysis technology extracts keyframes during converter operations and combines algorithms to identify parameter information on equipment displays, providing data support for operational optimization.
 
 3. Real-time monitoring and modeling analysis: The MatrixOne database provides unified storage and efficient retrieval of multimodal data, supporting real-time monitoring of converter status and anomaly alerts. Based on historical data and real-time features, machine learning models are built to predict converter operating parameters, such as the best switching time, improving production efficiency and reducing energy consumption.
 
@@ -196,7 +196,7 @@ Based on MatrixOne Intelligence, TechAgent built an AIGC platform supporting mul
 
 2. Intelligent parsing and feature extraction
 
-   a. With MatrixGenesis's intelligent parsing capabilities, semantic features and structured information are extracted from complex data:
+   a. With Genesis's intelligent parsing capabilities, semantic features and structured information are extracted from complex data:
 
    Text data: Pretrained language models generate embedding vectors and semantic tags.
 
@@ -230,7 +230,7 @@ Through the intelligent platform based on MatrixOne Intelligence, TechAgent achi
 
 - Data ingestion efficiency improved: With MatrixPipeline's automated processes, data ingestion and standardization efficiency increased by 60%.
 
-- Parsing efficiency increased: MatrixGenesis intelligent parsing reduced manual annotation workload and doubled data preprocessing speed.
+- Parsing efficiency increased: Genesis intelligent parsing reduced manual annotation workload and doubled data preprocessing speed.
 
 - Data architecture simplified: The original multi-tool combination was consolidated into a single database system, reducing operations complexity by 80%.
 
