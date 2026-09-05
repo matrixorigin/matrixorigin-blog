@@ -9,11 +9,11 @@ keywords:
   - 粤港澳大湾区创业大赛
   - AI数据智能平台
   - 多模态数据
-publishTime: '2025-10-09+17:00:00+08:00'
+publishTime: '2025-10-09 17:00:00+08:00'
 image:
   '1': /images/blog-covers/news.png
   '235': /images/blog-covers/news.png
-date: '2025-10-09+17:00:00+08:00'
+date: '2025-10-09 17:00:00+08:00'
 lang: zh
 status: published
 ---
