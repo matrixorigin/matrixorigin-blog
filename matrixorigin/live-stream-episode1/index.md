@@ -19,7 +19,7 @@ date: '2024-12-06 18:00:00+08:00'
 lang: en
 status: published
 translations:
-  zh: live-stream-esposide1-zh
+  zh: live-stream-episode1-zh
 ---
 
 ## MatrixOne 2.0.0 New Features Explained

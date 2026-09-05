@@ -20,7 +20,7 @@ date: '2025-08-22 17:30:00+08:00'
 lang: en
 status: published
 translations:
-  zh: preview-refernce-zh
+  zh: preview-reference-zh
 ---
 
 Today, as generative AI (GenAI) and large models rapidly enter mainstream enterprise applications, we are witnessing an industrial transformation driven jointly by compute capability, model capability, and data capability. The core standard for measuring enterprise AI maturity is shifting from "can it generate" to "can it produce reusable business value."
