@@ -138,7 +138,7 @@ In the overall solution, preprocessing and parsing are key stages for transformi
 
 #### Technical Process
 
-At the data preprocessing and parsing stage, MatrixOne Intelligence combines MatrixPipeline's automated pipeline capabilities with MatrixGenesis's intelligent parsing capabilities to provide a complete, efficient, and flexible solution covering the full process from data cleaning to data parsing.
+At the data preprocessing and parsing stage, MatrixOne Intelligence combines MatrixPipeline's automated pipeline capabilities with Genesis's intelligent parsing capabilities to provide a complete, efficient, and flexible solution covering the full process from data cleaning to data parsing.
 
 ##### Data Preprocessing
 
@@ -196,7 +196,7 @@ At the data preprocessing and parsing stage, the following product capabilities 
 
 - Includes powerful query capabilities that can quickly locate parsing results and support subsequent analysis and modeling.
 
-##### MatrixGenesis Model Services and AI Data Parsing
+##### Genesis Model Services and AI Data Parsing
 
 - Provides intelligent parsing modules that support PDF layout analysis, OCR, ASR, and other multimodal data parsing functions.
 
@@ -264,9 +264,9 @@ At the feature engineering stage, MatrixOne Intelligence provides strong product
 
 - Rollback and traceability: Supports rollback to specific feature versions, making it easier to troubleshoot model issues and reproduce historical states.
 
-##### MatrixGenesis Embedding Support
+##### Genesis Embedding Support
 
-- Pretrained model support: MatrixGenesis includes powerful pretrained models, such as BERT, CLIP, and Wav2Vec2.0, supporting semantic embedding generation for text, images, and audio.
+- Pretrained model support: Genesis includes powerful pretrained models, such as BERT, CLIP, and Wav2Vec2.0, supporting semantic embedding generation for text, images, and audio.
 
 - Model extensibility: Supports user-loaded custom embedding models to meet the specific needs of different business scenarios.
 
@@ -313,7 +313,7 @@ The core input of data annotation and augmentation is data that has already been
 
 - Efficient grouping capabilities support large-scale random data splitting operations.
 
-##### MatrixGenesis Large Model Services
+##### Genesis Large Model Services
 
 - Provides hosting capabilities for various large models used to generate image-text pairs, text descriptions, and semantically enhanced content.
 
@@ -385,7 +385,7 @@ The core inputs of this stage are the training, validation, and test sets genera
 
 - **Snapshot capability**: Records the state of training data and models to ensure traceability and reproducibility during training and evaluation.
 
-**MatrixGenesis Training Toolbox**
+**Genesis Training Toolbox**
 
 - **Pretrained model support**: Includes rich pretrained models, such as Qwen and Stable Diffusion, supporting multimodal and task-specific model fine-tuning.
 
@@ -445,7 +445,7 @@ This stage is closely connected to application-side interaction. Users submit na
 
 - Efficient index management: Provides distributed index construction and update mechanisms to ensure efficient retrieval performance at large scale.
 
-##### MatrixGenesis Model Support Capabilities
+##### Genesis Model Support Capabilities
 
 - Embedding model support: Includes semantic embedding models, such as BERT and CLIP, to generate high-quality vectorized representations for text, images, audio, and video.
 
@@ -461,4 +461,4 @@ This stage is closely connected to application-side interaction. Users submit na
 
 ### Summary
 
-Through a step-by-step breakdown of the technical process, MatrixOne Intelligence demonstrates a complete closed loop from data ingestion to intelligent applications. To address challenges enterprises face in GenAI implementation, including data dispersion, heterogeneous complexity, scalable processing, and intelligent applications, the solution provides unified data ingestion and integration, efficient preprocessing and parsing, multimodal feature engineering, precise data annotation and augmentation, and powerful model training and evaluation capabilities. Optimization at the RAG recall and search stage further improves the accuracy and business adaptability of large models during inference. With core products such as the MatrixOne database, MatrixPipeline, MatrixGenesis, and MatrixSearch, the solution enables seamless collaboration across data governance, storage, compute, and intelligent model capabilities. Designed around modularity, automation, and high performance, the overall process builds an efficient data intelligence platform for GenAI applications, accelerates AI application development and implementation, and provides strong support for enterprises to fully unlock the value of multimodal data.
+Through a step-by-step breakdown of the technical process, MatrixOne Intelligence demonstrates a complete closed loop from data ingestion to intelligent applications. To address challenges enterprises face in GenAI implementation, including data dispersion, heterogeneous complexity, scalable processing, and intelligent applications, the solution provides unified data ingestion and integration, efficient preprocessing and parsing, multimodal feature engineering, precise data annotation and augmentation, and powerful model training and evaluation capabilities. Optimization at the RAG recall and search stage further improves the accuracy and business adaptability of large models during inference. With core products such as the MatrixOne database, MatrixPipeline, Genesis, and MatrixSearch, the solution enables seamless collaboration across data governance, storage, compute, and intelligent model capabilities. Designed around modularity, automation, and high performance, the overall process builds an efficient data intelligence platform for GenAI applications, accelerates AI application development and implementation, and provides strong support for enterprises to fully unlock the value of multimodal data.
