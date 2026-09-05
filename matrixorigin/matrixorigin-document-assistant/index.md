@@ -18,7 +18,7 @@ date: '2026-01-16T17:00:00+08:00'
 lang: en
 status: published
 translations:
-  zh: martrixorigin-document-assistant-zh
+  zh: matrixorigin-document-assistant-zh
 ---
 
 # [MOI Practice Vol.3] Those Messy Documents Sitting in Your Cloud Drive Finally Have a Job to Do

@@ -17,7 +17,7 @@ date: '2026-03-23T17:00:00+08:00'
 lang: en
 status: published
 translations:
-  zh: martrixone-saas-openclaw-zh
+  zh: matrixone-saas-openclaw-zh
 ---
 
 # Multiverse and Time Variance Authority: A Conversation with MatrixOrigin CEO Wang Long on Another Possibility for AI Implementation
