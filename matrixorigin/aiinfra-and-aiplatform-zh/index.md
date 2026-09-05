@@ -1,9 +1,9 @@
 ---
-title: 'MatrixOne → MatrixOS: 矩阵起源的创业史即将用“AI Infra”和“AI Platform”书写新章程'
+title: 'MatrixOne → MatrixOS：矩阵起源的创业史即将用“AI Infra”和“AI Platform”书写新篇章'
 author: MatrixOrigin
 mail: lichuanzi@matrixorigin.cn
 description: >-
-  矩阵起源将在 MatrixOrigin 的基础上，扩展业务至 AI Infra（人工智能基础设施）和 AI
+  矩阵起源将在 MatrixOne 的基础上，扩展业务至 AI Infra（人工智能基础设施）和 AI
   Platform（人工智能平台）领域，并与世纪互联的 AIDC 业务进行深度融合和紧密协作。
 tags:
   - 新闻

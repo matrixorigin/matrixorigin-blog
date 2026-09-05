@@ -4,7 +4,7 @@ author: MatrixOrigin
 mail: lichuanzi@matrixorigin.cn
 description: >-
   MatrixOne 是一款分布式数据库，旨在提供高性能和高可用性的数据库服务。它兼容 MySQL 协议，使得用户可以使用 MySQL 客户端和工具与
-  MatrixOne 进行交互，本文详细详解了 MatrixOne 的 MySQL 协议实现。
+  MatrixOne 进行交互，本文详细介绍了 MatrixOne 的 MySQL 协议实现。
 tags:
   - 技术干货
 keywords:
@@ -938,7 +938,7 @@ func executeResultRowStmt() {
 
 #### Prepare(JDBC)
 
-JDBC中，Prepare操作发送的的数据包中，command type不再为query，而是prepare statement。客户端和服务端的交互也会发生变化，具体如下：
+JDBC中，Prepare操作发送的数据包中，command type不再为query，而是prepare statement。客户端和服务端的交互也会发生变化，具体如下：
 
 ![tupian4](./images/mysql4.png)
 

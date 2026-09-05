@@ -1,5 +1,5 @@
 ---
-title: 'What is the Binder in Database Kernels: A useful guide might helps you.'
+title: 'What Is the Binder in Database Kernels? A Useful Guide That Might Help You'
 author: Ou Yuanning
 mail: ouyuanning@matrixorigin.io
 description: >-

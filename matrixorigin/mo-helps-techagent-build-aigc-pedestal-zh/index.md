@@ -47,9 +47,9 @@ TechAgent 的一个核心能力是搜索能力，这其中既包含了基于关�
 
 ### 解决方案
 
-MatrixOne 是一款新型的云原生超融合数据库，通过简化的分布式数据库引擎，基于 K8s 及共享存储构建，同时支持 OLTP、OLAP、时序、向量、搜索等混合负载，同时高度兼容 MySQL 语法。MatrixOne 在 AIOT 和 AIGC 场景上有自己独特的优势，可以作为一站式的数据底座。对于 TechAgent 这样深度应用大模型和文档数据的场景非常适合，能够一站式完成底层数据处理，极大的减轻其数据架构的复杂度和交付运维难度。
+MatrixOne 是一款新型的云原生超融合数据库，通过简化的分布式数据库引擎，基于 K8s 及共享存储构建，同时支持 OLTP、OLAP、时序、向量、搜索等混合负载，同时高度兼容 MySQL 语法。MatrixOne 在 AIOT 和 AIGC 场景上有自己独特的优势，可以作为一站式的数据底座。对于 TechAgent 这样深度应用大模型和文档数据的场景非常适合，能够一站式完成底层数据处理，极大地减轻其数据架构的复杂度和交付运维难度。
 
-- MatrixOne 是一款 HTAP 数据库，对 OLTP 及 OLAP 的支持程度较高，针对 MySQL 及 Clickhouse 分别进行事务型处理和分析型处理的模式可以天然的一站式解决，也避免了定时通过 ETL 工具从 MySQL 把数据搬迁到 Clickhouse 的运维动作，而是直接通过创建视图 VIEW，通过 SQL 编写各类分析语句。MatrixOne 对于 MySQL 高度兼容，对于 TechAgent 使用的 Django 框架及 SQL Alchemy 的 ORM 工具都可以无缝对接。因此从 MySQL 及 Clickhouse 往 MatrixOne 迁移是整个改造的最基础环节。
+- MatrixOne 是一款 HTAP 数据库，对 OLTP 及 OLAP 的支持程度较高，可以一站式解决以 MySQL 和 ClickHouse 分别进行事务处理与分析处理的传统模式，也避免了定时通过 ETL 工具从 MySQL 把数据搬迁到 ClickHouse 的运维动作，而是直接通过创建视图（VIEW），使用 SQL 编写各类分析语句。MatrixOne 高度兼容 MySQL，与 TechAgent 使用的 Django 框架及 SQLAlchemy ORM 工具均可无缝对接。因此，将 MySQL 和 ClickHouse 迁移至 MatrixOne 是整个改造的基础环节。
 
 - MatrixOne 自带 JSON 及向量两种数据类型。用户可以非常方便的在任意表中创建向量 vecf32/vecf64 类型，或JSON类型的列，同时 MatrixOne 也提供了向量索引和搜索相关的函数，以及 JSON 解析相关函数，可以满足绝大部分 JSON 处理及语义搜索相关的需求。因此通过一定的应用适配和改造，MatrixOne 也可以将 MongoDB 及 Faiss 所起到的作用进行替代。
 
