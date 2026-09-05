@@ -20,7 +20,7 @@ date: '2024-04-12 17:00:00+08:00'
 lang: en
 status: published
 translations:
-  zh: building-a-serverless-dastabase-on-kubernetes-zh
+  zh: building-a-serverless-database-on-kubernetes-zh
 ---
 
 Today's topic is how MatrixOne (MO for short) builds an HTAP database based on K8S + S3. In essence, this is also about how to build a brand-new HTAP system for the cloud. We put K8S and S3 in the title because we believe these are the two technologies that have the greatest impact on database architecture in the cloud-native era.

@@ -18,7 +18,7 @@ date: '2025-07-16 17:30:00+08:00'
 lang: en
 status: published
 translations:
-  zh: invitatio-kexin-zh
+  zh: invitation-kexin-zh
 ---
 
 In the era of artificial intelligence, massive multimodal data is reshaping the boundaries of data infrastructure, and the integrated management of heterogeneous data such as text, images, audio, and video has become a key challenge. On the afternoon of Thursday, July 17, 2025, the Trusted Database Development Conference's Multimodal and Analytical Databases & Cloud-Native Databases Subforum will be held at Crowne Plaza Beijing U-Town.
