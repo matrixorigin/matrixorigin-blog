@@ -8,8 +8,8 @@ keywords: ["Agent Memory", "AI Agent", "MatrixOne", "Memoria", "Git4Data", "Vect
 publishTime: "2026-07-25T17:00:00+08:00"
 date: '2026-07-25'
 image:
-  "1": "/content/zh/shared/tech.png"
-  "235": "/content/zh/shared/tech.png"
+  "1": "/images/blog-covers/technical.png"
+  "235": "/images/blog-covers/technical.png"
 lang: en
 status: published
 translations:

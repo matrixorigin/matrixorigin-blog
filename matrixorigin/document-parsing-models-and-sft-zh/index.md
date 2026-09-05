@@ -23,7 +23,7 @@ status: published
 
 ## 1.1 解析模型（Parsing Model） & MOI
 
-解析模型是指用于从复杂文档（如 PDF、扫描图、报告等）中识别结构要素（如标题、段落、表格、图像等）并提取其内容模型。在MatrixOne Intelligence（下文简称MOI）产品中，采用了 **MinerU** ([mineru.readthedocs.io](https://mineru.readthedocs.io/ 'Welcome to the MinerU Documentation — MinerU 1.3.12 ...'))，一个开源的将PDF转化为markdown 解析工具。
+解析模型是指用于从复杂文档（如 PDF、扫描图、报告等）中识别结构要素（如标题、段落、表格、图像等）并提取其内容模型。在MatrixOne Intelligence（下文简称MOI）产品中，采用了 **MinerU**（[MinerU 官方文档](https://opendatalab.github.io/MinerU/)），一个开源的将PDF转化为markdown 解析工具。
 
 MinerU 用于解析PDF，主要的解析流程如下：
 

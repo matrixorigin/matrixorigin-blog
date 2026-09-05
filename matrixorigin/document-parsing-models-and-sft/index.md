@@ -25,7 +25,7 @@ translations:
 
 ## 1.1 Parsing Models and MOI
 
-A parsing model refers to a model that identifies structural elements, such as titles, paragraphs, tables, and images, from complex documents such as PDFs, scanned images, and reports, and extracts their content. In MatrixOne Intelligence (MOI), we use **MinerU** ([mineru.readthedocs.io](https://mineru.readthedocs.io/ 'Welcome to the MinerU Documentation — MinerU 1.3.12 ...')), an open-source parsing tool that converts PDFs into Markdown.
+A parsing model refers to a model that identifies structural elements, such as titles, paragraphs, tables, and images, from complex documents such as PDFs, scanned images, and reports, and extracts their content. In MatrixOne Intelligence (MOI), we use **MinerU** ([official documentation](https://opendatalab.github.io/MinerU/)), an open-source parsing tool that converts PDFs into Markdown.
 
 MinerU is used to parse PDFs. Its main parsing workflow is as follows:
 

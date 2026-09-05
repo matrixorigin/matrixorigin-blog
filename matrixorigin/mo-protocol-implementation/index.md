@@ -941,7 +941,7 @@ func executeResultRowStmt() {
 ### Prepare (JDBC)
 
 In JDBC, the command type in the packet sent for `Prepare` is no longer `query`, but `prepare statement`. The interaction between client and server also changes as follows:
-![Figure 4]( "PREPARE interaction")
+![Figure 4](./images/mysql4.png "PREPARE interaction")
 
 The structure of the `Prepare` command is as follows:
 
@@ -1120,7 +1120,7 @@ func appendResultSetBinaryRow() {
 ## LOAD DATA LOCAL INFILE
 
 The `LOAD DATA LOCAL INFILE` command is used for loading data from a local file on the client into a MySQL database table. During the network interaction process, the client first sends a `LOAD DATA LOCAL INFILE` query command, which includes the file path, target table, delimiter, and other data. The server responds with a LOCAL INFILE Packet that contains the filename. After receiving this packet, the client begins to send the file data, with an empty packet indicating the end of the data. The overall interaction process is as follows:
-![Figure 6]( "LOAD DATA interaction")
+![Figure 6](./images/mysql6.png "LOAD DATA interaction")
 
 The protocol packet structure is as follows:
 

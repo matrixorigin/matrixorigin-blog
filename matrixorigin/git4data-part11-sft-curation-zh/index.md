@@ -7,8 +7,8 @@ keywords: ["Git4Data", "MatrixOne", "大模型", "SFT", "数据策展", "data cu
 publishTime: "2026-07-23T17:00:00+08:00"
 date: '2026-07-23'
 image:
-  "1": "/content/zh/shared/tech.png"
-  "235": "/content/zh/shared/tech.png"
+  "1": "/images/blog-covers/technical.png"
+  "235": "/images/blog-covers/technical.png"
 lang: zh
 status: published
 translations:

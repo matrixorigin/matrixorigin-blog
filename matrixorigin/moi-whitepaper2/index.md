@@ -28,11 +28,11 @@ translations:
   <h3>Your Data for Your AI</h3>
 </div>
 
-[Part One--Industry Status, Challenges, and Solution Architecture](/posts/moi-whitepaper1)
+[Part One--Industry Status, Challenges, and Solution Architecture](/blog/moi-whitepaper1)
 
-[Part Two--Detailed Technical Process of the Solution](/posts/moi-whitepaper2)
+[Part Two--Detailed Technical Process of the Solution](/blog/moi-whitepaper2)
 
-[Part Three--Industry Use Cases](/posts/moi-whitepaper3)
+[Part Three--Industry Use Cases](/blog/moi-whitepaper3)
 
 ## Detailed Technical Process of the Solution
 

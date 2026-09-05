@@ -64,4 +64,4 @@ MatrixOne 是一款面向未来的超融合异构云原生数据库，通过超�
 - 翻译
 - 代码
 
-具体的贡献方式参见 [MatrixOrigin 官网](https://docs.matrixorigin.cn/latest/MatrixOne/Contribution-Guide/How-to-Contribute/contribute-code/)，一起来 MatrixOne 的 GitHub 仓库共建共赢吧！
+具体的贡献方式参见 [MatrixOne 代码贡献文档](https://docs.matrixorigin.cn/mo/zh/latest/MatrixOne/Contribution-Guide/How-to-Contribute/contribute-code.html)，一起来 MatrixOne 的 GitHub 仓库共建共赢吧！

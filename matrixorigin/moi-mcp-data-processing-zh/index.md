@@ -40,7 +40,7 @@ status: published
 
 ### 1.1 MOI MCP 配置
 
-MOI MCP 【[MCP 使用说明 - MatrixOne Intelligence 文档](https://docs.matrixorigin.cn/zh/m1intelligence/MatrixOne-Intelligence/mcp/mcp/#1-mcp)】是与 MatrixOne Intelligence 平台交互的核心。公有云配置方式简单快捷，适合快速上手和大多数在线使用场景。
+MOI MCP 【[从 MCP 客户端调用 - MatrixOne Intelligence 5.0 文档](https://docs.matrixorigin.cn/moi/zh/5.0/reference/api/ai-studio/agents/agent-invocation/call-agent-from-mcp-client.html)】是与 MatrixOne Intelligence 平台交互的核心。公有云配置方式简单快捷，适合快速上手和大多数在线使用场景。
 
 #### **公有云配置**
 
@@ -184,7 +184,7 @@ _请注意_：请务必将 moi-key 的值替换为您目标工作区的实际 mo
 
 **输入指令:**
 
-帮我获取 https://docs.matrixorigin.cn/zh/m1intelligence/MatrixOne-Intelligence/mcp/mcp/#\_8 的数据，转为md格式，保存在本地，文件名为 moi_mcp手册.md。
+帮我获取 https://docs.matrixorigin.cn/moi/zh/5.0/reference/api/ai-studio/agents/agent-invocation/call-agent-from-mcp-client.html 的数据，转为md格式，保存在本地，文件名为 moi_mcp手册.md。
 
 MCP 客户端将调用 fetch 服务的 fetch_markdown 工具完成此任务。
 
