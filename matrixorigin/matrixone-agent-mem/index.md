@@ -18,7 +18,7 @@ date: '2026-03-17T17:00:00+08:00'
 lang: en
 status: published
 translations:
-  zh: martrixone-agent-mem-zh
+  zh: matrixone-agent-mem-zh
 ---
 
 # Released at GTC 2026: Memoria, the Industry's First "Git for Memory" Trusted Memory Framework for Agents

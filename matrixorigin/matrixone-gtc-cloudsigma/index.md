@@ -17,7 +17,7 @@ date: '2026-03-23T17:00:00+08:00'
 lang: en
 status: published
 translations:
-  zh: martrixone-gtc-cloudsogma-zh
+  zh: matrixone-gtc-cloudsigma-zh
 ---
 
 # GTC 2026: MatrixOne Intelligence Officially Launches Across Multiple Overseas Regions, Partnering with CloudSigma to Build the Global Sovereign Cloud DATA + AI Landscape

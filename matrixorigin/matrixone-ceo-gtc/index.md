@@ -17,7 +17,7 @@ date: '2026-03-17T17:00:00+08:00'
 lang: en
 status: published
 translations:
-  zh: martrixone-ceo-gtc-zh
+  zh: matrixone-ceo-gtc-zh
 ---
 
 # On the Ground at GTC 2026: What Jensen Huang Spent 20 Minutes Explaining, and Why the AI Data Foundation Matters

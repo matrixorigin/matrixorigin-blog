@@ -17,7 +17,7 @@ date: '2026-03-12T17:00:00+08:00'
 lang: en
 status: published
 translations:
-  zh: martrixorigin-gtc-factory-zh
+  zh: matrixorigin-gtc-factory-zh
 ---
 
 # MatrixOrigin Appears at NVIDIA GTC 2026, Joining Jinpan Technology to Reveal the Full-Stack Enablement Path for AI Factory

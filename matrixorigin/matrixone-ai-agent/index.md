@@ -17,7 +17,7 @@ date: '2026-03-23T17:00:00+08:00'
 lang: en
 status: published
 translations:
-  zh: martrixone-ai-agent-zh
+  zh: matrixone-ai-agent-zh
 ---
 
 # MOI Practice Vol. 1: I Used AI to Cut Employee Reimbursement from 1 Hour to 5 Minutes
