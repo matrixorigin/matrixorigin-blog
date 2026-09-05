@@ -3,7 +3,7 @@ title: MatrixOne 内核 1.2.0 版本正式发布啦！
 author: MatrixOrigin
 mail: lichuanzi@matrixorigin.cn
 description: >-
-  MatrixOne 是一款分布式超融合异构数据库，本次迭代更新的重点功能有：快照备份、快照备份、增量物理备份、CTAS、BITMAP
+  MatrixOne 是一款分布式超融合异构数据库，本次迭代更新的重点功能有：快照备份、增量物理备份、CTAS、BITMAP
   和向量索引。随着这些新功能的引入，MatrixOne 正逐步成为企业级数据管理和分析的理想选择。
 tags:
   - 新闻

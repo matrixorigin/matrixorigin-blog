@@ -5,7 +5,7 @@ mail: contact@matrixorigin.cn
 description: >-
   MatrixOne 使用 Golang 语言开发，而 Golang 程序在低 Kernel 内核的 Linux 系统中有概率会触发 Bug 导致应用
   Crash。CentOS 7 使用的内核版本为较为陈旧的 Kernel 3.10.0，为了让小伙伴们更加稳定的使用
-  MatrixOne，经过测试多轮回归测试验证，社区为大家整理了 CentOS 7 内核升级至 5.0+ 的简易方案。
+  MatrixOne，经过多轮回归测试验证，社区为大家整理了 CentOS 7 内核升级至 5.0+ 的简易方案。
 tags:
   - 新闻
 keywords:

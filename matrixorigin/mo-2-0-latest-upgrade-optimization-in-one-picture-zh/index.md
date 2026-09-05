@@ -2,7 +2,7 @@
 title: MatrixOne 2.0 最新升级优化一图详解
 author: MatrixOrigin
 mail: lichuanzi@matrixorigin.cn
-description: MatrixOne 2.0 全新版本带来多项升级优化，通过一图详解让您快速掌握功能亮点和性能提升，为数据处理带来更高效的体验。。
+description: MatrixOne 2.0 全新版本带来多项升级优化，通过一图详解让您快速掌握功能亮点和性能提升，为数据处理带来更高效的体验。
 tags:
   - 新闻
 keywords:

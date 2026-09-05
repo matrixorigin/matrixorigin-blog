@@ -1,5 +1,5 @@
 ---
-title: MatrixOne2.0.0：AI向量与高可用能力的重磅升级
+title: MatrixOne 2.0.0：AI 向量与高可用能力的重磅升级
 author: MatrixOrigin
 mail: wudi@matrixorigin.cn
 description: 介绍 MatrixOne 2.0.0 的存算分离架构、灵活部署方式，以及面向生成式 AI 的向量和全文检索能力。

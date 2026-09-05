@@ -40,7 +40,7 @@ MatrixOne 在 AI 搜索中的实践也是此次活动的亮点之一。团队展
 
 [**MatrixOne助力AI搜索**](https://mp.weixin.qq.com/s/iYz8IQtBFUDrxkK-SaR9BA)
 
-[**MatrixOne2.0.0 Demo演示**](https://mp.weixin.qq.com/s/iYz8IQtBFUDrxkK-SaR9BA)
+[**MatrixOne 2.0.0 Demo 演示**](https://mp.weixin.qq.com/s/iYz8IQtBFUDrxkK-SaR9BA)
 
 ### 5. 获取PPT
 

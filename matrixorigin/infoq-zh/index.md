@@ -1,8 +1,8 @@
 ---
-title: 矩阵起源荣膺"2024AI最佳实践案例"------多模态AI数据智能平台，让您的数据成就您的AI
+title: 矩阵起源荣膺“2024 AI 最佳实践案例”——多模态 AI 数据智能平台，让您的数据成就您的 AI
 author: MatrixOrigin
 mail: wudi@matrixorigin.cn
-description: 矩阵起源凭借"多模态AI数据智能平台解决方案"，荣获InfoQ2024中国技术力量年度榜单"AI最佳实践案例/方案"
+description: 矩阵起源凭借“多模态 AI 数据智能平台解决方案”，荣获 InfoQ 2024 中国技术力量年度榜单“AI 最佳实践案例/方案”
 tags:
   - 新闻
 keywords:
