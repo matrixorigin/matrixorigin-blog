@@ -26,11 +26,11 @@ status: published
   <h3>Your Data for Your AI</h3>
 </div>
 
-[第一部分--行业现状挑战及解决方案架构](/posts/moi-whitepaper1)
+[第一部分--行业现状挑战及解决方案架构](/blog/moi-whitepaper1-zh)
 
-[第二部分--方案技术流程详解](/posts/moi-whitepaper2)
+[第二部分--方案技术流程详解](/blog/moi-whitepaper2-zh)
 
-[第三部分--行业案例介绍](/posts/moi-whitepaper3)
+[第三部分--行业案例介绍](/blog/moi-whitepaper3-zh)
 
 ## 行业案例
 

@@ -20,7 +20,7 @@ lang: zh
 status: published
 ---
 
-上篇回顾 : [Agentic时代，我们需要什么样的数据工程（一） | MatrixOrigin](https://matrixorigin.cn/posts/agent-area-data-need)
+上篇回顾：[Agentic 时代，我们需要什么样的数据工程（一） | MatrixOrigin](/blog/agent-area-data-need-zh)
 
 ### Data-Centric AI思想渐成主流
 

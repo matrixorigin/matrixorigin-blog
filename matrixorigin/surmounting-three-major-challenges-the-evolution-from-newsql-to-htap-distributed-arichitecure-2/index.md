@@ -26,7 +26,7 @@ lang: en
 status: published
 ---
 
-From the insights gained in the [last article](/posts/surmounting-three-major-challenges-the-evolution-from-newsql-to-htap-distributed-arichitecure-1), which highlighted the challenges and limitations of MatrixOne's early architecture, we transition into this section, where the focus shifts to the transformative rebirth and strategic refinement of its structure.
+From the insights gained in the [last article](/blog/surmounting-three-major-challenges-the-evolution-from-newsql-to-htap-distributed-arichitecure-1), which highlighted the challenges and limitations of MatrixOne's early architecture, we transition into this section, where the focus shifts to the transformative rebirth and strategic refinement of its structure.
 
 ## 3. MatrixOne Reborn
 

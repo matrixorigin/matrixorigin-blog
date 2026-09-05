@@ -232,4 +232,4 @@ So, is it a question of Push or Pull? It appears to be, and yet it also does not
 
 [4] [Switch to Push-Based Execution Model by Mytherin · Pull Request #2393 · duckdb/duckdb (github.com)](https://github.com/duckdb/duckdb/pull/2393)
 
-[5] [ClickHouse Query Execution Pipeline](https://presentations.clickhouse.com/meetup24/5.%20Clickhouse%20query%20execution%20pipeline%20changes/#1)
+[5] [ClickHouse Query Execution Pipeline](https://presentations.clickhouse.com/2018-database-saturday-2/pipeline/)

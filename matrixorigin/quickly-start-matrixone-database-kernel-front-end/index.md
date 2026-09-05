@@ -251,7 +251,7 @@ addBinding(nodeID, ctx) {
 
 The bind process of the WHERE clause is: first split the filter condition with AND as the separator, and then bind each expression recursively, for example, the filter condition A AND B AND C can be split into A, B and C, and then bind(A), bind(B), bind(C) respectively; After the filter binds, the statement containing the subquery needs to be flattened to convert the subquery into an equivalent join statement. Because the execution efficiency of the subquery is extremely low, it will slow down the speed of the entire query, and converting it to a join can greatly improve system performance.
 
-The problem of how to convert a subquery to a join is a bit more complex, so you can refer to the [paper](https://github.com/matrixorigin/docs/blob/main/readings/subqueries-sigmod01.pdf) if you are interested.
+The problem of how to convert a subquery to a join is a bit more complex, so you can refer to the [paper](https://sigmodrecord.org/publications/sigmodRecord/0106/pdfs/Orthogonal%20Optimization%20of%20Subqueries%20and%20Aggregation.pdf) if you are interested.
 
 The HAVING clause, like the WHERE clause, acts as a filter, but syntactically does not support subqueries. The bind process is the same as the first half of WHERE, so I won't go into that.
 

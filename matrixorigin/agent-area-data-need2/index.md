@@ -22,7 +22,7 @@ translations:
   zh: agent-area-data-need2-zh
 ---
 
-Previous article: [What Kind of Data Engineering Do We Need in the Agentic Era? (Part 1) | MatrixOrigin](https://matrixorigin.cn/posts/agent-area-data-need)
+Previous article: [What Kind of Data Engineering Do We Need in the Agentic Era? (Part 1) | MatrixOrigin](/blog/agent-area-data-need)
 
 ### Data-Centric AI Is Becoming Mainstream
 

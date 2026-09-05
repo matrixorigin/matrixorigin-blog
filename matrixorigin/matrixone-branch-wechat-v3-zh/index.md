@@ -304,8 +304,8 @@ lines terminated by '\n';
 
 - [MatrixOrigin, “AI 时代的数据管理新范式：Git for Data 让数据工程化”, InfoQ 写作社区](https://xie.infoq.cn/article/50d702e4a50b8168ea0a71fb5#:~:text=1)
 - [“Git for Data: 像 Git 一样管理你的数据”, InfoQ 中国](https://www.infoq.cn/article/8qjz1tqen5qngx3g8ofu#:~:text=MatrixOne%20%E5%B7%B2%E5%85%B7%E5%A4%87%20Git%20for%20Data,%E7%9A%84%E6%A0%B8%E5%BF%83%E8%83%BD%E5%8A%9B%EF%BC%8C%E5%8C%85%E6%8B%AC%EF%BC%9A)
-- [MatrixOne CREATE SNAPSHOT](https://docs.matrixorigin.cn/v25.3.0.0/MatrixOne/Reference/SQL-Reference/Data-Definition-Language/create-snapshot/)
-- [MatrixOne RESTORE SNAPSHOT](https://docs.matrixorigin.cn/v25.3.0.0/MatrixOne/Reference/SQL-Reference/Data-Definition-Language/restore-snapshot/)
-- [MatrixOne LOAD DATA](https://docs.matrixorigin.cn/en/dev/MatrixOne/Reference/SQL-Reference/Data-Manipulation-Language/load-data-infile/)
+- [MatrixOne CREATE SNAPSHOT](https://docs.matrixorigin.cn/mo/zh/latest/MatrixOne/Reference/SQL-Reference/Data-Definition-Language/create-snapshot.html)
+- [MatrixOne RESTORE SNAPSHOT](https://docs.matrixorigin.cn/mo/zh/latest/MatrixOne/Reference/SQL-Reference/Data-Definition-Language/restore-snapshot.html)
+- [MatrixOne LOAD DATA](https://docs.matrixorigin.cn/mo/zh/latest/MatrixOne/Reference/SQL-Reference/Data-Manipulation-Language/load-data-infile.html)
 - [PlanetScale Docs: Data Branching®](https://planetscale.com/docs/vitess/schema-changes/data-branching)
 - [lakeFS: Data Collaboration & Branching](https://lakefs.io/)

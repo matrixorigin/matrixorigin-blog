@@ -42,7 +42,7 @@ Before starting the automated process, we need to configure all required MCP ser
 
 ### 1.1 MOI MCP Configuration
 
-MOI MCP ([MCP User Guide - MatrixOne Intelligence Documentation](https://docs.matrixorigin.cn/zh/m1intelligence/MatrixOne-Intelligence/mcp/mcp/#1-mcp)) is the core interface for interacting with the MatrixOne Intelligence platform. Public-cloud configuration is simple and fast, making it suitable for quick onboarding and most online use cases.
+MOI MCP ([Calling from an MCP Client - MatrixOne Intelligence 5.0 Documentation](https://docs.matrixorigin.cn/moi/en/5.0/reference/api/ai-studio/agents/agent-invocation/call-agent-from-mcp-client.html)) is the core interface for interacting with the MatrixOne Intelligence platform. Public-cloud configuration is simple and fast, making it suitable for quick onboarding and most online use cases.
 
 #### **Public-Cloud Configuration**
 
@@ -186,7 +186,7 @@ Use the fetch MCP tool to fetch a specified page from the MOI user manual, conve
 
 **Input instruction:**
 
-Fetch the data from https://docs.matrixorigin.cn/zh/m1intelligence/MatrixOne-Intelligence/mcp/mcp/#\_8, convert it to Markdown format, and save it locally as `moi_mcp_manual.md`.
+Fetch the data from https://docs.matrixorigin.cn/moi/en/5.0/reference/api/ai-studio/agents/agent-invocation/call-agent-from-mcp-client.html, convert it to Markdown format, and save it locally as `moi_mcp_manual.md`.
 
 The MCP client will call the `fetch_markdown` tool from the fetch service to complete this task.
 
