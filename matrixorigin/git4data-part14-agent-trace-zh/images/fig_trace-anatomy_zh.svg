@@ -1,0 +1,69 @@
+<svg viewBox="0 0 1200 500" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system,'Segoe UI',Roboto,'PingFang SC','Microsoft YaHei',Arial,sans-serif">
+  <defs>
+    <pattern id="g" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0V40" fill="none" stroke="#161B22" stroke-width="1"/></pattern>
+  </defs>
+  <rect width="1200" height="500" fill="#0D1117"/><rect width="1200" height="500" fill="url(#g)"/>
+  <text x="44" y="40" fill="#E6EDF3" font-size="22" font-weight="700">同一次运行：日志给你五行文本，Trace 给你一棵有结构的树</text>
+
+  <!-- LOG side -->
+  <rect x="44" y="66" width="330" height="196" rx="10" fill="#161B22" stroke="#30363D" stroke-width="1.3"/>
+  <text x="64" y="90" fill="#9DA7B3" font-size="12.5" font-weight="700">Log · 扁平事件流</text>
+  <text x="64" y="116" fill="#6E7681" font-size="10" font-family="ui-monospace,monospace">12:04:01 INFO  retrieval done n=5</text>
+  <text x="64" y="134" fill="#6E7681" font-size="10" font-family="ui-monospace,monospace">12:04:01 INFO  llm call tokens=420</text>
+  <text x="64" y="152" fill="#F85149" font-size="10" font-family="ui-monospace,monospace">12:04:03 ERROR search_kb timeout</text>
+  <text x="64" y="170" fill="#6E7681" font-size="10" font-family="ui-monospace,monospace">12:04:03 INFO  llm call tokens=510</text>
+  <text x="64" y="188" fill="#F85149" font-size="10" font-family="ui-monospace,monospace">12:04:03 WARN  search_kb empty</text>
+  <text x="64" y="220" fill="#F0883E" font-size="10.5">谁调用了谁、哪一步占了多少时间、</text>
+  <text x="64" y="238" fill="#F0883E" font-size="10.5">token 花在哪——只存在于人的脑子里。</text>
+
+  <text x="392" y="170" fill="#6E7681" font-size="24" text-anchor="middle">▶</text>
+
+  <!-- TRACE side -->
+  <rect x="410" y="66" width="746" height="196" rx="10" fill="#10231A" stroke="#3FB950" stroke-width="1.5"/>
+  <text x="430" y="90" fill="#3FB950" font-size="12.5" font-weight="700">Trace · 一次执行的树</text>
+  <text x="560" y="90" fill="#6E7681" font-size="10.5">run #100387　invoke_agent「客服助手 v2」　2.9s · 1,645 tokens · failed</text>
+
+  <g font-size="10.5" font-family="ui-monospace,monospace">
+    <text x="440" y="116" fill="#9DA7B3">├─ retrieval</text>
+    <text x="586" y="116" fill="#E6EDF3">取回相关记忆</text>
+    <text x="736" y="116" fill="#6E7681">120ms</text>
+    <text x="812" y="116" fill="#6E7681">5 条</text>
+
+    <text x="440" y="140" fill="#9DA7B3">├─ llm  #1</text>
+    <text x="586" y="140" fill="#E6EDF3">规划下一步</text>
+    <text x="736" y="140" fill="#6E7681">610ms</text>
+    <text x="812" y="140" fill="#79C0FF">420 tokens</text>
+
+    <text x="440" y="164" fill="#9DA7B3">├─ tool #1</text>
+    <text x="586" y="164" fill="#E6EDF3">search_kb(...)</text>
+    <text x="728" y="164" fill="#F85149">1,900ms</text>
+    <text x="812" y="164" fill="#F85149">✗ timeout</text>
+    <text x="924" y="164" fill="#F0883E" font-size="10">← 2.9s 里的 1.9s 卡在这</text>
+
+    <text x="440" y="188" fill="#9DA7B3">├─ llm  #2</text>
+    <text x="586" y="188" fill="#E6EDF3">换个说法重试</text>
+    <text x="736" y="188" fill="#6E7681">380ms</text>
+    <text x="812" y="188" fill="#79C0FF">510 tokens</text>
+
+    <text x="440" y="212" fill="#9DA7B3">└─ tool #2</text>
+    <text x="586" y="212" fill="#E6EDF3">search_kb(...)</text>
+    <text x="744" y="212" fill="#6E7681">80ms</text>
+    <text x="812" y="212" fill="#F85149">✗ empty</text>
+  </g>
+  <text x="430" y="240" fill="#3FB950" font-size="10.5">父子关系、耗时、token、成败都是显式的字段——所以机器可以直接聚合、比较、归因。</text>
+
+  <!-- differences -->
+  <rect x="44" y="278" width="1112" height="92" rx="10" fill="#0F1622" stroke="#21262D" stroke-width="1.2"/>
+  <text x="62" y="300" fill="#9DA7B3" font-size="12" font-weight="700">Agent 的 Trace 和微服务的 Trace，有三个不同：</text>
+  <text x="62" y="324" fill="#9DA7B3" font-size="11">① 同样的输入不保证同样的树——同一道题可能一次两步、一次五步。所以单看一条意义有限，要在一批 trace 上做统计。</text>
+  <text x="62" y="344" fill="#9DA7B3" font-size="11">② 一步的成本差异极大——一次 LLM 调用几百毫秒到几十秒，本地函数是微秒级。成本高度集中在少数几个 span 上。</text>
+  <text x="62" y="364" fill="#F0883E" font-size="11">③ 行为不只由代码决定：一次运行的行为 = 代码/模型 × 配置 × 提示词 × <tspan font-weight="700">它当时读到的记忆</tspan> × 输入。</text>
+
+  <!-- gap -->
+  <rect x="44" y="386" width="1112" height="76" rx="10" fill="#161B22" stroke="#F85149" stroke-width="1.4"/>
+  <text x="62" y="410" fill="#F85149" font-size="12.5" font-weight="700">于是留下一个所有 trace 方案共同的缺口：</text>
+  <text x="62" y="434" fill="#E6EDF3" font-size="11.5">它们都在记录 Agent <tspan font-weight="700">做了什么</tspan>，但都没有记录<tspan font-weight="700">它当时读到的世界是什么样</tspan>——而记忆和配置一直在变。</text>
+  <text x="62" y="454" fill="#6E7681" font-size="11">补法：给评测集和记忆打快照，每次运行记下 memory_snapshot / config_version，事后时间旅行读回那一版。</text>
+
+  <text x="44" y="486" fill="#6E7681" font-size="11">采集口径可对齐 OpenTelemetry GenAI 语义约定（invoke_agent / plan / execute_tool / retrieval，gen_ai.* 属性）——注意该约定目前仍标记为 Development。</text>
+</svg>
