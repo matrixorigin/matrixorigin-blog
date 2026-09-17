@@ -1,0 +1,83 @@
+<svg viewBox="0 0 1200 470" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system,'Segoe UI',Roboto,'PingFang SC','Microsoft YaHei',Arial,sans-serif">
+  <defs>
+    <pattern id="g" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0V40" fill="none" stroke="#161B22" stroke-width="1"/></pattern>
+  </defs>
+  <rect width="1200" height="470" fill="#0D1117"/><rect width="1200" height="470" fill="url(#g)"/>
+  <text x="44" y="40" fill="#E6EDF3" font-size="22" font-weight="700">开发者的分支，和 Agent 的分支不是同一种形状</text>
+  <text x="44" y="64" fill="#F0883E" font-size="12.5" font-weight="700">BranchBench 的五个负载，就是照着右边这些形状设计的</text>
+
+  <!-- developer -->
+  <rect x="44" y="86" width="250" height="180" rx="10" fill="#161B22" stroke="#30363D" stroke-width="1.4"/>
+  <text x="64" y="110" fill="#9DA7B3" font-size="12.5" font-weight="700">开发者</text>
+  <circle cx="80" cy="150" r="6" fill="#79C0FF"/><text x="80" y="176" fill="#6E7681" font-size="9.5" text-anchor="middle">main</text>
+  <line x1="86" y1="150" x2="164" y2="132" stroke="#6E7681" stroke-width="1.4"/>
+  <line x1="86" y1="150" x2="164" y2="168" stroke="#6E7681" stroke-width="1.4"/>
+  <circle cx="170" cy="130" r="6" fill="#3FB950"/><circle cx="170" cy="170" r="6" fill="#3FB950"/>
+  <text x="186" y="134" fill="#9DA7B3" font-size="10">feature/…</text>
+  <text x="186" y="174" fill="#9DA7B3" font-size="10">staging</text>
+  <text x="64" y="212" fill="#6E7681" font-size="10.5">几条 · 活几天到几周</text>
+  <text x="64" y="230" fill="#6E7681" font-size="10.5">人手动创建，人按回车</text>
+  <text x="64" y="252" fill="#3FB950" font-size="10.5" font-weight="700">建分支慢一秒钟，无所谓</text>
+
+  <!-- agent shapes -->
+  <text x="330" y="106" fill="#9DA7B3" font-size="12.5" font-weight="700">Agent：一个任务可能跑上千次 branch → mutate → evaluate → prune</text>
+
+  <!-- deep narrow -->
+  <rect x="330" y="118" width="196" height="148" rx="10" fill="#161B22" stroke="#A371F7" stroke-width="1.4"/>
+  <text x="346" y="140" fill="#A371F7" font-size="11.5" font-weight="700">深而窄 · MCTS</text>
+  <g stroke="#6E7681" stroke-width="1.2">
+    <line x1="428" y1="156" x2="404" y2="176"/><line x1="428" y1="156" x2="452" y2="176"/>
+    <line x1="404" y1="176" x2="388" y2="196"/><line x1="404" y1="176" x2="420" y2="196"/>
+    <line x1="388" y1="196" x2="380" y2="216"/><line x1="420" y1="196" x2="428" y2="216"/>
+  </g>
+  <g fill="#A371F7"><circle cx="428" cy="156" r="4"/><circle cx="404" cy="176" r="4"/><circle cx="452" cy="176" r="4"/><circle cx="388" cy="196" r="4"/><circle cx="420" cy="196" r="4"/><circle cx="380" cy="216" r="4"/><circle cx="428" cy="216" r="4"/></g>
+  <text x="346" y="240" fill="#6E7681" font-size="10">数十至上百层，每层 3–10 个子节点</text>
+  <text x="346" y="256" fill="#6E7681" font-size="10">压力：分支元数据规模、并发活跃分支数</text>
+
+  <!-- wide flat -->
+  <rect x="542" y="118" width="196" height="148" rx="10" fill="#161B22" stroke="#F0883E" stroke-width="1.4"/>
+  <text x="558" y="140" fill="#F0883E" font-size="11.5" font-weight="700">极宽极浅 · 模拟 / 故障复现</text>
+  <g stroke="#6E7681" stroke-width="1.1">
+    <line x1="640" y1="158" x2="574" y2="196"/><line x1="640" y1="158" x2="596" y2="196"/><line x1="640" y1="158" x2="618" y2="196"/>
+    <line x1="640" y1="158" x2="640" y2="196"/><line x1="640" y1="158" x2="662" y2="196"/><line x1="640" y1="158" x2="684" y2="196"/><line x1="640" y1="158" x2="706" y2="196"/>
+  </g>
+  <circle cx="640" cy="158" r="4.5" fill="#F0883E"/>
+  <g fill="#F0883E"><circle cx="574" cy="199" r="3.5"/><circle cx="596" cy="199" r="3.5"/><circle cx="618" cy="199" r="3.5"/><circle cx="640" cy="199" r="3.5"/><circle cx="662" cy="199" r="3.5"/><circle cx="684" cy="199" r="3.5"/><circle cx="706" cy="199" r="3.5"/></g>
+  <text x="640" y="218" fill="#6E7681" font-size="9.5" text-anchor="middle">…一次 fork 出 1000 条…</text>
+  <text x="558" y="240" fill="#6E7681" font-size="10">跑完一次跨分支聚合，然后全部丢弃</text>
+  <text x="558" y="256" fill="#6E7681" font-size="10">压力：批量建分支、聚合写吞吐、垃圾回收</text>
+
+  <!-- bushy -->
+  <rect x="754" y="118" width="196" height="148" rx="10" fill="#161B22" stroke="#3FB950" stroke-width="1.4"/>
+  <text x="770" y="140" fill="#3FB950" font-size="11.5" font-weight="700">中等丛生 · 软件工程</text>
+  <g stroke="#6E7681" stroke-width="1.2">
+    <line x1="852" y1="158" x2="812" y2="184"/><line x1="852" y1="158" x2="852" y2="184"/><line x1="852" y1="158" x2="892" y2="184"/>
+    <line x1="812" y1="184" x2="796" y2="210"/><line x1="812" y1="184" x2="828" y2="210"/>
+    <line x1="892" y1="184" x2="880" y2="210"/>
+  </g>
+  <g fill="#3FB950"><circle cx="852" cy="158" r="4"/><circle cx="812" cy="184" r="4"/><circle cx="852" cy="184" r="4"/><circle cx="892" cy="184" r="4"/><circle cx="796" cy="210" r="4"/><circle cx="828" cy="210" r="4"/><circle cx="880" cy="210" r="4"/></g>
+  <text x="770" y="240" fill="#6E7681" font-size="10">测试没全过之前，整次迭代都是投机的</text>
+  <text x="770" y="256" fill="#6E7681" font-size="10">压力：schema 变更 + 回填 + 读密集测试</text>
+
+  <!-- wide shallow -->
+  <rect x="966" y="118" width="190" height="148" rx="10" fill="#161B22" stroke="#79C0FF" stroke-width="1.4"/>
+  <text x="982" y="140" fill="#79C0FF" font-size="11.5" font-weight="700">宽而浅 · 数据 curation</text>
+  <g stroke="#6E7681" stroke-width="1.2">
+    <line x1="1060" y1="158" x2="1006" y2="182"/><line x1="1060" y1="158" x2="1042" y2="182"/><line x1="1060" y1="158" x2="1078" y2="182"/><line x1="1060" y1="158" x2="1114" y2="182"/>
+    <line x1="1006" y1="182" x2="998" y2="206"/><line x1="1006" y1="182" x2="1014" y2="206"/>
+    <line x1="1114" y1="182" x2="1106" y2="206"/><line x1="1114" y1="182" x2="1122" y2="206"/>
+  </g>
+  <g fill="#79C0FF"><circle cx="1060" cy="158" r="4"/><circle cx="1006" cy="182" r="4"/><circle cx="1042" cy="182" r="4"/><circle cx="1078" cy="182" r="4"/><circle cx="1114" cy="182" r="4"/><circle cx="998" cy="206" r="3.5"/><circle cx="1014" cy="206" r="3.5"/><circle cx="1106" cy="206" r="3.5"/><circle cx="1122" cy="206" r="3.5"/></g>
+  <text x="982" y="240" fill="#6E7681" font-size="10">一个异常一条分支，横向比较哪个方案好</text>
+  <text x="982" y="256" fill="#6E7681" font-size="10">压力：跨分支读与比较</text>
+
+  <!-- bottom band -->
+  <rect x="44" y="290" width="1112" height="94" rx="10" fill="#0F1622" stroke="#21262D" stroke-width="1.2"/>
+  <text x="62" y="314" fill="#9DA7B3" font-size="12" font-weight="700">变的不只是数量，还有三件事：</text>
+  <text x="62" y="338" fill="#9DA7B3" font-size="11.5">① 变更不只是逻辑的（UPDATE），还有物理的（CREATE INDEX、物化结构、系统配置）——因为 Agent 评估的往往就是「这个物理设计好不好」。</text>
+  <text x="62" y="358" fill="#9DA7B3" font-size="11.5">② 评估经常是跨分支的：「哪个清洗方案最好」「这一千次模拟的分布长什么样」——答案不在任何单个分支里。</text>
+  <text x="62" y="378" fill="#9DA7B3" font-size="11.5">③ 分支生命周期成了主要开销：机器每秒建几条，创建延迟直接决定单位时间内能探索多少个假设。</text>
+
+  <text x="44" y="416" fill="#F85149" font-size="12.5" font-weight="700">BranchBench 的结论：五个负载、2 小时超时，被测的六个系统没有一个跑完。</text>
+  <text x="44" y="440" fill="#6E7681" font-size="11.5">被测系统：Neon · DoltgreSQL · TigerData · Xata · PostgreSQL 事务/savepoint · PostgreSQL 18 file-copy clone。（MatrixOne 不在被测名单内。）</text>
+</svg>
