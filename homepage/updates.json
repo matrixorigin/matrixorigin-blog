@@ -158,22 +158,22 @@
     },
     {
       "id": "matrixnext-2026",
-      "enabled": false,
+      "enabled": true,
       "order": 50,
-      "variant": "image",
+      "variant": "split",
       "startsAt": "2026-09-01",
-      "endsAt": "2026-10-17",
+      "endsAt": "2026-11-14",
       "content": {
         "zh": {
           "tag": "品牌活动",
-          "date": "2026.10.17",
+          "date": "2026.11.14",
           "title": "MatrixNEXT 2026：与 AI 创造者，共建未来",
-          "desc": "一场从真实问题出发的 AI Builder Festival，把想法做成能运行、能展示、能继续成长的智能体。",
-          "cta": "了解活动并报名"
+          "desc": "一场从真实问题出发的 AI Builder 赛事，把想法做成能运行、能展示、能继续成长的智能体。",
+          "cta": "了解活动详情"
         },
         "en": {
           "tag": "Community Event",
-          "date": "Oct 17, 2026",
+          "date": "Nov 14, 2026",
           "title": "MatrixNEXT 2026: where AI builders build AI",
           "desc": "An AI Builder Festival grounded in real problems: turn an idea into an agent that runs, demonstrates value, and keeps growing.",
           "cta": "Explore the event"
@@ -186,7 +186,7 @@
           "zh": "MatrixNEXT 2026 AI Builder Festival 的未来构建空间",
           "en": "Futuristic building space for the MatrixNEXT 2026 AI Builder Festival"
         },
-        "objectPosition": "center"
+        "objectPosition": "right center"
       },
       "destination": {
         "kind": "page",
