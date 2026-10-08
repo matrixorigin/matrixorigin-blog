@@ -158,8 +158,8 @@
     },
     {
       "id": "matrixnext-2026",
-      "enabled": false,
-      "order": 50,
+      "enabled": true,
+      "order": 0,
       "variant": "split",
       "startsAt": "2026-09-01",
       "endsAt": "2026-11-14",
