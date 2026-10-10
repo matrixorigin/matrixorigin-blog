@@ -10,7 +10,7 @@ image:
   "1": "/images/blog-covers/technical.png"
   "235": "/images/blog-covers/technical.png"
 lang: zh
-status: draft
+status: published
 ---
 
 # 73.8 亿次 Commit 之后，Agent 改错的数据谁来收拾？
